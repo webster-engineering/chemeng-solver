@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit Operations Wizard - Webster Engineering</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #1e1e2e;
+            --bg-secondary: #181825;
+            --bg-card: #313244;
+            --text-primary: #cdd6f4;
+            --text-secondary: #a6adc8;
+            --accent: #89b4fa;
+            --accent-hover: #b4befe;
+            --success: #a6e3a1;
+            --warning: #f9e2af;
+            --border: #45475a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--bg-secondary);
+            padding: 20px 40px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.3rem;
+            color: var(--accent);
+        }
+
+        .back-link {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .wizard-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .wizard-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .wizard-subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 25px;
+        }
+
+        .step-indicator {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .step {
+            flex: 1;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+        }
+
+        .step.active {
+            background: var(--accent);
+        }
+
+        .step.completed {
+            background: var(--success);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            color: var(--bg-primary);
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .equipment-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .equipment-option {
+            background: var(--bg-primary);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .equipment-option:hover {
+            border-color: var(--accent);
+        }
+
+        .equipment-option.selected {
+            border-color: var(--success);
+            background: rgba(166, 227, 161, 0.1);
+        }
+
+        .equipment-option .icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .equipment-option .name {
+            font-weight: 600;
+        }
+
+        .equipment-option .desc {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        .result-card {
+            background: var(--bg-primary);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .result-title {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .result-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .result-unit {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-left: 5px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .info-box {
+            background: rgba(137, 180, 250, 0.1);
+            border-left: 4px solid var(--accent);
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>⚙️ Unit Operations Wizard</h1>
+        <a href="/" class="back-link">← Back to Solver</a>
+    </div>
+
+    <div class="container">
+        <!-- Step 1: Select Equipment -->
+        <div id="step1" class="wizard-card">
+            <div class="step-indicator">
+                <div class="step active"></div>
+                <div class="step"></div>
+                <div class="step"></div>
+                <div class="step"></div>
+            </div>
+
+            <h2 class="wizard-title">Select Unit Operation</h2>
+            <p class="wizard-subtitle">Choose the equipment you want to design</p>
+
+            <div class="equipment-grid">
+                <div class="equipment-option" onclick="selectEquipment('pump')">
+                    <div class="icon">⊛</div>
+                    <div class="name">Centrifugal Pump</div>
+                    <div class="desc">Size pump and motor</div>
+                </div>
+                <div class="equipment-option" onclick="selectEquipment('hx')">
+                    <div class="icon">⊞</div>
+                    <div class="name">Heat Exchanger</div>
+                    <div class="desc">Shell & tube design</div>
+                </div>
+                <div class="equipment-option" onclick="selectEquipment('vessel')">
+                    <div class="icon">🛢️</div>
+                    <div class="name">Pressure Vessel</div>
+                    <div class="desc">Tank/vessel sizing</div>
+                </div>
+                <div class="equipment-option" onclick="selectEquipment('column')">
+                    <div class="icon">🗼</div>
+                    <div class="name">Distillation Column</div>
+                    <div class="desc">Stages and reflux</div>
+                </div>
+                <div class="equipment-option" onclick="selectEquipment('relief')">
+                    <div class="icon">⧖</div>
+                    <div class="name">Relief Valve</div>
+                    <div class="desc">API 520 sizing</div>
+                </div>
+                <div class="equipment-option" onclick="selectEquipment('pipe')">
+                    <div class="icon">─</div>
+                    <div class="name">Pipe Sizing</div>
+                    <div class="desc">Diameter and ΔP</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Enter Parameters (dynamic) -->
+        <div id="step2" class="wizard-card hidden">
+            <div class="step-indicator">
+                <div class="step completed"></div>
+                <div class="step active"></div>
+                <div class="step"></div>
+                <div class="step"></div>
+            </div>
+
+            <h2 class="wizard-title" id="step2Title">Enter Parameters</h2>
+            <p class="wizard-subtitle" id="step2Subtitle"></p>
+
+            <div id="parameterForm"></div>
+
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="goToStep(1)">← Back</button>
+                <button class="btn btn-primary" onclick="calculateResults()">Calculate →</button>
+            </div>
+        </div>
+
+        <!-- Step 3: Results -->
+        <div id="step3" class="wizard-card hidden">
+            <div class="step-indicator">
+                <div class="step completed"></div>
+                <div class="step completed"></div>
+                <div class="step active"></div>
+                <div class="step"></div>
+            </div>
+
+            <h2 class="wizard-title">Design Results</h2>
+            <p class="wizard-subtitle">Calculated specifications for your equipment</p>
+
+            <div id="resultsContainer"></div>
+
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="goToStep(2)">← Modify Inputs</button>
+                <button class="btn btn-primary" onclick="goToStep(4)">Specifications →</button>
+            </div>
+        </div>
+
+        <!-- Step 4: Summary/Spec Sheet -->
+        <div id="step4" class="wizard-card hidden">
+            <div class="step-indicator">
+                <div class="step completed"></div>
+                <div class="step completed"></div>
+                <div class="step completed"></div>
+                <div class="step active"></div>
+            </div>
+
+            <h2 class="wizard-title">Equipment Data Sheet</h2>
+            <p class="wizard-subtitle">Complete specifications ready for procurement</p>
+
+            <div id="specSheet"></div>
+
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="goToStep(1)">Start New Design</button>
+                <button class="btn btn-primary" onclick="exportSpec()">Export PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedEquipment = null;
+        let inputData = {};
+        let results = {};
+
+        const equipmentConfigs = {
+            pump: {
+                title: "Centrifugal Pump Design",
+                subtitle: "Enter process requirements for pump sizing",
+                params: [
+                    { id: 'flow', label: 'Flow Rate', unit: 'gpm', value: 100 },
+                    { id: 'head', label: 'Total Dynamic Head', unit: 'ft', value: 150 },
+                    { id: 'sg', label: 'Specific Gravity', unit: '', value: 1.0 },
+                    { id: 'viscosity', label: 'Viscosity', unit: 'cP', value: 1.0 },
+                    { id: 'npsha', label: 'NPSH Available', unit: 'ft', value: 20 },
+                    { id: 'efficiency', label: 'Pump Efficiency (est)', unit: '%', value: 70 },
+                ],
+                calculate: function (d) {
+                    const hp = (d.flow * d.head * d.sg) / (3960 * d.efficiency / 100);
+                    const motorHp = Math.ceil(hp * 1.15 / 5) * 5; // Next std size
+                    const ns = 1750 * Math.sqrt(d.flow) / Math.pow(d.head, 0.75);
+                    return {
+                        'Hydraulic Power': { value: hp.toFixed(2), unit: 'HP' },
+                        'Motor Size (min)': { value: motorHp, unit: 'HP' },
+                        'Specific Speed': { value: ns.toFixed(0), unit: '' },
+                        'Pump Type': { value: ns < 1500 ? 'Radial' : ns < 4000 ? 'Mixed Flow' : 'Axial', unit: '' },
+                        'NPSH Margin': { value: (d.npsha - 10).toFixed(1), unit: 'ft (est)' },
+                    };
+                }
+            },
+            hx: {
+                title: "Heat Exchanger Design",
+                subtitle: "Enter thermal duty requirements",
+                params: [
+                    { id: 'duty', label: 'Heat Duty', unit: 'BTU/hr', value: 1000000 },
+                    { id: 't1_in', label: 'Hot Side Inlet Temp', unit: '°F', value: 200 },
+                    { id: 't1_out', label: 'Hot Side Outlet Temp', unit: '°F', value: 150 },
+                    { id: 't2_in', label: 'Cold Side Inlet Temp', unit: '°F', value: 80 },
+                    { id: 't2_out', label: 'Cold Side Outlet Temp', unit: '°F', value: 120 },
+                    { id: 'U', label: 'Overall U (estimated)', unit: 'BTU/hr-ft²-°F', value: 100 },
+                ],
+                calculate: function (d) {
+                    const dt1 = d.t1_in - d.t2_out;
+                    const dt2 = d.t1_out - d.t2_in;
+                    const lmtd = (dt1 - dt2) / Math.log(dt1 / dt2);
+                    const area = d.duty / (d.U * lmtd);
+                    const tubes = Math.ceil(area / (Math.PI * 0.75 / 12 * 16)); // 3/4" x 16ft
+                    return {
+                        'LMTD': { value: lmtd.toFixed(1), unit: '°F' },
+                        'Required Area': { value: area.toFixed(0), unit: 'ft²' },
+                        'Est. Tube Count': { value: tubes, unit: '(3/4" x 16ft)' },
+                        'Shell Diameter': { value: Math.ceil(Math.sqrt(tubes) * 1.5), unit: 'in (approx)' },
+                    };
+                }
+            },
+            vessel: {
+                title: "Pressure Vessel Design",
+                subtitle: "Enter vessel requirements",
+                params: [
+                    { id: 'volume', label: 'Required Volume', unit: 'gal', value: 1000 },
+                    { id: 'pressure', label: 'Design Pressure', unit: 'psig', value: 150 },
+                    { id: 'temp', label: 'Design Temperature', unit: '°F', value: 300 },
+                    { id: 'material', label: 'Material (1=CS, 2=SS)', unit: '', value: 1 },
+                    { id: 'corr_allow', label: 'Corrosion Allowance', unit: 'in', value: 0.125 },
+                    { id: 'l_d_ratio', label: 'L/D Ratio', unit: '', value: 3 },
+                ],
+                calculate: function (d) {
+                    const vol_ft3 = d.volume / 7.48;
+                    const D = Math.pow(4 * vol_ft3 / (Math.PI * d.l_d_ratio), 1 / 3);
+                    const L = D * d.l_d_ratio;
+                    const S = d.material == 1 ? 20000 : 20000; // Allowable stress
+                    const E = 0.85; // Joint efficiency
+                    const t = (d.pressure * D * 12 / 2) / (S * E - 0.6 * d.pressure) + d.corr_allow;
+                    return {
+                        'Diameter': { value: (D * 12).toFixed(1), unit: 'in' },
+                        'Length (T-T)': { value: (L).toFixed(1), unit: 'ft' },
+                        'Wall Thickness': { value: t.toFixed(3), unit: 'in' },
+                        'Empty Weight': { value: Math.round(D * L * 50 * t * 4), unit: 'lb (approx)' },
+                    };
+                }
+            },
+            column: {
+                title: "Distillation Column Design",
+                subtitle: "Enter separation requirements",
+                params: [
+                    { id: 'xd', label: 'Distillate Purity (LK)', unit: 'mol frac', value: 0.95 },
+                    { id: 'xb', label: 'Bottoms Purity (LK)', unit: 'mol frac', value: 0.05 },
+                    { id: 'alpha', label: 'Relative Volatility', unit: '', value: 2.5 },
+                    { id: 'feed', label: 'Feed Rate', unit: 'lbmol/hr', value: 100 },
+                    { id: 'reflux_mult', label: 'R/Rmin Multiplier', unit: '', value: 1.2 },
+                ],
+                calculate: function (d) {
+                    const nmin = Math.log((d.xd / (1 - d.xd)) * ((1 - d.xb) / d.xb)) / Math.log(d.alpha);
+                    const rmin = 1 / (d.alpha - 1);
+                    const r = rmin * d.reflux_mult;
+                    const x = (r - rmin) / (r + 1);
+                    const y = 0.75 * (1 - Math.pow(x, 0.5668));
+                    const n = (y + nmin + y * nmin) / (1 - y);
+                    return {
+                        'Min Stages (Fenske)': { value: nmin.toFixed(1), unit: '' },
+                        'Min Reflux (Rmin)': { value: rmin.toFixed(2), unit: '' },
+                        'Operating Reflux': { value: r.toFixed(2), unit: '' },
+                        'Theoretical Stages': { value: n.toFixed(1), unit: '' },
+                        'Actual Trays (η=0.7)': { value: Math.ceil(n / 0.7), unit: '' },
+                    };
+                }
+            },
+            relief: {
+                title: "Relief Valve Sizing",
+                subtitle: "Enter relief conditions (API 520)",
+                params: [
+                    { id: 'flow', label: 'Required Relief Flow', unit: 'lb/hr', value: 10000 },
+                    { id: 'pressure', label: 'Set Pressure + 10%', unit: 'psia', value: 165 },
+                    { id: 'mw', label: 'Molecular Weight', unit: '', value: 28 },
+                    { id: 'temp', label: 'Relieving Temperature', unit: '°F', value: 200 },
+                    { id: 'k', label: 'Cp/Cv Ratio', unit: '', value: 1.4 },
+                    { id: 'z', label: 'Compressibility Z', unit: '', value: 1.0 },
+                ],
+                calculate: function (d) {
+                    const C = 520 * Math.sqrt(d.k * Math.pow(2 / (d.k + 1), (d.k + 1) / (d.k - 1)));
+                    const T_R = d.temp + 460;
+                    const Kd = 0.975;
+                    const A = d.flow * Math.sqrt(T_R * d.z) / (C * Kd * d.pressure * Math.sqrt(d.mw));
+                    const orifices = [
+                        ['D', 0.110], ['E', 0.196], ['F', 0.307], ['G', 0.503],
+                        ['H', 0.785], ['J', 1.287], ['K', 1.838], ['L', 2.853]
+                    ];
+                    let orifice = 'T';
+                    for (let [letter, size] of orifices) {
+                        if (size >= A) { orifice = letter; break; }
+                    }
+                    return {
+                        'Required Area': { value: A.toFixed(3), unit: 'in²' },
+                        'Standard Orifice': { value: orifice, unit: '' },
+                        'C Coefficient': { value: C.toFixed(0), unit: '' },
+                    };
+                }
+            },
+            pipe: {
+                title: "Pipe Sizing",
+                subtitle: "Size pipe for velocity and pressure drop",
+                params: [
+                    { id: 'flow', label: 'Flow Rate', unit: 'gpm', value: 100 },
+                    { id: 'max_vel', label: 'Max Velocity', unit: 'ft/s', value: 8 },
+                    { id: 'length', label: 'Pipe Length', unit: 'ft', value: 100 },
+                    { id: 'sg', label: 'Specific Gravity', unit: '', value: 1.0 },
+                    { id: 'viscosity', label: 'Viscosity', unit: 'cP', value: 1.0 },
+                ],
+                calculate: function (d) {
+                    const Q_cfs = d.flow / 449;
+                    const A_min = Q_cfs / d.max_vel;
+                    const D_min = Math.sqrt(4 * A_min / Math.PI) * 12;
+                    const sizes = [1, 1.5, 2, 3, 4, 6, 8, 10, 12];
+                    let nomSize = 12;
+                    for (let s of sizes) { if (s >= D_min) { nomSize = s; break; } }
+                    const ID = nomSize - 0.5; // Approximate
+                    const A_actual = Math.PI * Math.pow(ID / 12 / 2, 2);
+                    const V = Q_cfs / A_actual;
+                    return {
+                        'Min Diameter': { value: D_min.toFixed(2), unit: 'in' },
+                        'Nominal Size': { value: nomSize, unit: 'in NPS' },
+                        'Actual Velocity': { value: V.toFixed(2), unit: 'ft/s' },
+                        'Approx ΔP': { value: (0.002 * d.length * V * V * d.sg).toFixed(1), unit: 'psi' },
+                    };
+                }
+            }
+        };
+
+        function selectEquipment(type) {
+            selectedEquipment = type;
+            document.querySelectorAll('.equipment-option').forEach(el => el.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+            setTimeout(() => goToStep(2), 300);
+        }
+
+        function goToStep(step) {
+            document.querySelectorAll('.wizard-card').forEach(el => el.classList.add('hidden'));
+            document.getElementById('step' + step).classList.remove('hidden');
+
+            if (step === 2 && selectedEquipment) {
+                buildParameterForm();
+            }
+        }
+
+        function buildParameterForm() {
+            const config = equipmentConfigs[selectedEquipment];
+            document.getElementById('step2Title').textContent = config.title;
+            document.getElementById('step2Subtitle').textContent = config.subtitle;
+
+            let html = '';
+            for (let i = 0; i < config.params.length; i += 2) {
+                html += '<div class="form-row">';
+                for (let j = i; j < Math.min(i + 2, config.params.length); j++) {
+                    const p = config.params[j];
+                    html += `
+                        <div class="form-group">
+                            <label class="form-label">${p.label} ${p.unit ? '(' + p.unit + ')' : ''}</label>
+                            <input class="form-input" type="number" step="any" id="param_${p.id}" value="${p.value}">
+                        </div>
+                    `;
+                }
+                html += '</div>';
+            }
+            document.getElementById('parameterForm').innerHTML = html;
+        }
+
+        function calculateResults() {
+            const config = equipmentConfigs[selectedEquipment];
+            inputData = {};
+            config.params.forEach(p => {
+                inputData[p.id] = parseFloat(document.getElementById('param_' + p.id).value) || 0;
+            });
+
+            results = config.calculate(inputData);
+
+            let html = '<div class="form-row">';
+            let i = 0;
+            for (let [name, data] of Object.entries(results)) {
+                html += `
+                    <div class="result-card">
+                        <div class="result-title">${name}</div>
+                        <div class="result-value">${data.value}<span class="result-unit">${data.unit}</span></div>
+                    </div>
+                `;
+                i++;
+                if (i % 2 === 0) html += '</div><div class="form-row">';
+            }
+            html += '</div>';
+            document.getElementById('resultsContainer').innerHTML = html;
+
+            goToStep(3);
+        }
+
+        function exportSpec() {
+            const config = equipmentConfigs[selectedEquipment];
+            let text = `EQUIPMENT DATA SHEET\n${'='.repeat(50)}\n\n`;
+            text += `Equipment Type: ${config.title}\n`;
+            text += `Date: ${new Date().toLocaleDateString()}\n\n`;
+            text += `PROCESS PARAMETERS\n${'-'.repeat(30)}\n`;
+            config.params.forEach(p => {
+                text += `${p.label}: ${inputData[p.id]} ${p.unit}\n`;
+            });
+            text += `\nDESIGN RESULTS\n${'-'.repeat(30)}\n`;
+            for (let [name, data] of Object.entries(results)) {
+                text += `${name}: ${data.value} ${data.unit}\n`;
+            }
+
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${selectedEquipment}_datasheet.txt`;
+            a.click();
+        }
+    </script>
+</body>
+
+</html>

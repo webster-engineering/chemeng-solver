@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P&ID Sketcher - Webster Engineering</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #1e1e2e;
+            --bg-secondary: #181825;
+            --bg-card: #313244;
+            --text-primary: #cdd6f4;
+            --text-secondary: #a6adc8;
+            --accent: #89b4fa;
+            --accent-hover: #b4befe;
+            --success: #a6e3a1;
+            --warning: #f9e2af;
+            --border: #45475a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        .toolbar {
+            width: 80px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            padding: 15px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .tool-btn {
+            width: 60px;
+            height: 60px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            font-size: 0.65rem;
+            transition: all 0.2s;
+        }
+
+        .tool-btn:hover {
+            border-color: var(--accent);
+        }
+
+        .tool-btn.active {
+            background: var(--accent);
+            color: var(--bg-primary);
+        }
+
+        .tool-btn .icon {
+            font-size: 1.5rem;
+            margin-bottom: 4px;
+        }
+
+        .canvas-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: var(--bg-secondary);
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.2rem;
+            color: var(--accent);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .btn:hover {
+            border-color: var(--accent);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: var(--bg-primary);
+            border: none;
+        }
+
+        #canvas {
+            flex: 1;
+            background: #252536;
+            cursor: crosshair;
+        }
+
+        .properties-panel {
+            width: 280px;
+            background: var(--bg-secondary);
+            border-left: 1px solid var(--border);
+            padding: 20px;
+        }
+
+        .panel-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 15px;
+        }
+
+        .property-group {
+            margin-bottom: 15px;
+        }
+
+        .property-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .property-input {
+            width: 100%;
+            padding: 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 0.85rem;
+        }
+
+        .symbol-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .symbol-item {
+            padding: 10px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
+
+        .symbol-item:hover {
+            border-color: var(--accent);
+        }
+
+        .symbol-item .sym {
+            font-size: 1.5rem;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .back-link {
+            display: inline-block;
+            padding: 8px 16px;
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="toolbar">
+        <a href="/" class="back-link">← Back</a>
+        <button class="tool-btn active" data-tool="select" title="Select">
+            <span class="icon">↖</span>Select
+        </button>
+        <button class="tool-btn" data-tool="line" title="Pipe/Line">
+            <span class="icon">─</span>Pipe
+        </button>
+        <button class="tool-btn" data-tool="vessel" title="Vessel">
+            <span class="icon">⬭</span>Vessel
+        </button>
+        <button class="tool-btn" data-tool="pump" title="Pump">
+            <span class="icon">⊛</span>Pump
+        </button>
+        <button class="tool-btn" data-tool="valve" title="Valve">
+            <span class="icon">⧖</span>Valve
+        </button>
+        <button class="tool-btn" data-tool="hx" title="Heat Exchanger">
+            <span class="icon">⊞</span>HX
+        </button>
+        <button class="tool-btn" data-tool="text" title="Text Label">
+            <span class="icon">T</span>Text
+        </button>
+    </div>
+
+    <div class="canvas-container">
+        <div class="header">
+            <h1>⚗️ P&ID Sketcher</h1>
+            <div class="header-actions">
+                <button class="btn" onclick="clearCanvas()">Clear</button>
+                <button class="btn" onclick="exportPNG()">Export PNG</button>
+                <button class="btn btn-primary" onclick="saveDiagram()">Save</button>
+            </div>
+        </div>
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <div class="properties-panel">
+        <h3 class="panel-title">Equipment Symbols</h3>
+        <div class="symbol-list">
+            <div class="symbol-item" draggable="true" data-type="tank">
+                <span class="sym">🛢️</span>Tank
+            </div>
+            <div class="symbol-item" draggable="true" data-type="reactor">
+                <span class="sym">⚗️</span>Reactor
+            </div>
+            <div class="symbol-item" draggable="true" data-type="column">
+                <span class="sym">🗼</span>Column
+            </div>
+            <div class="symbol-item" draggable="true" data-type="pump">
+                <span class="sym">⊛</span>Pump
+            </div>
+            <div class="symbol-item" draggable="true" data-type="compressor">
+                <span class="sym">🌀</span>Compressor
+            </div>
+            <div class="symbol-item" draggable="true" data-type="hx_shell">
+                <span class="sym">⊞</span>Shell & Tube
+            </div>
+            <div class="symbol-item" draggable="true" data-type="hx_plate">
+                <span class="sym">≡</span>Plate HX
+            </div>
+            <div class="symbol-item" draggable="true" data-type="valve_control">
+                <span class="sym">⧖</span>Control Valve
+            </div>
+            <div class="symbol-item" draggable="true" data-type="valve_manual">
+                <span class="sym">✕</span>Manual Valve
+            </div>
+            <div class="symbol-item" draggable="true" data-type="valve_check">
+                <span class="sym">◁</span>Check Valve
+            </div>
+            <div class="symbol-item" draggable="true" data-type="instrument">
+                <span class="sym">◯</span>Instrument
+            </div>
+            <div class="symbol-item" draggable="true" data-type="motor">
+                <span class="sym">Ⓜ</span>Motor
+            </div>
+        </div>
+
+        <h3 class="panel-title" style="margin-top: 25px;">Selected Item</h3>
+        <div id="selectedProps">
+            <p style="color: var(--text-secondary); font-size: 0.8rem;">No item selected</p>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let currentTool = 'select';
+        let elements = [];
+        let selectedElement = null;
+        let isDrawing = false;
+        let startX, startY;
+
+        // Resize canvas
+        function resizeCanvas() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            redraw();
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Tool selection
+        document.querySelectorAll('.tool-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentTool = btn.dataset.tool;
+            });
+        });
+
+        // Symbol drag and drop
+        document.querySelectorAll('.symbol-item').forEach(item => {
+            item.addEventListener('dragstart', e => {
+                e.dataTransfer.setData('type', item.dataset.type);
+            });
+        });
+
+        canvas.addEventListener('dragover', e => e.preventDefault());
+        canvas.addEventListener('drop', e => {
+            e.preventDefault();
+            const type = e.dataTransfer.getData('type');
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            addElement(type, x, y);
+        });
+
+        // Drawing
+        canvas.addEventListener('mousedown', e => {
+            const rect = canvas.getBoundingClientRect();
+            startX = e.clientX - rect.left;
+            startY = e.clientY - rect.top;
+            isDrawing = true;
+
+            if (currentTool === 'select') {
+                selectedElement = findElementAt(startX, startY);
+                updatePropertiesPanel();
+            }
+        });
+
+        canvas.addEventListener('mousemove', e => {
+            if (!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            if (currentTool === 'line') {
+                redraw();
+                ctx.strokeStyle = '#89b4fa';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.lineTo(x, y);
+                ctx.stroke();
+            }
+        });
+
+        canvas.addEventListener('mouseup', e => {
+            if (!isDrawing) return;
+            isDrawing = false;
+
+            const rect = canvas.getBoundingClientRect();
+            const endX = e.clientX - rect.left;
+            const endY = e.clientY - rect.top;
+
+            if (currentTool === 'line' && (Math.abs(endX - startX) > 5 || Math.abs(endY - startY) > 5)) {
+                elements.push({ type: 'line', x1: startX, y1: startY, x2: endX, y2: endY });
+                redraw();
+            }
+        });
+
+        function addElement(type, x, y) {
+            const symbols = {
+                tank: '🛢️', reactor: '⚗️', column: '🗼', pump: '⊛',
+                compressor: '🌀', hx_shell: '⊞', hx_plate: '≡',
+                valve_control: '⧖', valve_manual: '✕', valve_check: '◁',
+                instrument: '◯', motor: 'Ⓜ'
+            };
+            elements.push({ type: 'symbol', symbolType: type, x, y, symbol: symbols[type] || '?', label: type.toUpperCase() });
+            redraw();
+        }
+
+        function findElementAt(x, y) {
+            for (let i = elements.length - 1; i >= 0; i--) {
+                const el = elements[i];
+                if (el.type === 'symbol') {
+                    if (Math.abs(el.x - x) < 30 && Math.abs(el.y - y) < 30) return el;
+                }
+            }
+            return null;
+        }
+
+        function redraw() {
+            ctx.fillStyle = '#252536';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw grid
+            ctx.strokeStyle = '#313244';
+            ctx.lineWidth = 1;
+            for (let x = 0; x < canvas.width; x += 50) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+            }
+            for (let y = 0; y < canvas.height; y += 50) {
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+            }
+
+            // Draw elements
+            elements.forEach(el => {
+                if (el.type === 'line') {
+                    ctx.strokeStyle = '#89b4fa';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.moveTo(el.x1, el.y1);
+                    ctx.lineTo(el.x2, el.y2);
+                    ctx.stroke();
+                } else if (el.type === 'symbol') {
+                    ctx.font = '32px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillStyle = '#cdd6f4';
+                    ctx.fillText(el.symbol, el.x, el.y);
+                    ctx.font = '10px Inter';
+                    ctx.fillText(el.label, el.x, el.y + 25);
+
+                    if (el === selectedElement) {
+                        ctx.strokeStyle = '#a6e3a1';
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(el.x - 25, el.y - 25, 50, 50);
+                    }
+                }
+            });
+        }
+
+        function updatePropertiesPanel() {
+            const panel = document.getElementById('selectedProps');
+            if (selectedElement) {
+                panel.innerHTML = `
+                    <div class="property-group">
+                        <div class="property-label">Type</div>
+                        <input class="property-input" value="${selectedElement.symbolType}" disabled>
+                    </div>
+                    <div class="property-group">
+                        <div class="property-label">Label</div>
+                        <input class="property-input" value="${selectedElement.label}" 
+                            onchange="selectedElement.label = this.value; redraw();">
+                    </div>
+                    <button class="btn" style="width:100%; margin-top:10px;" onclick="deleteSelected()">Delete</button>
+                `;
+            } else {
+                panel.innerHTML = '<p style="color: var(--text-secondary); font-size: 0.8rem;">No item selected</p>';
+            }
+            redraw();
+        }
+
+        function deleteSelected() {
+            if (selectedElement) {
+                elements = elements.filter(e => e !== selectedElement);
+                selectedElement = null;
+                updatePropertiesPanel();
+            }
+        }
+
+        function clearCanvas() {
+            if (confirm('Clear all elements?')) {
+                elements = [];
+                selectedElement = null;
+                redraw();
+                updatePropertiesPanel();
+            }
+        }
+
+        function exportPNG() {
+            const link = document.createElement('a');
+            link.download = 'pid-diagram.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+
+        function saveDiagram() {
+            const data = JSON.stringify(elements);
+            localStorage.setItem('pid_diagram', data);
+            alert('Diagram saved!');
+        }
+
+        // Load saved diagram
+        const saved = localStorage.getItem('pid_diagram');
+        if (saved) {
+            try { elements = JSON.parse(saved); redraw(); } catch (e) { }
+        }
+    </script>
+</body>
+
+</html>

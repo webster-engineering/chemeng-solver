@@ -133,6 +133,24 @@ async def root():
     return {"message": "Webster Engineering Solver API", "docs": "/docs"}
 
 
+@app.get("/pid.html")
+async def pid_tool():
+    """Serve the P&ID sketcher tool."""
+    pid_path = Path(__file__).parent / "web" / "pid.html"
+    if pid_path.exists():
+        return FileResponse(pid_path)
+    raise HTTPException(status_code=404, detail="P&ID tool not found")
+
+
+@app.get("/wizard.html")
+async def wizard_tool():
+    """Serve the unit operations wizard."""
+    wizard_path = Path(__file__).parent / "web" / "wizard.html"
+    if wizard_path.exists():
+        return FileResponse(wizard_path)
+    raise HTTPException(status_code=404, detail="Wizard not found")
+
+
 @app.get("/api/categories", response_model=List[CategoryInfo])
 async def get_categories():
     """Get all available equation categories."""
