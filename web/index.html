@@ -7,6 +7,7 @@
     <title>Webster Engineering Equation Solver</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
     <style>
         :root {
             --bg-primary: #121218;
@@ -49,9 +50,9 @@
             width: 200%;
             height: 200%;
             background:
-                radial-gradient(ellipse at 30% 30%, rgba(91, 110, 174, 0.12) 0%, transparent 40%),
-                radial-gradient(ellipse at 70% 70%, rgba(107, 125, 184, 0.10) 0%, transparent 45%),
-                radial-gradient(ellipse at 50% 50%, rgba(91, 110, 174, 0.06) 0%, transparent 50%);
+                radial-gradient(ellipse at 30% 30%, rgba(91, 110, 174, 0.18) 0%, transparent 40%),
+                radial-gradient(ellipse at 70% 70%, rgba(107, 125, 184, 0.15) 0%, transparent 45%),
+                radial-gradient(ellipse at 50% 50%, rgba(91, 110, 174, 0.10) 0%, transparent 50%);
             pointer-events: none;
             z-index: -2;
             animation: bgOrbit 60s linear infinite;
@@ -973,7 +974,8 @@
         .calc-counter {
             position: fixed;
             bottom: 20px;
-            left: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 8px;
@@ -1633,27 +1635,9 @@
         <!-- Main Content -->
         <main class="main-content">
             <div id="welcomeState" class="empty-state">
-                <div class="empty-state-icon">
-                    <svg class="welcome-flask" width="80" height="80" viewBox="0 0 100 100" fill="none"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <linearGradient id="flaskGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#6366f1" />
-                                <stop offset="50%" style="stop-color:#8b5cf6" />
-                                <stop offset="100%" style="stop-color:#d946ef" />
-                            </linearGradient>
-                        </defs>
-                        <path class="blueprint-line"
-                            d="M40 10 L40 35 L20 75 Q15 85 25 90 L75 90 Q85 85 80 75 L60 35 L60 10 Z"
-                            stroke="url(#flaskGrad)" stroke-width="3" fill="none" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                        <path d="M35 10 L65 10" stroke="url(#flaskGrad)" stroke-width="3" stroke-linecap="round" />
-                        <path class="flask-liquid" d="M25 70 Q50 60 75 70 L75 80 Q50 90 25 80 Z" fill="url(#flaskGrad)"
-                            opacity="0.3" />
-                        <circle class="flask-bubble" cx="35" cy="55" r="3" fill="url(#flaskGrad)" opacity="0.6" />
-                        <circle class="flask-bubble" cx="50" cy="48" r="4" fill="url(#flaskGrad)" opacity="0.5" />
-                        <circle class="flask-bubble" cx="60" cy="58" r="2" fill="url(#flaskGrad)" opacity="0.7" />
-                    </svg>
+                <div class="empty-state-icon" id="flask3DContainer"
+                    style="width: 240px; height: 240px; position: relative;">
+                    <canvas id="flask3DCanvas" style="width: 100%; height: 100%;"></canvas>
                 </div>
                 <h2>Welcome to the Webster Engineering Solver</h2>
                 <p>Select an equation from the sidebar to get started</p>
@@ -2630,6 +2614,177 @@
         if (calcBtn) {
             calcBtn.addEventListener('click', createRipple);
         }
+
+        // ===== Three.js 3D Flask =====
+        function init3DFlask() {
+            const container = document.getElementById('flask3DContainer');
+            const canvas = document.getElementById('flask3DCanvas');
+            if (!container || !canvas || typeof THREE === 'undefined') return;
+
+            // Scene setup
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
+            camera.position.set(0, 0, 5);
+
+            const renderer = new THREE.WebGLRenderer({
+                canvas: canvas,
+                alpha: true,
+                antialias: true
+            });
+            renderer.setSize(240, 240);
+            renderer.setPixelRatio(window.devicePixelRatio);
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0x5b6eae, 0.4);
+            scene.add(ambientLight);
+
+            const pointLight1 = new THREE.PointLight(0x7a8bc4, 1.5, 100);
+            pointLight1.position.set(3, 3, 3);
+            scene.add(pointLight1);
+
+            const pointLight2 = new THREE.PointLight(0x6b7db8, 1, 100);
+            pointLight2.position.set(-3, -2, 2);
+            scene.add(pointLight2);
+
+            // Flask shape using LatheGeometry (profile curve rotated around Y axis)
+            const flaskProfile = [];
+            // Neck
+            flaskProfile.push(new THREE.Vector2(0.25, 1.5));
+            flaskProfile.push(new THREE.Vector2(0.25, 0.8));
+            // Shoulder
+            flaskProfile.push(new THREE.Vector2(0.3, 0.6));
+            flaskProfile.push(new THREE.Vector2(0.5, 0.4));
+            flaskProfile.push(new THREE.Vector2(0.7, 0.2));
+            // Body
+            flaskProfile.push(new THREE.Vector2(0.85, 0));
+            flaskProfile.push(new THREE.Vector2(0.9, -0.3));
+            flaskProfile.push(new THREE.Vector2(0.85, -0.6));
+            // Bottom
+            flaskProfile.push(new THREE.Vector2(0.7, -0.8));
+            flaskProfile.push(new THREE.Vector2(0.4, -0.95));
+            flaskProfile.push(new THREE.Vector2(0, -1));
+
+            const flaskGeometry = new THREE.LatheGeometry(flaskProfile, 32);
+
+            // Glass material
+            const glassMaterial = new THREE.MeshPhysicalMaterial({
+                color: 0x5b6eae,
+                transparent: true,
+                opacity: 0.3,
+                roughness: 0.05,
+                metalness: 0.1,
+                clearcoat: 1,
+                clearcoatRoughness: 0.1,
+                side: THREE.DoubleSide
+            });
+
+            const flask = new THREE.Mesh(flaskGeometry, glassMaterial);
+            scene.add(flask);
+
+            // Liquid inside flask
+            const liquidProfile = [];
+            liquidProfile.push(new THREE.Vector2(0, -0.4));
+            liquidProfile.push(new THREE.Vector2(0.75, -0.4));
+            liquidProfile.push(new THREE.Vector2(0.82, -0.5));
+            liquidProfile.push(new THREE.Vector2(0.78, -0.65));
+            liquidProfile.push(new THREE.Vector2(0.6, -0.85));
+            liquidProfile.push(new THREE.Vector2(0.3, -0.95));
+            liquidProfile.push(new THREE.Vector2(0, -0.98));
+
+            const liquidGeometry = new THREE.LatheGeometry(liquidProfile, 32);
+            const liquidMaterial = new THREE.MeshPhysicalMaterial({
+                color: 0x7a8bc4,
+                transparent: true,
+                opacity: 0.6,
+                roughness: 0.2,
+                metalness: 0.3,
+                emissive: 0x5b6eae,
+                emissiveIntensity: 0.2
+            });
+
+            const liquid = new THREE.Mesh(liquidGeometry, liquidMaterial);
+            scene.add(liquid);
+
+            // Bubbles
+            const bubbles = [];
+            const bubbleGeometry = new THREE.SphereGeometry(0.06, 16, 16);
+            const bubbleMaterial = new THREE.MeshPhysicalMaterial({
+                color: 0xaabbdd,
+                transparent: true,
+                opacity: 0.5,
+                roughness: 0,
+                metalness: 0.5
+            });
+
+            for (let i = 0; i < 8; i++) {
+                const bubble = new THREE.Mesh(bubbleGeometry, bubbleMaterial.clone());
+                bubble.position.set(
+                    (Math.random() - 0.5) * 0.6,
+                    -0.5 - Math.random() * 0.4,
+                    (Math.random() - 0.5) * 0.6
+                );
+                bubble.userData = {
+                    speed: 0.005 + Math.random() * 0.01,
+                    startY: bubble.position.y,
+                    phase: Math.random() * Math.PI * 2
+                };
+                bubbles.push(bubble);
+                scene.add(bubble);
+            }
+
+            // Rim highlight
+            const rimGeometry = new THREE.TorusGeometry(0.25, 0.03, 8, 32);
+            const rimMaterial = new THREE.MeshPhysicalMaterial({
+                color: 0x7a8bc4,
+                emissive: 0x5b6eae,
+                emissiveIntensity: 0.3,
+                roughness: 0.1,
+                metalness: 0.8
+            });
+            const rim = new THREE.Mesh(rimGeometry, rimMaterial);
+            rim.position.y = 1.5;
+            rim.rotation.x = Math.PI / 2;
+            scene.add(rim);
+
+            // Animation
+            let time = 0;
+            function animate() {
+                requestAnimationFrame(animate);
+                time += 0.016;
+
+                // Rotate flask slowly
+                flask.rotation.y = Math.sin(time * 0.5) * 0.3;
+                flask.rotation.x = Math.sin(time * 0.3) * 0.1;
+                liquid.rotation.y = flask.rotation.y;
+                liquid.rotation.x = flask.rotation.x;
+                rim.rotation.y = flask.rotation.y;
+                rim.rotation.z = flask.rotation.x;
+
+                // Animate bubbles
+                bubbles.forEach((bubble, i) => {
+                    bubble.position.y += bubble.userData.speed;
+                    bubble.position.x = Math.sin(time * 2 + bubble.userData.phase) * 0.1 + (Math.random() - 0.5) * 0.01;
+
+                    // Reset bubble when it reaches top of liquid
+                    if (bubble.position.y > -0.4) {
+                        bubble.position.y = bubble.userData.startY;
+                    }
+
+                    // Sync rotation with flask
+                    bubble.position.applyAxisAngle(new THREE.Vector3(0, 1, 0), flask.rotation.y * 0.01);
+                });
+
+                // Gentle liquid wave
+                liquid.position.y = Math.sin(time * 1.5) * 0.02;
+
+                renderer.render(scene, camera);
+            }
+
+            animate();
+        }
+
+        // Initialize 3D Flask
+        init3DFlask();
     </script>
 </body>
 
