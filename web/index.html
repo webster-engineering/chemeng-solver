@@ -372,18 +372,45 @@
 
         .unit-select {
             padding: 12px;
-            background: rgba(0, 0, 0, 0.3);
+            background: #2a2a3e;
             border: 1px solid var(--border);
             border-radius: 10px;
-            color: var(--text-primary);
+            color: #ffffff;
             font-size: 0.85rem;
             cursor: pointer;
             transition: all 0.25s ease;
         }
 
+        .unit-select option {
+            background: #2a2a3e;
+            color: #ffffff;
+            padding: 8px;
+        }
+
         .unit-select:focus {
             outline: none;
             border-color: var(--accent);
+        }
+
+        .reference-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--accent-light);
+            text-decoration: none;
+            font-size: 0.85rem;
+            margin-top: 10px;
+            padding: 8px 14px;
+            background: var(--bg-card);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+        }
+
+        .reference-link:hover {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: var(--accent);
+            transform: translateX(4px);
         }
 
         .calculate-btn {
@@ -752,6 +779,7 @@
                     <h1 class="equation-title" id="eqTitle"></h1>
                     <p class="equation-description" id="eqDescription"></p>
                     <p class="equation-reference" id="eqReference"></p>
+                    <div id="externalLinks" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px;"></div>
                 </div>
                 <div class="input-section">
                     <h3 class="section-title">Inputs</h3>
@@ -835,6 +863,29 @@
             document.getElementById('eqDescription').textContent = eq.description;
             document.getElementById('eqReference').textContent = `Reference: ${eq.reference}`;
 
+            // Add external resource links
+            const searchQuery = encodeURIComponent(`${eq.name} chemical engineering`);
+            document.getElementById('externalLinks').innerHTML = `
+                <a href="https://www.google.com/search?q=${searchQuery}" target="_blank" class="reference-link">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                    </svg>
+                    Search Google
+                </a>
+                <a href="https://en.wikipedia.org/wiki/Special:Search?search=${searchQuery}" target="_blank" class="reference-link">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/>
+                    </svg>
+                    Wikipedia
+                </a>
+                <a href="https://scholar.google.com/scholar?q=${searchQuery}" target="_blank" class="reference-link">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                    </svg>
+                    Google Scholar
+                </a>
+            `;
+
             // Build input form
             equationParams = eq.parameters.filter(p => p.param_type === 'input');
             const inputGrid = document.getElementById('inputGrid');
@@ -851,7 +902,6 @@
                 <div class="input-group">
                     <label class="input-label ${param.tooltip ? 'tooltip' : ''}" ${param.tooltip ? `data-tooltip="${param.tooltip}"` : ''}>
                         <span class="symbol">${param.symbol}</span>
-                        ${param.name}${param.required ? ' *' : ''}
                     </label>
                     <input type="number" class="input-field" id="input_${param.name}" 
                            placeholder="${param.description}" step="any">
