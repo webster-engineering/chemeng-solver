@@ -1,0 +1,29 @@
+# Chemical Engineering Equation Solver - Dependencies
+
+# GUI Framework
+PySide6>=6.5.0
+
+# Scientific Computing
+numpy>=1.24.0
+scipy>=1.10.0
+
+# Data Handling
+pandas>=2.0.0
+openpyxl>=3.1.0
+
+# Physical Units
+pint>=0.22
+
+# PDF Generation
+reportlab>=4.0.0
+
+# Plotting
+matplotlib>=3.7.0
+
+# Testing
+pytest>=7.3.0
+
+# Web API
+fastapi>=0.100.0
+uvicorn>=0.22.0
+python-multipart>=0.0.6

@@ -1,0 +1,210 @@
+{
+    "ziegler_nichols_pid": {
+        "description": "Ziegler-Nichols PID tuning benchmark values",
+        "reference": "Ziegler & Nichols, 1942",
+        "cases": [
+            {
+                "inputs": {
+                    "Ku": {
+                        "value": 2.0,
+                        "unit": "",
+                        "tolerance": 0.01
+                    },
+                    "Pu": {
+                        "value": 5.0,
+                        "unit": "min",
+                        "tolerance": 0.01
+                    }
+                },
+                "outputs": {
+                    "Kp": {
+                        "value": 1.2,
+                        "unit": ""
+                    },
+                    "Ti": {
+                        "value": 2.5,
+                        "unit": "min"
+                    },
+                    "Td": {
+                        "value": 0.625,
+                        "unit": "min"
+                    }
+                },
+                "tolerance": 0.01
+            }
+        ]
+    },
+    "cv_liquid": {
+        "description": "Control valve Cv liquid benchmark",
+        "reference": "ISA-75.01.01",
+        "cases": [
+            {
+                "inputs": {
+                    "Q": {
+                        "value": 100,
+                        "unit": "gpm",
+                        "tolerance": 0.01
+                    },
+                    "dP": {
+                        "value": 25,
+                        "unit": "psi",
+                        "tolerance": 0.01
+                    },
+                    "SG": {
+                        "value": 1.0,
+                        "unit": "",
+                        "tolerance": 0.01
+                    }
+                },
+                "outputs": {
+                    "Cv": {
+                        "value": 20.0,
+                        "unit": ""
+                    }
+                },
+                "tolerance": 0.01
+            },
+            {
+                "inputs": {
+                    "Q": {
+                        "value": 500,
+                        "unit": "gpm",
+                        "tolerance": 0.01
+                    },
+                    "dP": {
+                        "value": 100,
+                        "unit": "psi",
+                        "tolerance": 0.01
+                    },
+                    "SG": {
+                        "value": 0.85,
+                        "unit": "",
+                        "tolerance": 0.01
+                    }
+                },
+                "outputs": {
+                    "Cv": {
+                        "value": 46.1,
+                        "unit": ""
+                    }
+                },
+                "tolerance": 0.02
+            }
+        ]
+    },
+    "darcy_weisbach": {
+        "description": "Darcy-Weisbach pressure drop benchmark",
+        "reference": "Perry's 8th Ed",
+        "cases": [
+            {
+                "inputs": {
+                    "f": {
+                        "value": 0.02,
+                        "unit": "",
+                        "tolerance": 0.001
+                    },
+                    "L": {
+                        "value": 100,
+                        "unit": "ft",
+                        "tolerance": 0.1
+                    },
+                    "D": {
+                        "value": 4,
+                        "unit": "in",
+                        "tolerance": 0.01
+                    },
+                    "V": {
+                        "value": 10,
+                        "unit": "ft/s",
+                        "tolerance": 0.1
+                    },
+                    "rho": {
+                        "value": 62.4,
+                        "unit": "lb/ft**3",
+                        "tolerance": 0.1
+                    }
+                },
+                "outputs": {
+                    "dP": {
+                        "value": 6.48,
+                        "unit": "psi"
+                    }
+                },
+                "tolerance": 0.05
+            }
+        ]
+    },
+    "lmtd": {
+        "description": "Log mean temperature difference benchmark",
+        "reference": "Perry's Chemical Engineers' Handbook",
+        "cases": [
+            {
+                "inputs": {
+                    "T_hot_in": {
+                        "value": 300,
+                        "unit": "degF",
+                        "tolerance": 0.1
+                    },
+                    "T_hot_out": {
+                        "value": 200,
+                        "unit": "degF",
+                        "tolerance": 0.1
+                    },
+                    "T_cold_in": {
+                        "value": 100,
+                        "unit": "degF",
+                        "tolerance": 0.1
+                    },
+                    "T_cold_out": {
+                        "value": 150,
+                        "unit": "degF",
+                        "tolerance": 0.1
+                    }
+                },
+                "outputs": {
+                    "LMTD": {
+                        "value": 118.2,
+                        "unit": "delta_degF"
+                    }
+                },
+                "tolerance": 0.02
+            }
+        ]
+    },
+    "second_order_response": {
+        "description": "Second-order response characteristics",
+        "reference": "Seborg Process Dynamics and Control",
+        "cases": [
+            {
+                "inputs": {
+                    "K": {
+                        "value": 1.0,
+                        "unit": "",
+                        "tolerance": 0.01
+                    },
+                    "tau": {
+                        "value": 1.0,
+                        "unit": "min",
+                        "tolerance": 0.01
+                    },
+                    "zeta": {
+                        "value": 0.5,
+                        "unit": "",
+                        "tolerance": 0.01
+                    }
+                },
+                "outputs": {
+                    "overshoot": {
+                        "value": 16.3,
+                        "unit": ""
+                    },
+                    "decay_ratio": {
+                        "value": 0.0267,
+                        "unit": ""
+                    }
+                },
+                "tolerance": 0.05
+            }
+        ]
+    }
+}
