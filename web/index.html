@@ -838,7 +838,16 @@
             // Build input form
             equationParams = eq.parameters.filter(p => p.param_type === 'input');
             const inputGrid = document.getElementById('inputGrid');
-            inputGrid.innerHTML = equationParams.map(param => `
+            inputGrid.innerHTML = equationParams.map(param => {
+                // Build unit options - use unit_options array if available, otherwise just default
+                const unitOptions = (param.unit_options && param.unit_options.length > 0)
+                    ? param.unit_options
+                    : (param.unit ? [param.unit] : ['']);
+                const optionsHtml = unitOptions.map(u =>
+                    `<option value="${u}" ${u === param.unit ? 'selected' : ''}>${u || '—'}</option>`
+                ).join('');
+
+                return `
                 <div class="input-group">
                     <label class="input-label ${param.tooltip ? 'tooltip' : ''}" ${param.tooltip ? `data-tooltip="${param.tooltip}"` : ''}>
                         <span class="symbol">${param.symbol}</span>
@@ -847,10 +856,10 @@
                     <input type="number" class="input-field" id="input_${param.name}" 
                            placeholder="${param.description}" step="any">
                     <select class="unit-select" id="unit_${param.name}">
-                        <option value="${param.unit}">${param.unit || '—'}</option>
+                        ${optionsHtml}
                     </select>
                 </div>
-            `).join('');
+            `}).join('');
 
             // Clear results
             document.getElementById('resultsContent').innerHTML = `

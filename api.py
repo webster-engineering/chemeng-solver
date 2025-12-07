@@ -18,6 +18,7 @@ from typing import Dict, Any, List, Optional
 import uvicorn
 
 # Import equation registries
+from core.units import UNIT_CATEGORIES
 from equations.process_control import PROCESS_CONTROL_EQUATIONS
 from equations.fluid_dynamics import FLUID_DYNAMICS_EQUATIONS
 from equations.heat_transfer import HEAT_TRANSFER_EQUATIONS
@@ -93,6 +94,8 @@ class ParameterInfo(BaseModel):
     description: str
     symbol: str
     unit: str
+    unit_options: List[str] = []
+    unit_category: str = ""
     param_type: str
     required: bool
     tooltip: Optional[str] = None
@@ -200,11 +203,22 @@ async def get_equation_details(category: str, equation_id: str):
     
     parameters = []
     for param in eq.parameters:
+        # Get available units from category
+        unit_options = []
+        unit_category = param.unit_category or ""
+        if unit_category and unit_category in UNIT_CATEGORIES:
+            unit_options = UNIT_CATEGORIES[unit_category].common_units
+        elif param.default_unit:
+            # If not in category, at least offer the default unit
+            unit_options = [param.default_unit]
+        
         parameters.append(ParameterInfo(
             name=param.name,
             description=param.description,
             symbol=param.symbol or param.name,
             unit=param.default_unit or "",
+            unit_options=unit_options,
+            unit_category=unit_category,
             param_type=param.param_type.value,
             required=param.required,
             tooltip=param.tooltip,
