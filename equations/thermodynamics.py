@@ -310,3 +310,184 @@ THERMODYNAMICS_EQUATIONS = {
     'flash': FlashCalculation,
     'compressor_work': CompressorWork,
 }
+
+
+class VanDerWaals(BaseEquation):
+    """Van der Waals equation of state for real gases."""
+    
+    equation_id = "van_der_waals"
+    name = "Van der Waals Equation"
+    category = "Thermodynamics"
+    description = "(P + a/V²)(V - b) = RT - real gas behavior"
+    reference = "Van der Waals, 1873"
+    
+    def get_parameters(self) -> List[EquationParameter]:
+        return [
+            EquationParameter("T", "Temperature", "temperature", "degC",
+                              ParameterType.INPUT, symbol="T"),
+            EquationParameter("P", "Pressure", "pressure", "bar",
+                              ParameterType.INPUT, symbol="P"),
+            EquationParameter("Tc", "Critical temperature", "temperature", "degC",
+                              ParameterType.INPUT, symbol="Tᶜ"),
+            EquationParameter("Pc", "Critical pressure", "pressure", "bar",
+                              ParameterType.INPUT, symbol="Pᶜ"),
+            EquationParameter("Z", "Compressibility factor", "dimensionless", "",
+                              ParameterType.OUTPUT, symbol="Z"),
+            EquationParameter("V_molar", "Molar volume", "L/mol", "",
+                              ParameterType.OUTPUT, symbol="Vₘ"),
+        ]
+    
+    def _calculate(self, T: pint.Quantity, P: pint.Quantity, Tc: pint.Quantity, 
+                   Pc: pint.Quantity, **kwargs) -> Dict[str, pint.Quantity]:
+        t = T.to('K').magnitude
+        p = P.to('Pa').magnitude
+        tc = Tc.to('K').magnitude
+        pc = Pc.to('Pa').magnitude
+        R = 8.314
+        
+        # Calculate a and b from critical properties
+        a = 27 * R**2 * tc**2 / (64 * pc)
+        b = R * tc / (8 * pc)
+        
+        # Solve cubic for V (iterative)
+        v = R * t / p  # ideal gas initial guess
+        for _ in range(20):
+            v_new = (R * t / (p + a/v**2)) + b
+            if abs(v_new - v) < 1e-10:
+                break
+            v = v_new
+        
+        z = p * v / (R * t)
+        v_liters = v * 1000  # L/mol
+        
+        return {
+            "Z": ureg.Quantity(z, ""),
+            "V_molar": ureg.Quantity(v_liters, "L/mol")
+        }
+
+
+class ActivityCoefficient(BaseEquation):
+    """Margules equation for activity coefficients."""
+    
+    equation_id = "activity_coefficient"
+    name = "Margules Activity Coefficient"
+    category = "Thermodynamics"
+    description = "Calculate activity coefficients for non-ideal liquid mixtures"
+    reference = "Smith, Van Ness & Abbott"
+    
+    def get_parameters(self) -> List[EquationParameter]:
+        return [
+            EquationParameter("x1", "Mole fraction of component 1", "dimensionless", "",
+                              ParameterType.INPUT, symbol="x₁", typical_range=(0, 1)),
+            EquationParameter("A12", "Margules parameter A12", "dimensionless", "",
+                              ParameterType.INPUT, symbol="A₁₂", typical_range=(0, 3)),
+            EquationParameter("A21", "Margules parameter A21", "dimensionless", "",
+                              ParameterType.INPUT, symbol="A₂₁", typical_range=(0, 3)),
+            EquationParameter("gamma1", "Activity coefficient of component 1", "dimensionless", "",
+                              ParameterType.OUTPUT, symbol="γ₁"),
+            EquationParameter("gamma2", "Activity coefficient of component 2", "dimensionless", "",
+                              ParameterType.OUTPUT, symbol="γ₂"),
+        ]
+    
+    def _calculate(self, x1: pint.Quantity, A12: pint.Quantity, A21: pint.Quantity,
+                   **kwargs) -> Dict[str, pint.Quantity]:
+        x = x1.magnitude if hasattr(x1, 'magnitude') else float(x1)
+        a12 = A12.magnitude if hasattr(A12, 'magnitude') else float(A12)
+        a21 = A21.magnitude if hasattr(A21, 'magnitude') else float(A21)
+        
+        x2 = 1 - x
+        ln_gamma1 = x2**2 * (a12 + 2*(a21 - a12)*x)
+        ln_gamma2 = x**2 * (a21 + 2*(a12 - a21)*x2)
+        
+        return {
+            "gamma1": ureg.Quantity(np.exp(ln_gamma1), ""),
+            "gamma2": ureg.Quantity(np.exp(ln_gamma2), "")
+        }
+
+
+class JouleThomson(BaseEquation):
+    """Joule-Thomson coefficient for throttling calculations."""
+    
+    equation_id = "joule_thomson"
+    name = "Joule-Thomson Effect"
+    category = "Thermodynamics"
+    description = "Temperature change during isenthalpic throttling"
+    reference = "Perry's Chemical Engineers' Handbook"
+    
+    def get_parameters(self) -> List[EquationParameter]:
+        return [
+            EquationParameter("mu_JT", "Joule-Thomson coefficient", "degC/bar", "degF/psi",
+                              ParameterType.INPUT, symbol="μⱼₜ", typical_range=(-1, 1)),
+            EquationParameter("P1", "Inlet pressure", "pressure", "bar",
+                              ParameterType.INPUT, symbol="P₁"),
+            EquationParameter("P2", "Outlet pressure", "pressure", "bar",
+                              ParameterType.INPUT, symbol="P₂"),
+            EquationParameter("T1", "Inlet temperature", "temperature", "degC",
+                              ParameterType.INPUT, symbol="T₁"),
+            EquationParameter("delta_T", "Temperature change", "delta_degC", "delta_degF",
+                              ParameterType.OUTPUT, symbol="ΔT"),
+            EquationParameter("T2", "Outlet temperature", "temperature", "degC",
+                              ParameterType.OUTPUT, symbol="T₂"),
+        ]
+    
+    def _calculate(self, mu_JT: pint.Quantity, P1: pint.Quantity, P2: pint.Quantity,
+                   T1: pint.Quantity, **kwargs) -> Dict[str, pint.Quantity]:
+        mu = mu_JT.magnitude if hasattr(mu_JT, 'magnitude') else float(mu_JT)
+        p1 = P1.to('bar').magnitude
+        p2 = P2.to('bar').magnitude
+        t1 = T1.to('degC').magnitude
+        
+        delta_t = mu * (p2 - p1)  # Usually negative (cooling)
+        t2 = t1 + delta_t
+        
+        return {
+            "delta_T": ureg.Quantity(delta_t, "delta_degC"),
+            "T2": ureg.Quantity(t2, "degC")
+        }
+
+
+class HeatCapacityMixture(BaseEquation):
+    """Heat capacity of ideal gas mixture."""
+    
+    equation_id = "heat_capacity_mixture"
+    name = "Mixture Heat Capacity"
+    category = "Thermodynamics"
+    description = "Calculate Cp of ideal gas mixture from pure component values"
+    reference = "Standard thermodynamics"
+    
+    def get_parameters(self) -> List[EquationParameter]:
+        return [
+            EquationParameter("y1", "Mole fraction of component 1", "dimensionless", "",
+                              ParameterType.INPUT, symbol="y₁", typical_range=(0, 1)),
+            EquationParameter("Cp1", "Heat capacity of component 1", "J/(mol*K)", "BTU/(lbmol*R)",
+                              ParameterType.INPUT, symbol="Cₚ₁"),
+            EquationParameter("Cp2", "Heat capacity of component 2", "J/(mol*K)", "BTU/(lbmol*R)",
+                              ParameterType.INPUT, symbol="Cₚ₂"),
+            EquationParameter("Cp_mix", "Mixture heat capacity", "J/(mol*K)", "BTU/(lbmol*R)",
+                              ParameterType.OUTPUT, symbol="Cₚₘᵢₓ"),
+        ]
+    
+    def _calculate(self, y1: pint.Quantity, Cp1: pint.Quantity, Cp2: pint.Quantity,
+                   **kwargs) -> Dict[str, pint.Quantity]:
+        y = y1.magnitude if hasattr(y1, 'magnitude') else float(y1)
+        cp1 = Cp1.to('J/(mol*K)').magnitude
+        cp2 = Cp2.to('J/(mol*K)').magnitude
+        
+        cp_mix = y * cp1 + (1-y) * cp2
+        
+        return {"Cp_mix": ureg.Quantity(cp_mix, "J/(mol*K)")}
+
+
+# Update registry
+THERMODYNAMICS_EQUATIONS = {
+    'ideal_gas': IdealGas,
+    'antoine': AntoineVaporPressure,
+    'raoults_law': RaoultsLaw,
+    'clausius_clapeyron': ClausiusClapeyron,
+    'flash': FlashCalculation,
+    'compressor_work': CompressorWork,
+    'van_der_waals': VanDerWaals,
+    'activity_coefficient': ActivityCoefficient,
+    'joule_thomson': JouleThomson,
+    'heat_capacity_mixture': HeatCapacityMixture,
+}
