@@ -9,21 +9,21 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <style>
         :root {
-            --bg-primary: #0f0f1a;
-            --bg-secondary: #141428;
-            --bg-card: rgba(30, 30, 50, 0.6);
-            --bg-glass: rgba(255, 255, 255, 0.03);
-            --text-primary: #e4e4f0;
-            --text-secondary: #8b8ba7;
-            --accent: #6366f1;
-            --accent-light: #818cf8;
-            --accent-glow: rgba(99, 102, 241, 0.4);
+            --bg-primary: #121218;
+            --bg-secondary: #1a1a22;
+            --bg-card: rgba(28, 28, 36, 0.6);
+            --bg-glass: rgba(255, 255, 255, 0.025);
+            --text-primary: #e0e0e6;
+            --text-secondary: #8a8a9a;
+            --accent: #5b6eae;
+            --accent-light: #7a8bc4;
+            --accent-glow: rgba(91, 110, 174, 0.15);
             --success: #22c55e;
             --warning: #f59e0b;
             --error: #ef4444;
-            --border: rgba(255, 255, 255, 0.08);
-            --gradient-1: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
-            --gradient-2: linear-gradient(135deg, #0f0f1a 0%, #1e1b4b 100%);
+            --border: rgba(255, 255, 255, 0.06);
+            --gradient-1: linear-gradient(135deg, #5b6eae 0%, #6b7db8 100%);
+            --gradient-2: linear-gradient(135deg, #121218 0%, #1a1a24 100%);
         }
 
         * {
@@ -40,30 +40,84 @@
             overflow-x: hidden;
         }
 
-        /* Animated background */
+        /* Enhanced Animated Background - Orbital Gradients */
         body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background:
+                radial-gradient(ellipse at 30% 30%, rgba(91, 110, 174, 0.12) 0%, transparent 40%),
+                radial-gradient(ellipse at 70% 70%, rgba(107, 125, 184, 0.10) 0%, transparent 45%),
+                radial-gradient(ellipse at 50% 50%, rgba(91, 110, 174, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -2;
+            animation: bgOrbit 60s linear infinite;
+        }
+
+        @keyframes bgOrbit {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Molecular Hexagonal Lattice Overlay */
+        body::after {
             content: '';
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background:
-                radial-gradient(ellipse at 20% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
-                radial-gradient(ellipse at 50% 50%, rgba(217, 70, 239, 0.05) 0%, transparent 70%);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='52' viewBox='0 0 60 52'%3E%3Cpath d='M30 0 L60 15 L60 37 L30 52 L0 37 L0 15 Z' fill='none' stroke='rgba(91,110,174,0.025)' stroke-width='0.5'/%3E%3C/svg%3E");
+            background-size: 60px 52px;
             pointer-events: none;
             z-index: -1;
-            animation: bgPulse 15s ease-in-out infinite alternate;
+            opacity: 0.8;
+            animation: latticeShift 120s linear infinite;
         }
 
-        @keyframes bgPulse {
+        @keyframes latticeShift {
             0% {
-                opacity: 0.6;
+                background-position: 0 0;
             }
 
             100% {
+                background-position: 600px 520px;
+            }
+        }
+
+        /* Volumetric Glow Pulse */
+        .bg-glow {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 800px;
+            height: 800px;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, rgba(91, 110, 174, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: -1;
+            animation: glowPulse 8s ease-in-out infinite;
+        }
+
+        @keyframes glowPulse {
+
+            0%,
+            100% {
+                opacity: 0.5;
+                transform: translate(-50%, -50%) scale(1);
+            }
+
+            50% {
                 opacity: 1;
+                transform: translate(-50%, -50%) scale(1.2);
             }
         }
 
@@ -408,7 +462,7 @@
         }
 
         .reference-link:hover {
-            background: rgba(99, 102, 241, 0.1);
+            background: rgba(91, 110, 174, 0.1);
             border-color: var(--accent);
             transform: translateX(4px);
         }
@@ -628,7 +682,7 @@
 
         .tool-card:hover {
             border-color: var(--accent);
-            background: rgba(99, 102, 241, 0.1);
+            background: rgba(91, 110, 174, 0.1);
             transform: translateY(-3px);
             box-shadow: 0 8px 25px var(--accent-glow);
         }
@@ -687,6 +741,332 @@
             }
         }
 
+        /* Theme Toggle */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+        }
+
+        .theme-toggle:hover {
+            background: var(--accent);
+            transform: rotate(20deg);
+        }
+
+        /* Tips Carousel */
+        .tips-carousel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tips-carousel .tip {
+            display: none;
+            animation: tipFade 0.5s ease-out;
+        }
+
+        .tips-carousel .tip.active {
+            display: block;
+        }
+
+        .tips-carousel .tip-icon {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+
+        .tips-carousel .tip-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .tips-carousel .tip-label {
+            font-size: 0.7rem;
+            color: var(--accent-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        @keyframes tipFade {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Equation Preview Tooltip */
+        .equation-item {
+            position: relative;
+        }
+
+        .equation-preview {
+            position: absolute;
+            left: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            margin-left: 10px;
+            background: var(--bg-card);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px;
+            width: 280px;
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s, transform 0.2s;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .equation-item:hover .equation-preview {
+            opacity: 1;
+            transform: translateY(-50%) translateX(0);
+            pointer-events: auto;
+        }
+
+        .equation-preview h4 {
+            font-size: 0.9rem;
+            color: var(--accent-light);
+            margin-bottom: 6px;
+        }
+
+        .equation-preview p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .equation-preview .preview-inputs {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            opacity: 0.8;
+        }
+
+        /* Input Validation States */
+        .input-field.valid {
+            border-color: var(--success) !important;
+            box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+        }
+
+        .input-field.warning {
+            border-color: var(--warning) !important;
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+        }
+
+        .input-field.invalid {
+            border-color: var(--error) !important;
+            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+        }
+
+        /* Copy Toast */
+        .copy-toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--success);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .copy-toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* Result Card Copy Interaction */
+        .result-card {
+            cursor: pointer;
+            position: relative;
+        }
+
+        .result-card::after {
+            content: '📋 Click to copy';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .result-card:hover::after {
+            opacity: 1;
+        }
+
+        /* Comparison Mode */
+        .comparison-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+        }
+
+        .comparison-toggle input {
+            accent-color: var(--accent);
+        }
+
+        .result-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .result-comparison .result-card {
+            font-size: 0.85rem;
+        }
+
+        .result-comparison .result-card.previous {
+            opacity: 0.6;
+            border-style: dashed;
+        }
+
+        .delta-indicator {
+            font-size: 0.75rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 8px;
+        }
+
+        .delta-indicator.positive {
+            background: rgba(34, 197, 94, 0.2);
+            color: var(--success);
+        }
+
+        .delta-indicator.negative {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--error);
+        }
+
+        /* Calculation Counter */
+        .calc-counter {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            z-index: 100;
+        }
+
+        .calc-counter strong {
+            color: var(--accent-light);
+        }
+
+        /* History Dropdown */
+        .history-dropdown {
+            position: relative;
+        }
+
+        .history-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            padding: 8px 14px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            margin-bottom: 10px;
+            width: 100%;
+            text-align: left;
+        }
+
+        .history-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+        }
+
+        .history-list.show {
+            display: block;
+        }
+
+        .history-item {
+            padding: 10px 14px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .history-item:hover {
+            background: rgba(91, 110, 174, 0.1);
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Light Theme */
+        body.light-mode {
+            --bg-primary: #f5f5f7;
+            --bg-secondary: #ffffff;
+            --bg-card: rgba(255, 255, 255, 0.8);
+            --bg-glass: rgba(255, 255, 255, 0.6);
+            --text-primary: #1d1d1f;
+            --text-secondary: #6e6e73;
+            --border: rgba(0, 0, 0, 0.1);
+            --gradient-2: linear-gradient(135deg, #f5f5f7 0%, #e8e8ed 100%);
+        }
+
+        body.light-mode::before {
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(91, 110, 174, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
+        }
+
+        body.light-mode .unit-select,
+        body.light-mode .unit-select option {
+            background: #f0f0f5;
+            color: #1d1d1f;
+        }
+
+        body.light-mode .input-field {
+            background: rgba(0, 0, 0, 0.03);
+            color: #1d1d1f;
+        }
+
         /* Scrollbar styling */
         ::-webkit-scrollbar {
             width: 8px;
@@ -705,6 +1085,458 @@
             background: var(--accent);
         }
 
+        /* ===============================================
+           VISUAL ENHANCEMENTS - Engineering Aesthetics
+           =============================================== */
+
+        /* Floating Engineering Symbols Container */
+        .floating-symbols {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .floating-symbol {
+            position: absolute;
+            opacity: 0.04;
+            animation: floatDrift 40s ease-in-out infinite;
+        }
+
+        .floating-symbol:nth-child(1) {
+            top: 10%;
+            left: 5%;
+            animation-delay: 0s;
+        }
+
+        .floating-symbol:nth-child(2) {
+            top: 60%;
+            left: 15%;
+            animation-delay: -8s;
+        }
+
+        .floating-symbol:nth-child(3) {
+            top: 20%;
+            right: 10%;
+            animation-delay: -16s;
+        }
+
+        .floating-symbol:nth-child(4) {
+            top: 70%;
+            right: 20%;
+            animation-delay: -24s;
+        }
+
+        .floating-symbol:nth-child(5) {
+            top: 40%;
+            left: 50%;
+            animation-delay: -32s;
+        }
+
+        .floating-symbol:nth-child(6) {
+            bottom: 15%;
+            left: 30%;
+            animation-delay: -12s;
+        }
+
+        @keyframes floatDrift {
+
+            0%,
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            25% {
+                transform: translate(30px, -20px) rotate(5deg);
+            }
+
+            50% {
+                transform: translate(10px, 30px) rotate(-3deg);
+            }
+
+            75% {
+                transform: translate(-20px, 10px) rotate(2deg);
+            }
+        }
+
+        /* Particle Canvas Background */
+        #particleCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.6;
+        }
+
+        /* Enhanced Button - Neon Edge Glow */
+        .calculate-btn {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .calculate-btn::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(90deg, #5b6eae, #6b7db8, #7a8bc4, #6b7db8, #5b6eae);
+            background-size: 400% 100%;
+            z-index: -1;
+            border-radius: inherit;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            animation: neonShift 3s linear infinite;
+        }
+
+        .calculate-btn:hover::before {
+            opacity: 1;
+        }
+
+        @keyframes neonShift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            100% {
+                background-position: 400% 50%;
+            }
+        }
+
+        /* Liquid Metal Ripple Effect on Click */
+        .ripple-effect {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, transparent 70%);
+            transform: scale(0);
+            animation: rippleExpand 0.6s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes rippleExpand {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* Tool Card Energy Wave Effect */
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.5s ease;
+            z-index: -1;
+        }
+
+        .tool-card:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        /* Icon Glow Pulse on Hover */
+        .category-header:hover .category-count,
+        .equation-item:hover {
+            animation: iconGlow 1.5s ease-in-out infinite;
+        }
+
+        @keyframes iconGlow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 5px var(--accent-glow);
+            }
+
+            50% {
+                box-shadow: 0 0 20px var(--accent-glow), 0 0 30px var(--accent-glow);
+            }
+        }
+
+        /* Blueprint Line-Draw Animation */
+        .blueprint-line {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: drawLine 3s ease-out forwards;
+        }
+
+        @keyframes drawLine {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        /* Thermodynamic Contour Decoration */
+        .thermo-contour {
+            position: absolute;
+            opacity: 0.03;
+            pointer-events: none;
+        }
+
+        .results-panel .thermo-contour {
+            bottom: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+        }
+
+        /* Animated Flask Bubbles */
+        @keyframes bubbleRise {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 0.7;
+            }
+
+            50% {
+                transform: translateY(-15px) scale(1.2);
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: translateY(-30px) scale(0.8);
+                opacity: 0;
+            }
+        }
+
+        .flask-bubble {
+            animation: bubbleRise 2s ease-in-out infinite;
+        }
+
+        .flask-bubble:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .flask-bubble:nth-child(2) {
+            animation-delay: 0.5s;
+        }
+
+        .flask-bubble:nth-child(3) {
+            animation-delay: 1s;
+        }
+
+        /* Liquid Oscillation in Flask */
+        @keyframes liquidWave {
+
+            0%,
+            100% {
+                d: path('M25 70 Q50 65 75 70 L75 80 Q50 85 25 80 Z');
+            }
+
+            50% {
+                d: path('M25 70 Q50 75 75 70 L75 80 Q50 75 25 80 Z');
+            }
+        }
+
+        .flask-liquid {
+            animation: liquidWave 3s ease-in-out infinite;
+        }
+
+        /* Welcome State Flask Glow */
+        .welcome-flask {
+            filter: drop-shadow(0 0 15px rgba(91, 110, 174, 0.25));
+            animation: flaskGlow 4s ease-in-out infinite;
+        }
+
+        @keyframes flaskGlow {
+
+            0%,
+            100% {
+                filter: drop-shadow(0 0 15px rgba(91, 110, 174, 0.25));
+            }
+
+            50% {
+                filter: drop-shadow(0 0 40px rgba(139, 92, 246, 0.5));
+            }
+        }
+
+        /* Gradient Border Effect for Panels */
+        .results-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-1);
+            opacity: 0.6;
+        }
+
+        /* History Dropdown UI */
+        .history-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .history-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 14px;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .history-btn:hover {
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
+
+        .history-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            min-width: 280px;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-top: 8px;
+            padding: 8px;
+            z-index: 100;
+            display: none;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        .history-menu.show {
+            display: block;
+            animation: dropdownSlide 0.25s ease-out;
+        }
+
+        @keyframes dropdownSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .history-item {
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-item:hover {
+            background: rgba(91, 110, 174, 0.1);
+        }
+
+        .history-item .time {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .history-item .values {
+            font-size: 0.8rem;
+            color: var(--text-primary);
+            margin-top: 4px;
+        }
+
+        /* Input Linking Suggestions */
+        .link-suggestions {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .link-suggestions h4 {
+            font-size: 0.85rem;
+            color: var(--accent-light);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .link-suggestion-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            background: var(--bg-glass);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .link-suggestion-item:hover {
+            background: rgba(91, 110, 174, 0.12);
+            transform: translateX(4px);
+        }
+
+        .link-suggestion-item .eq-name {
+            font-size: 0.85rem;
+            color: var(--text-primary);
+        }
+
+        .link-suggestion-item .param-match {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .link-arrow {
+            color: var(--accent);
+            font-size: 1.2rem;
+        }
+
+        /* Equation Preview Enhancement */
+        .equation-preview {
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(91, 110, 174, 0.04) 100%);
+        }
+
+        .equation-preview .formula {
+            font-family: 'Courier New', monospace;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: var(--accent-light);
+            margin: 8px 0;
+        }
+
         @media (max-width: 1200px) {
             .container {
                 grid-template-columns: 1fr;
@@ -719,6 +1551,75 @@
 </head>
 
 <body>
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode">🌙</button>
+
+    <!-- Copy Toast -->
+    <div class="copy-toast" id="copyToast">✓ Copied to clipboard!</div>
+
+    <!-- Calculation Counter -->
+    <div class="calc-counter" id="calcCounter">
+        Calculations today: <strong id="calcCount">0</strong>
+    </div>
+
+    <!-- Particle Canvas for Molecular Motion -->
+    <canvas id="particleCanvas"></canvas>
+
+    <!-- Volumetric Glow -->
+    <div class="bg-glow"></div>
+
+    <!-- Floating Engineering Symbols -->
+    <div class="floating-symbols">
+        <!-- Pump Symbol -->
+        <svg class="floating-symbol" width="80" height="80" viewBox="0 0 100 100" fill="none">
+            <circle cx="50" cy="50" r="35" stroke="currentColor" stroke-width="2" opacity="0.5" />
+            <path d="M30 50 L70 50 M50 30 L50 70" stroke="currentColor" stroke-width="2" opacity="0.5" />
+            <path d="M50 15 L50 30 M50 70 L50 85" stroke="currentColor" stroke-width="2" opacity="0.5" />
+        </svg>
+        <!-- Valve Symbol -->
+        <svg class="floating-symbol" width="70" height="70" viewBox="0 0 100 100" fill="none">
+            <path d="M20 50 L50 30 L80 50 L50 70 Z" stroke="currentColor" stroke-width="2" fill="none" opacity="0.5" />
+            <line x1="10" y1="50" x2="20" y2="50" stroke="currentColor" stroke-width="2" opacity="0.5" />
+            <line x1="80" y1="50" x2="90" y2="50" stroke="currentColor" stroke-width="2" opacity="0.5" />
+        </svg>
+        <!-- Heat Exchanger Symbol -->
+        <svg class="floating-symbol" width="90" height="60" viewBox="0 0 120 80" fill="none">
+            <ellipse cx="60" cy="40" rx="50" ry="30" stroke="currentColor" stroke-width="2" opacity="0.5" />
+            <line x1="10" y1="40" x2="30" y2="40" stroke="currentColor" stroke-width="2" opacity="0.5" />
+            <line x1="90" y1="40" x2="110" y2="40" stroke="currentColor" stroke-width="2" opacity="0.5" />
+            <path d="M40 25 L40 55 M50 25 L50 55 M60 25 L60 55 M70 25 L70 55 M80 25 L80 55" stroke="currentColor"
+                stroke-width="1" opacity="0.3" />
+        </svg>
+        <!-- Reactor Symbol -->
+        <svg class="floating-symbol" width="60" height="80" viewBox="0 0 80 100" fill="none">
+            <rect x="15" y="20" width="50" height="60" rx="5" stroke="currentColor" stroke-width="2" fill="none"
+                opacity="0.5" />
+            <path d="M30 20 L30 10 L50 10 L50 20" stroke="currentColor" stroke-width="2" opacity="0.5" />
+            <circle cx="40" cy="50" r="15" stroke="currentColor" stroke-width="1" opacity="0.3" />
+            <line x1="15" y1="80" x2="15" y2="90" stroke="currentColor" stroke-width="2" opacity="0.5" />
+            <line x1="65" y1="80" x2="65" y2="90" stroke="currentColor" stroke-width="2" opacity="0.5" />
+        </svg>
+        <!-- Distillation Column Symbol -->
+        <svg class="floating-symbol" width="50" height="100" viewBox="0 0 60 120" fill="none">
+            <rect x="15" y="10" width="30" height="100" rx="3" stroke="currentColor" stroke-width="2" fill="none"
+                opacity="0.5" />
+            <line x1="15" y1="30" x2="45" y2="30" stroke="currentColor" stroke-width="1" opacity="0.3" />
+            <line x1="15" y1="50" x2="45" y2="50" stroke="currentColor" stroke-width="1" opacity="0.3" />
+            <line x1="15" y1="70" x2="45" y2="70" stroke="currentColor" stroke-width="1" opacity="0.3" />
+            <line x1="15" y1="90" x2="45" y2="90" stroke="currentColor" stroke-width="1" opacity="0.3" />
+            <path d="M5 20 L15 20" stroke="currentColor" stroke-width="2" opacity="0.5" />
+            <path d="M45 10 L55 10" stroke="currentColor" stroke-width="2" opacity="0.5" />
+        </svg>
+        <!-- Tank Symbol -->
+        <svg class="floating-symbol" width="70" height="70" viewBox="0 0 100 100" fill="none">
+            <ellipse cx="50" cy="20" rx="30" ry="10" stroke="currentColor" stroke-width="2" opacity="0.5" />
+            <ellipse cx="50" cy="80" rx="30" ry="10" stroke="currentColor" stroke-width="2" opacity="0.5" />
+            <line x1="20" y1="20" x2="20" y2="80" stroke="currentColor" stroke-width="2" opacity="0.5" />
+            <line x1="80" y1="20" x2="80" y2="80" stroke="currentColor" stroke-width="2" opacity="0.5" />
+        </svg>
+    </div>
+
+
     <div class="container">
         <!-- Sidebar -->
         <aside class="sidebar">
@@ -733,7 +1634,8 @@
         <main class="main-content">
             <div id="welcomeState" class="empty-state">
                 <div class="empty-state-icon">
-                    <svg width="80" height="80" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg class="welcome-flask" width="80" height="80" viewBox="0 0 100 100" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
                         <defs>
                             <linearGradient id="flaskGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                                 <stop offset="0%" style="stop-color:#6366f1" />
@@ -741,14 +1643,16 @@
                                 <stop offset="100%" style="stop-color:#d946ef" />
                             </linearGradient>
                         </defs>
-                        <path d="M40 10 L40 35 L20 75 Q15 85 25 90 L75 90 Q85 85 80 75 L60 35 L60 10 Z"
+                        <path class="blueprint-line"
+                            d="M40 10 L40 35 L20 75 Q15 85 25 90 L75 90 Q85 85 80 75 L60 35 L60 10 Z"
                             stroke="url(#flaskGrad)" stroke-width="3" fill="none" stroke-linecap="round"
                             stroke-linejoin="round" />
                         <path d="M35 10 L65 10" stroke="url(#flaskGrad)" stroke-width="3" stroke-linecap="round" />
-                        <path d="M25 70 Q50 60 75 70 L75 80 Q50 90 25 80 Z" fill="url(#flaskGrad)" opacity="0.3" />
-                        <circle cx="35" cy="55" r="3" fill="url(#flaskGrad)" opacity="0.6" />
-                        <circle cx="50" cy="48" r="4" fill="url(#flaskGrad)" opacity="0.5" />
-                        <circle cx="60" cy="58" r="2" fill="url(#flaskGrad)" opacity="0.7" />
+                        <path class="flask-liquid" d="M25 70 Q50 60 75 70 L75 80 Q50 90 25 80 Z" fill="url(#flaskGrad)"
+                            opacity="0.3" />
+                        <circle class="flask-bubble" cx="35" cy="55" r="3" fill="url(#flaskGrad)" opacity="0.6" />
+                        <circle class="flask-bubble" cx="50" cy="48" r="4" fill="url(#flaskGrad)" opacity="0.5" />
+                        <circle class="flask-bubble" cx="60" cy="58" r="2" fill="url(#flaskGrad)" opacity="0.7" />
                     </svg>
                 </div>
                 <h2>Welcome to the Webster Engineering Solver</h2>
@@ -794,9 +1698,46 @@
         <!-- Results Panel -->
         <aside class="results-panel">
             <h3 class="results-header">Results</h3>
+            <label class="comparison-toggle">
+                <input type="checkbox" onchange="toggleComparison(this)">
+                Compare with previous
+            </label>
             <div id="resultsContent">
                 <div class="empty-state">
                     <p>Run a calculation to see results</p>
+                </div>
+            </div>
+
+            <!-- Tips Carousel -->
+            <div class="tips-carousel" id="tipsCarousel">
+                <div class="tip-label">💡 ChemE Fact</div>
+                <div class="tip active">
+                    <div class="tip-text">The Haber process for ammonia synthesis operates at 400-500°C and 150-300 atm,
+                        producing 150 million tons annually.</div>
+                </div>
+                <div class="tip">
+                    <div class="tip-text">A typical oil refinery can process up to 600,000 barrels of crude oil per day
+                        into gasoline, diesel, and jet fuel.</div>
+                </div>
+                <div class="tip">
+                    <div class="tip-text">The Reynolds number (Re > 4000) determines turbulent flow - discovered by
+                        Osborne Reynolds in 1883.</div>
+                </div>
+                <div class="tip">
+                    <div class="tip-text">Water has an unusually high heat capacity (4.18 kJ/kg·K), making it excellent
+                        for industrial cooling.</div>
+                </div>
+                <div class="tip">
+                    <div class="tip-text">Distillation accounts for ~40% of all energy used in chemical processing. Heat
+                        integration can cut this in half.</div>
+                </div>
+                <div class="tip">
+                    <div class="tip-text">The Navier-Stokes equations governing fluid flow remain one of the Millennium
+                        Prize Problems in mathematics.</div>
+                </div>
+                <div class="tip">
+                    <div class="tip-text">Bioreactors can produce 200+ grams of monoclonal antibodies per liter - up
+                        from milligrams in the 1980s.</div>
                 </div>
             </div>
             <div id="chartSection" style="display:none; margin-top: 20px;">
@@ -816,6 +1757,159 @@
         let currentCategory = null;
         let currentEquation = null;
         let equationParams = [];
+        let previousResult = null;
+        let comparisonMode = false;
+        let equationCache = {};
+
+        // ===== Chemical Engineering Tips =====
+        const chemEngTips = [
+            { icon: "🧪", text: "The Haber process for ammonia synthesis operates at 400-500°C and 150-300 atm, producing 150 million tons annually worldwide." },
+            { icon: "⚗️", text: "A typical oil refinery can process up to 600,000 barrels of crude oil per day into gasoline, diesel, and jet fuel." },
+            { icon: "🔬", text: "The Reynolds number (Re > 4000) determines turbulent flow - discovered by Osborne Reynolds in 1883." },
+            { icon: "💧", text: "Water has an unusually high heat capacity (4.18 kJ/kg·K), making it excellent for industrial cooling." },
+            { icon: "🏭", text: "The first commercial petrochemical plant opened in 1920 in the US, producing isopropyl alcohol." },
+            { icon: "⚡", text: "Electrolysis of water requires 237 kJ/mol, but fuel cells can recover up to 83% of this energy." },
+            { icon: "🌡️", text: "Absolute zero (-273.15°C) is theoretically unreachable - the closest achieved is 100 picoKelvin." },
+            { icon: "🔄", text: "Distillation accounts for ~40% of all energy used in chemical processing. Heat integration can cut this in half." },
+            { icon: "📊", text: "The Navier-Stokes equations governing fluid flow remain one of the Millennium Prize Problems in mathematics." },
+            { icon: "🎯", text: "Six Sigma quality (3.4 defects per million) was pioneered by Motorola and adopted industry-wide." },
+            { icon: "💨", text: "Supersonic wind tunnels can simulate speeds up to Mach 10 (12,350 km/h) for aerospace testing." },
+            { icon: "🧬", text: "Bioreactors can produce 200+ grams of monoclonal antibodies per liter - up from milligrams in the 1980s." },
+        ];
+        let currentTipIndex = 0;
+
+        // ===== Theme Toggle =====
+        function toggleTheme() {
+            const body = document.body;
+            const btn = document.querySelector('.theme-toggle');
+            body.classList.toggle('light-mode');
+            btn.textContent = body.classList.contains('light-mode') ? '☀️' : '🌙';
+            localStorage.setItem('theme', body.classList.contains('light-mode') ? 'light' : 'dark');
+        }
+
+        function loadTheme() {
+            const saved = localStorage.getItem('theme');
+            if (saved === 'light') {
+                document.body.classList.add('light-mode');
+                document.querySelector('.theme-toggle').textContent = '☀️';
+            }
+        }
+
+        // ===== Calculation Counter =====
+        function updateCalcCounter() {
+            const today = new Date().toDateString();
+            let data = JSON.parse(localStorage.getItem('calcStats') || '{}');
+            if (data.date !== today) {
+                data = { date: today, count: 0 };
+            }
+            data.count++;
+            localStorage.setItem('calcStats', JSON.stringify(data));
+            document.getElementById('calcCount').textContent = data.count;
+        }
+
+        function loadCalcCounter() {
+            const today = new Date().toDateString();
+            let data = JSON.parse(localStorage.getItem('calcStats') || '{}');
+            if (data.date !== today) {
+                data = { date: today, count: 0 };
+            }
+            document.getElementById('calcCount').textContent = data.count;
+        }
+
+        // ===== Calculation History =====
+        function saveToHistory(equationId, inputs, outputs) {
+            const key = `history_${equationId}`;
+            let history = JSON.parse(localStorage.getItem(key) || '[]');
+            history.unshift({
+                timestamp: new Date().toISOString(),
+                inputs: inputs,
+                outputs: outputs
+            });
+            history = history.slice(0, 10); // Keep last 10
+            localStorage.setItem(key, JSON.stringify(history));
+        }
+
+        function loadFromHistory(equationId, index) {
+            const key = `history_${equationId}`;
+            const history = JSON.parse(localStorage.getItem(key) || '[]');
+            if (history[index]) {
+                const entry = history[index];
+                for (const [name, data] of Object.entries(entry.inputs)) {
+                    const input = document.getElementById(`input_${name}`);
+                    const unit = document.getElementById(`unit_${name}`);
+                    if (input) input.value = data.value;
+                    if (unit && data.unit) unit.value = data.unit;
+                }
+            }
+        }
+
+        function getHistory(equationId) {
+            const key = `history_${equationId}`;
+            return JSON.parse(localStorage.getItem(key) || '[]');
+        }
+
+        // ===== Copy to Clipboard =====
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const toast = document.getElementById('copyToast');
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 2000);
+            });
+        }
+
+        // ===== Input Validation =====
+        function validateInput(inputEl, param) {
+            const value = parseFloat(inputEl.value);
+            inputEl.classList.remove('valid', 'warning', 'invalid');
+
+            if (isNaN(value)) return;
+
+            if (param.typical_range && param.typical_range.length === 2) {
+                const [min, max] = param.typical_range;
+                const range = max - min;
+                const edgeBuffer = range * 0.1;
+
+                if (value < min || value > max) {
+                    inputEl.classList.add('invalid');
+                } else if (value < min + edgeBuffer || value > max - edgeBuffer) {
+                    inputEl.classList.add('warning');
+                } else {
+                    inputEl.classList.add('valid');
+                }
+            }
+        }
+
+        function setupInputValidation() {
+            for (const param of equationParams) {
+                const inputEl = document.getElementById(`input_${param.name}`);
+                if (inputEl && param.typical_range) {
+                    inputEl.addEventListener('input', () => validateInput(inputEl, param));
+                }
+            }
+        }
+
+        // ===== Tips Carousel =====
+        function rotateTip() {
+            const tips = document.querySelectorAll('.tips-carousel .tip');
+            if (tips.length === 0) return;
+
+            tips.forEach(t => t.classList.remove('active'));
+            currentTipIndex = (currentTipIndex + 1) % tips.length;
+            tips[currentTipIndex].classList.add('active');
+        }
+
+        function initTipsCarousel() {
+            setInterval(rotateTip, 8000);
+        }
+
+        // ===== Comparison Mode Toggle =====
+        function toggleComparison(checkbox) {
+            comparisonMode = checkbox.checked;
+            if (lastResult) {
+                displayResultsEnhanced(lastResult);
+            }
+        }
+
 
         // Load categories on page load
         async function loadCategories() {
@@ -831,7 +1925,9 @@
                     </div>
                     <div class="equation-list">
                         ${cat.equations.map(eq => `
-                            <div class="equation-item" onclick="selectEquation('${cat.name.toLowerCase().replace(/ /g, '_')}', '${eq.id}')">
+                            <div class="equation-item" 
+                                 onclick="selectEquation('${cat.name.toLowerCase().replace(/ /g, '_')}', '${eq.id}')"
+                                 onmouseenter="showEquationPreview(this, '${cat.name.toLowerCase().replace(/ /g, '_')}', '${eq.id}')">
                                 ${eq.name}
                             </div>
                         `).join('')}
@@ -917,6 +2013,12 @@
                     <p>Enter values and click Calculate</p>
                 </div>
             `;
+
+            // Render history dropdown if there's history for this equation
+            setTimeout(() => renderHistoryDropdown(), 100);
+
+            // Setup input validation
+            setupInputValidation();
         }
 
         async function calculate() {
@@ -1164,29 +2266,370 @@
                 html += `<div class="validation-badge ${status}">${icon} ${result.validation_status}</div>`;
             }
 
-            // Output cards
-            for (const [name, data] of Object.entries(result.outputs)) {
-                const value = typeof data.value === 'number' ?
-                    (Math.abs(data.value) < 0.001 || Math.abs(data.value) > 10000 ?
-                        data.value.toExponential(4) : data.value.toFixed(4)) : data.value;
-                html += `
-                    <div class="result-card">
-                        <div class="result-name">${name}</div>
-                        <div class="result-value">
-                            ${value}
-                            <span class="result-unit">${data.unit || ''}</span>
+            // Check for comparison mode
+            if (comparisonMode && previousResult && previousResult.outputs) {
+                html += '<div class="result-comparison">';
+                for (const [name, data] of Object.entries(result.outputs)) {
+                    const value = typeof data.value === 'number' ?
+                        (Math.abs(data.value) < 0.001 || Math.abs(data.value) > 10000 ?
+                            data.value.toExponential(4) : data.value.toFixed(4)) : data.value;
+
+                    // Current result
+                    const copyText = `${value} ${data.unit || ''}`.trim();
+                    html += `
+                        <div class="result-card" onclick="copyToClipboard('${copyText}')">
+                            <div class="result-name">${name} (Current)</div>
+                            <div class="result-value">
+                                ${value}
+                                <span class="result-unit">${data.unit || ''}</span>
+                            </div>
                         </div>
-                    </div>
-                `;
+                    `;
+
+                    // Previous result
+                    const prevData = previousResult.outputs[name];
+                    if (prevData) {
+                        const prevValue = typeof prevData.value === 'number' ?
+                            (Math.abs(prevData.value) < 0.001 || Math.abs(prevData.value) > 10000 ?
+                                prevData.value.toExponential(4) : prevData.value.toFixed(4)) : prevData.value;
+
+                        // Calculate delta
+                        let delta = '';
+                        if (typeof data.value === 'number' && typeof prevData.value === 'number') {
+                            const pctChange = ((data.value - prevData.value) / prevData.value * 100).toFixed(1);
+                            const deltaClass = parseFloat(pctChange) >= 0 ? 'positive' : 'negative';
+                            delta = `<span class="delta-indicator ${deltaClass}">${pctChange > 0 ? '+' : ''}${pctChange}%</span>`;
+                        }
+
+                        html += `
+                            <div class="result-card previous">
+                                <div class="result-name">${name} (Previous) ${delta}</div>
+                                <div class="result-value">
+                                    ${prevValue}
+                                    <span class="result-unit">${prevData.unit || ''}</span>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+                html += '</div>';
+            } else {
+                // Normal output cards with copy functionality
+                for (const [name, data] of Object.entries(result.outputs)) {
+                    const value = typeof data.value === 'number' ?
+                        (Math.abs(data.value) < 0.001 || Math.abs(data.value) > 10000 ?
+                            data.value.toExponential(4) : data.value.toFixed(4)) : data.value;
+                    const copyText = `${value} ${data.unit || ''}`.trim();
+                    html += `
+                        <div class="result-card" onclick="copyToClipboard('${copyText}')">
+                            <div class="result-name">${name}</div>
+                            <div class="result-value">
+                                ${value}
+                                <span class="result-unit">${data.unit || ''}</span>
+                            </div>
+                        </div>
+                    `;
+                }
             }
 
             container.innerHTML = html;
+            previousResult = lastResult;
             lastResult = result;
             showChartActions();
+
+            // Update calculation counter
+            updateCalcCounter();
+
+            // Save to history
+            const inputs = {};
+            for (const param of equationParams) {
+                const valueEl = document.getElementById(`input_${param.name}`);
+                const unitEl = document.getElementById(`unit_${param.name}`);
+                if (valueEl && valueEl.value) {
+                    inputs[param.name] = {
+                        value: parseFloat(valueEl.value),
+                        unit: unitEl ? unitEl.value : ''
+                    };
+                }
+            }
+            saveToHistory(currentEquation, inputs, result.outputs);
+
+            // Show input linking suggestions
+            showLinkSuggestions(result.outputs);
         };
+
+        // ===== Particle System (Brownian Motion) =====
+        const particleCanvas = document.getElementById('particleCanvas');
+        const ctx = particleCanvas ? particleCanvas.getContext('2d') : null;
+        let particles = [];
+
+        function initParticles() {
+            if (!particleCanvas || !ctx) return;
+
+            particleCanvas.width = window.innerWidth;
+            particleCanvas.height = window.innerHeight;
+
+            particles = [];
+            const numParticles = 25;
+
+            for (let i = 0; i < numParticles; i++) {
+                particles.push({
+                    x: Math.random() * particleCanvas.width,
+                    y: Math.random() * particleCanvas.height,
+                    vx: (Math.random() - 0.5) * 0.5,
+                    vy: (Math.random() - 0.5) * 0.5,
+                    radius: Math.random() * 2 + 1,
+                    opacity: Math.random() * 0.3 + 0.1
+                });
+            }
+        }
+
+        function drawParticles() {
+            if (!ctx || !particleCanvas) return;
+
+            ctx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+
+            // Draw connecting lines (polymer chains)
+            ctx.strokeStyle = 'rgba(91, 110, 174, 0.06)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 150) {
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.globalAlpha = 0.1 * (1 - dist / 150);
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            // Draw particles
+            for (const p of particles) {
+                // Brownian motion - random velocity changes
+                p.vx += (Math.random() - 0.5) * 0.1;
+                p.vy += (Math.random() - 0.5) * 0.1;
+
+                // Damping
+                p.vx *= 0.99;
+                p.vy *= 0.99;
+
+                // Update position
+                p.x += p.vx;
+                p.y += p.vy;
+
+                // Wrap around edges
+                if (p.x < 0) p.x = particleCanvas.width;
+                if (p.x > particleCanvas.width) p.x = 0;
+                if (p.y < 0) p.y = particleCanvas.height;
+                if (p.y > particleCanvas.height) p.y = 0;
+
+                // Draw particle
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(91, 110, 174, ${p.opacity})`;
+                ctx.globalAlpha = 1;
+                ctx.fill();
+            }
+
+            requestAnimationFrame(drawParticles);
+        }
+
+        // ===== Ripple Effect on Calculate Button =====
+        function createRipple(event) {
+            const button = event.currentTarget;
+            const rect = button.getBoundingClientRect();
+            const ripple = document.createElement('span');
+            ripple.classList.add('ripple-effect');
+            ripple.style.left = `${event.clientX - rect.left}px`;
+            ripple.style.top = `${event.clientY - rect.top}px`;
+            ripple.style.width = ripple.style.height = '20px';
+            button.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 600);
+        }
+
+        // ===== Equation Preview on Hover =====
+        async function showEquationPreview(element, category, eqId) {
+            const cacheKey = `${category}/${eqId}`;
+
+            // Check cache
+            if (!equationCache[cacheKey]) {
+                try {
+                    const response = await fetch(`${API_BASE}/api/equations/${category}/${eqId}`);
+                    equationCache[cacheKey] = await response.json();
+                } catch (e) {
+                    return;
+                }
+            }
+
+            const eq = equationCache[cacheKey];
+
+            // Create or update preview
+            let preview = element.querySelector('.equation-preview');
+            if (!preview) {
+                preview = document.createElement('div');
+                preview.className = 'equation-preview';
+                element.appendChild(preview);
+            }
+
+            const inputsList = eq.parameters.map(p => `${p.symbol}`).join(', ');
+            preview.innerHTML = `
+                <h4>${eq.name}</h4>
+                ${eq.formula ? `<div class="formula">${eq.formula}</div>` : ''}
+                <p>${eq.description.substring(0, 100)}${eq.description.length > 100 ? '...' : ''}</p>
+                <div class="preview-inputs">Inputs: ${inputsList}</div>
+            `;
+        }
+
+        // ===== History Dropdown UI =====
+        function renderHistoryDropdown() {
+            if (!currentEquation) return;
+
+            const history = getHistory(currentEquation);
+            if (history.length === 0) return;
+
+            // Check if dropdown already exists
+            let dropdown = document.querySelector('.history-dropdown');
+            if (!dropdown) {
+                const inputSection = document.querySelector('.input-section');
+                if (!inputSection) return;
+
+                const header = inputSection.querySelector('.section-title');
+                if (!header) return;
+
+                dropdown = document.createElement('div');
+                dropdown.className = 'history-dropdown';
+                dropdown.innerHTML = `
+                    <button class="history-btn" onclick="toggleHistoryMenu(event)">
+                        📜 History <span class="history-count">(${history.length})</span>
+                    </button>
+                    <div class="history-menu" id="historyMenu"></div>
+                `;
+                header.parentNode.insertBefore(dropdown, header.nextSibling);
+            }
+
+            // Update count
+            const countSpan = dropdown.querySelector('.history-count');
+            if (countSpan) countSpan.textContent = `(${history.length})`;
+
+            // Populate menu
+            const menu = dropdown.querySelector('.history-menu');
+            if (!menu) return;
+
+            menu.innerHTML = history.map((entry, idx) => {
+                const time = new Date(entry.timestamp);
+                const timeStr = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const dateStr = time.toLocaleDateString();
+                const values = Object.entries(entry.inputs).slice(0, 2).map(([k, v]) => `${k}=${v.value}`).join(', ');
+                return `
+                    <div class="history-item" onclick="loadHistoryEntry(${idx})">
+                        <div class="time">${dateStr} ${timeStr}</div>
+                        <div class="values">${values}${Object.keys(entry.inputs).length > 2 ? '...' : ''}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleHistoryMenu(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('historyMenu');
+            if (menu) {
+                menu.classList.toggle('show');
+            }
+        }
+
+        function loadHistoryEntry(index) {
+            loadFromHistory(currentEquation, index);
+            const menu = document.getElementById('historyMenu');
+            if (menu) menu.classList.remove('show');
+        }
+
+        // Close history menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.history-dropdown')) {
+                const menu = document.getElementById('historyMenu');
+                if (menu) menu.classList.remove('show');
+            }
+        });
+
+        // ===== Input Linking Suggestions =====
+        const linkableParams = {
+            'pressure': ['pressure', 'P', 'pressure_drop', 'delta_P'],
+            'temperature': ['temperature', 'T', 'temp', 'T_hot', 'T_cold'],
+            'flow_rate': ['flow_rate', 'Q', 'volumetric_flow', 'mass_flow'],
+            'velocity': ['velocity', 'v', 'fluid_velocity'],
+            'heat_duty': ['heat_duty', 'Q_heat', 'heat_transfer'],
+            'area': ['area', 'A', 'surface_area']
+        };
+
+        function showLinkSuggestions(outputs) {
+            // Remove existing suggestions
+            const existing = document.querySelector('.link-suggestions');
+            if (existing) existing.remove();
+
+            // Find matchable output types
+            const suggestions = [];
+            for (const [outputName, outputData] of Object.entries(outputs)) {
+                for (const [category, params] of Object.entries(linkableParams)) {
+                    if (params.some(p => outputName.toLowerCase().includes(p.toLowerCase()))) {
+                        suggestions.push({
+                            outputName,
+                            outputValue: outputData.value,
+                            outputUnit: outputData.unit,
+                            category
+                        });
+                    }
+                }
+            }
+
+            if (suggestions.length === 0) return;
+
+            // Create suggestions container
+            const container = document.getElementById('resultsContent');
+            if (!container) return;
+
+            const suggestionsDiv = document.createElement('div');
+            suggestionsDiv.className = 'link-suggestions';
+            suggestionsDiv.innerHTML = `
+                <h4>🔗 Link to Other Equations</h4>
+                ${suggestions.slice(0, 3).map(s => `
+                    <div class="link-suggestion-item" onclick="copyToClipboard('${s.outputValue}')">
+                        <div>
+                            <div class="eq-name">${s.outputName}</div>
+                            <div class="param-match">${typeof s.outputValue === 'number' ? s.outputValue.toFixed(4) : s.outputValue} ${s.outputUnit || ''}</div>
+                        </div>
+                        <span class="link-arrow">→</span>
+                    </div>
+                `).join('')}
+            `;
+
+            container.appendChild(suggestionsDiv);
+        }
+
+        // ===== Window Resize Handler =====
+        window.addEventListener('resize', () => {
+            if (particleCanvas) {
+                particleCanvas.width = window.innerWidth;
+                particleCanvas.height = window.innerHeight;
+            }
+        });
 
         // Initialize
         loadCategories();
+        loadTheme();
+        loadCalcCounter();
+        initTipsCarousel();
+        initParticles();
+        drawParticles();
+
+        // Add ripple effect to calculate button
+        const calcBtn = document.getElementById('calculateBtn');
+        if (calcBtn) {
+            calcBtn.addEventListener('click', createRipple);
+        }
     </script>
 </body>
 
