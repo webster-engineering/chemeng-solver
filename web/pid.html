@@ -271,6 +271,19 @@
                 <button class="tool-btn" id="pipeTool" onclick="setTool('pipe')">Draw Pipe</button>
             </div>
             <div class="toolbar-group">
+                <button class="tool-btn" onclick="undo()" title="Ctrl+Z">↩ Undo</button>
+                <button class="tool-btn" onclick="redo()" title="Ctrl+Y">↪ Redo</button>
+            </div>
+            <div class="toolbar-group">
+                <button class="tool-btn" id="snapBtn" onclick="toggleSnap()">⊞ Snap</button>
+                <button class="tool-btn" onclick="rotateSelected()" title="R">↻ Rotate</button>
+                <button class="tool-btn" onclick="duplicateSelected()" title="Ctrl+D">⧉ Copy</button>
+            </div>
+            <div class="toolbar-group">
+                <button class="tool-btn" onclick="saveDiagram()">💾 Save</button>
+                <button class="tool-btn" onclick="loadDiagram()">📂 Load</button>
+            </div>
+            <div class="toolbar-group">
                 <button class="tool-btn" onclick="clearCanvas()">Clear</button>
                 <button class="tool-btn" onclick="exportPNG()">Export PNG</button>
             </div>
@@ -300,6 +313,12 @@
         let selectedSymbolType = null;
         let isDrawingPipe = false;
         let pipeStart = null;
+
+        // New state for enhancements
+        let undoStack = [];
+        let redoStack = [];
+        let snapToGrid = false;
+        const GRID_SIZE = 40;
 
         // Professional P&ID Symbol Definitions
         const SYMBOLS = {
@@ -881,14 +900,19 @@
             // Draw elements
             elements.forEach(el => {
                 if (el.type === 'pipe') {
-                    ctx.strokeStyle = '#cdd6f4';
+                    ctx.strokeStyle = el === selectedElement ? '#a6e3a1' : '#cdd6f4';
                     ctx.lineWidth = 3;
                     ctx.beginPath();
                     ctx.moveTo(el.x1, el.y1);
                     ctx.lineTo(el.x2, el.y2);
                     ctx.stroke();
                 } else if (el.type === 'symbol') {
+                    ctx.save();
+                    ctx.translate(el.x, el.y);
+                    ctx.rotate((el.rotation || 0) * Math.PI / 180);
+                    ctx.translate(-el.x, -el.y);
                     SYMBOLS[el.symbolType].draw(ctx, el.x, el.y, el === selectedElement);
+                    ctx.restore();
                     if (el.tag) {
                         ctx.font = '10px Inter';
                         ctx.fillStyle = '#cdd6f4';
@@ -973,12 +997,21 @@
                     <div class="prop-label">Position Y</div>
                     <input class="prop-input" type="number" id="posY" value="${Math.round(selectedElement.y)}">
                 </div>
+                ${selectedElement.type === 'symbol' ? `
+                <div class="prop-group">
+                    <div class="prop-label">Rotation (°)</div>
+                    <input class="prop-input" type="number" id="rotInput" value="${selectedElement.rotation || 0}" step="90">
+                </div>
+                ` : ''}
                 <button class="delete-btn" onclick="deleteSelected()">Delete</button>
             `;
 
-            document.getElementById('tagInput').onchange = e => { selectedElement.tag = e.target.value; redraw(); };
-            document.getElementById('posX').onchange = e => { selectedElement.x = parseInt(e.target.value); redraw(); };
-            document.getElementById('posY').onchange = e => { selectedElement.y = parseInt(e.target.value); redraw(); };
+            document.getElementById('tagInput').onchange = e => { saveState(); selectedElement.tag = e.target.value; redraw(); };
+            document.getElementById('posX').onchange = e => { saveState(); selectedElement.x = parseInt(e.target.value); redraw(); };
+            document.getElementById('posY').onchange = e => { saveState(); selectedElement.y = parseInt(e.target.value); redraw(); };
+            if (document.getElementById('rotInput')) {
+                document.getElementById('rotInput').onchange = e => { saveState(); selectedElement.rotation = parseInt(e.target.value) % 360; redraw(); };
+            }
         }
 
         function deleteSelected() {
@@ -1005,6 +1038,155 @@
             link.href = canvas.toDataURL();
             link.click();
         }
+
+        // Save state for undo
+        function saveState() {
+            undoStack.push(JSON.stringify(elements));
+            if (undoStack.length > 50) undoStack.shift();
+            redoStack = [];
+        }
+
+        // Undo
+        function undo() {
+            if (undoStack.length === 0) return;
+            redoStack.push(JSON.stringify(elements));
+            elements = JSON.parse(undoStack.pop());
+            selectedElement = null;
+            updateProperties();
+            redraw();
+        }
+
+        // Redo
+        function redo() {
+            if (redoStack.length === 0) return;
+            undoStack.push(JSON.stringify(elements));
+            elements = JSON.parse(redoStack.pop());
+            selectedElement = null;
+            updateProperties();
+            redraw();
+        }
+
+        // Snap to grid toggle
+        function toggleSnap() {
+            snapToGrid = !snapToGrid;
+            document.getElementById('snapBtn').classList.toggle('active', snapToGrid);
+            document.getElementById('statusText').textContent = snapToGrid ? 'Snap to grid: ON' : 'Snap to grid: OFF';
+        }
+
+        // Snap coordinate to grid
+        function snapCoord(val) {
+            return snapToGrid ? Math.round(val / GRID_SIZE) * GRID_SIZE : val;
+        }
+
+        // Rotate selected element
+        function rotateSelected() {
+            if (!selectedElement || selectedElement.type !== 'symbol') return;
+            saveState();
+            selectedElement.rotation = ((selectedElement.rotation || 0) + 90) % 360;
+            redraw();
+        }
+
+        // Duplicate selected element
+        function duplicateSelected() {
+            if (!selectedElement) return;
+            saveState();
+            const copy = JSON.parse(JSON.stringify(selectedElement));
+            copy.x += 50;
+            copy.y += 50;
+            elements.push(copy);
+            selectedElement = copy;
+            updateProperties();
+            redraw();
+        }
+
+        // Save diagram to file
+        function saveDiagram() {
+            const data = JSON.stringify(elements, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'pid-diagram.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Load diagram from file
+        function loadDiagram() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = event => {
+                    try {
+                        elements = JSON.parse(event.target.result);
+                        selectedElement = null;
+                        updateProperties();
+                        redraw();
+                    } catch (err) {
+                        alert('Invalid diagram file');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', e => {
+            if (e.ctrlKey && e.key === 'z') { e.preventDefault(); undo(); }
+            if (e.ctrlKey && e.key === 'y') { e.preventDefault(); redo(); }
+            if (e.ctrlKey && e.key === 'd') { e.preventDefault(); duplicateSelected(); }
+            if (e.key === 'r' && selectedElement) { rotateSelected(); }
+            if (e.key === 'Delete' && selectedElement) { deleteSelected(); }
+            if (e.key === 'Escape') { selectedElement = null; updateProperties(); redraw(); }
+        });
+
+        // Override mousedown to save state before changes
+        const originalMousedown = canvas.onmousedown;
+        canvas.addEventListener('mousedown', e => {
+            const rect = canvas.getBoundingClientRect();
+            let x = e.clientX - rect.left;
+            let y = e.clientY - rect.top;
+
+            // Apply snap
+            x = snapCoord(x);
+            y = snapCoord(y);
+
+            if (currentTool === 'place' && selectedSymbolType) {
+                saveState();
+                elements.push({ type: 'symbol', symbolType: selectedSymbolType, x, y, tag: '', rotation: 0 });
+                redraw();
+            } else if (currentTool === 'pipe') {
+                isDrawingPipe = true;
+                pipeStart = { x, y };
+            } else if (currentTool === 'select') {
+                selectedElement = elements.find(el => {
+                    if (el.type === 'symbol') {
+                        return Math.abs(el.x - x) < 30 && Math.abs(el.y - y) < 30;
+                    }
+                    return false;
+                }) || null;
+                updateProperties();
+                redraw();
+            }
+        }, true);
+
+        // Override mouseup for pipe with snap
+        canvas.addEventListener('mouseup', e => {
+            if (!isDrawingPipe) return;
+            isDrawingPipe = false;
+            const rect = canvas.getBoundingClientRect();
+            let x = snapCoord(e.clientX - rect.left);
+            let y = snapCoord(e.clientY - rect.top);
+            if (Math.abs(x - pipeStart.x) > 5 || Math.abs(y - pipeStart.y) > 5) {
+                saveState();
+                elements.push({ type: 'pipe', x1: pipeStart.x, y1: pipeStart.y, x2: x, y2: y });
+            }
+            redraw();
+        }, true);
 
         // Init
         initPalette();

@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Webster Engineering Equation Solver</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <style>
         :root {
             --bg-primary: #1e1e2e;
@@ -363,7 +364,7 @@
         <main class="main-content">
             <div id="welcomeState" class="empty-state">
                 <div class="empty-state-icon">🧪</div>
-                <h2>Welcome to Webster Engineering Solver</h2>
+                <h2>Welcome to the Webster Engineering Solver</h2>
                 <p>Select an equation from the sidebar to get started</p>
                 <div style="display: flex; gap: 15px; justify-content: center; margin-top: 30px;">
                     <a href="/pid.html"
@@ -399,6 +400,15 @@
                 <div class="empty-state">
                     <p>Run a calculation to see results</p>
                 </div>
+            </div>
+            <div id="chartSection" style="display:none; margin-top: 20px;">
+                <h4 style="font-size: 0.9rem; color: var(--accent); margin-bottom: 10px;">Sensitivity Analysis</h4>
+                <canvas id="sensitivityChart" style="max-height: 250px;"></canvas>
+            </div>
+            <div id="chartActions" style="display:none; margin-top: 15px;">
+                <button class="calculate-btn" style="padding: 10px; font-size: 0.85rem;" onclick="runSensitivity()">
+                    📊 Run Sensitivity Analysis
+                </button>
             </div>
         </aside>
     </div>
@@ -578,6 +588,173 @@
                 </div>
             `).join('');
         });
+
+        // Charting variables
+        let sensitivityChart = null;
+        let lastResult = null;
+
+        // Show chart actions after successful calculation
+        function showChartActions() {
+            document.getElementById('chartActions').style.display = 'block';
+        }
+
+        // Run sensitivity analysis on first input parameter
+        async function runSensitivity() {
+            if (!currentEquation || equationParams.length === 0) return;
+
+            const baseParam = equationParams[0];
+            const baseInput = document.getElementById(`input_${baseParam.name}`);
+            const baseValue = parseFloat(baseInput.value);
+            if (isNaN(baseValue) || baseValue === 0) {
+                alert('Enter a valid base value for the first parameter');
+                return;
+            }
+
+            // Run calculations at ±50% in 10 steps
+            const variations = [];
+            const outputs = {};
+
+            for (let pct = -50; pct <= 50; pct += 10) {
+                const testValue = baseValue * (1 + pct / 100);
+                variations.push({ pct, value: testValue });
+
+                // Build inputs
+                const inputs = {};
+                for (const param of equationParams) {
+                    const valueEl = document.getElementById(`input_${param.name}`);
+                    const unitEl = document.getElementById(`unit_${param.name}`);
+                    let value = parseFloat(valueEl.value);
+
+                    if (param.name === baseParam.name) {
+                        value = testValue;
+                    }
+
+                    if (!isNaN(value)) {
+                        inputs[param.name] = { value, unit: unitEl.value || '' };
+                    }
+                }
+
+                try {
+                    const response = await fetch(`${API_BASE}/api/calculate/${currentCategory}/${currentEquation}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ inputs })
+                    });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        for (const [name, data] of Object.entries(result.outputs)) {
+                            if (!outputs[name]) outputs[name] = [];
+                            outputs[name].push(data.value);
+                        }
+                    }
+                } catch (e) {
+                    console.error('Sensitivity calc error:', e);
+                }
+            }
+
+            // Create chart
+            const labels = variations.map(v => `${v.pct > 0 ? '+' : ''}${v.pct}%`);
+            const datasets = [];
+            const colors = ['#89b4fa', '#a6e3a1', '#f9e2af', '#f38ba8', '#cba6f7', '#94e2d5'];
+
+            let i = 0;
+            for (const [name, values] of Object.entries(outputs)) {
+                datasets.push({
+                    label: name,
+                    data: values,
+                    borderColor: colors[i % colors.length],
+                    backgroundColor: colors[i % colors.length] + '33',
+                    tension: 0.3,
+                    fill: false
+                });
+                i++;
+            }
+
+            // Show chart section
+            document.getElementById('chartSection').style.display = 'block';
+
+            // Destroy old chart
+            if (sensitivityChart) {
+                sensitivityChart.destroy();
+            }
+
+            // Create new chart
+            const ctx = document.getElementById('sensitivityChart').getContext('2d');
+            sensitivityChart = new Chart(ctx, {
+                type: 'line',
+                data: { labels, datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#cdd6f4', font: { size: 10 } }
+                        },
+                        title: {
+                            display: true,
+                            text: `Effect of ${baseParam.name} variation`,
+                            color: '#cdd6f4'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#a6adc8' },
+                            grid: { color: '#45475a' }
+                        },
+                        y: {
+                            ticks: { color: '#a6adc8' },
+                            grid: { color: '#45475a' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update displayResults to show chart button
+        const originalDisplayResults = displayResults;
+        displayResults = function (result) {
+            const container = document.getElementById('resultsContent');
+
+            if (!result.success) {
+                container.innerHTML = `
+                    <div class="validation-badge fail">❌ Error</div>
+                    <p>${result.error || 'Calculation failed'}</p>
+                `;
+                document.getElementById('chartActions').style.display = 'none';
+                document.getElementById('chartSection').style.display = 'none';
+                return;
+            }
+
+            let html = '';
+
+            // Validation badge
+            if (result.validation_status) {
+                const status = result.validation_status.toLowerCase();
+                const icon = status === 'pass' ? '✓' : status === 'warning' ? '⚠' : '✗';
+                html += `<div class="validation-badge ${status}">${icon} ${result.validation_status}</div>`;
+            }
+
+            // Output cards
+            for (const [name, data] of Object.entries(result.outputs)) {
+                const value = typeof data.value === 'number' ?
+                    (Math.abs(data.value) < 0.001 || Math.abs(data.value) > 10000 ?
+                        data.value.toExponential(4) : data.value.toFixed(4)) : data.value;
+                html += `
+                    <div class="result-card">
+                        <div class="result-name">${name}</div>
+                        <div class="result-value">
+                            ${value}
+                            <span class="result-unit">${data.unit || ''}</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+            lastResult = result;
+            showChartActions();
+        };
 
         // Initialize
         loadCategories();
