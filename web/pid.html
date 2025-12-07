@@ -14,10 +14,10 @@
             --text-primary: #cdd6f4;
             --text-secondary: #a6adc8;
             --accent: #89b4fa;
-            --accent-hover: #b4befe;
             --success: #a6e3a1;
-            --warning: #f9e2af;
             --border: #45475a;
+            --symbol-stroke: #89b4fa;
+            --symbol-fill: #313244;
         }
 
         * {
@@ -30,34 +30,122 @@
             font-family: 'Inter', sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
-            min-height: 100vh;
             display: flex;
+            height: 100vh;
+            overflow: hidden;
         }
 
-        .toolbar {
-            width: 80px;
+        /* Left Toolbar - Equipment Palette */
+        .palette {
+            width: 200px;
             background: var(--bg-secondary);
             border-right: 1px solid var(--border);
-            padding: 15px 10px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            overflow-y: auto;
         }
 
-        .tool-btn {
-            width: 60px;
-            height: 60px;
+        .palette-header {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+            color: var(--accent);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-btn {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.8rem;
+        }
+
+        .palette-section {
+            padding: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .palette-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .symbol-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+        }
+
+        .symbol-btn {
+            aspect-ratio: 1;
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            color: var(--text-primary);
-            font-size: 0.65rem;
+            padding: 5px;
             transition: all 0.2s;
+        }
+
+        .symbol-btn:hover {
+            border-color: var(--accent);
+            background: #3b3b52;
+        }
+
+        .symbol-btn.active {
+            border-color: var(--success);
+            background: rgba(166, 227, 161, 0.1);
+        }
+
+        .symbol-btn canvas {
+            width: 40px;
+            height: 40px;
+        }
+
+        .symbol-btn span {
+            font-size: 0.6rem;
+            color: var(--text-secondary);
+            margin-top: 3px;
+        }
+
+        /* Main Canvas Area */
+        .canvas-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .toolbar {
+            background: var(--bg-secondary);
+            padding: 10px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .toolbar-group {
+            display: flex;
+            gap: 5px;
+            padding-right: 15px;
+            border-right: 1px solid var(--border);
+        }
+
+        .tool-btn {
+            padding: 8px 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 0.8rem;
         }
 
         .tool-btn:hover {
@@ -69,87 +157,39 @@
             color: var(--bg-primary);
         }
 
-        .tool-btn .icon {
-            font-size: 1.5rem;
-            margin-bottom: 4px;
-        }
-
-        .canvas-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .header {
-            background: var(--bg-secondary);
-            padding: 15px 20px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header h1 {
-            font-size: 1.2rem;
-            color: var(--accent);
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn {
-            padding: 8px 16px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: var(--text-primary);
-            cursor: pointer;
-            font-size: 0.85rem;
-        }
-
-        .btn:hover {
-            border-color: var(--accent);
-        }
-
-        .btn-primary {
-            background: var(--accent);
-            color: var(--bg-primary);
-            border: none;
-        }
-
-        #canvas {
+        #mainCanvas {
             flex: 1;
             background: #252536;
             cursor: crosshair;
         }
 
-        .properties-panel {
-            width: 280px;
+        /* Properties Panel */
+        .properties {
+            width: 250px;
             background: var(--bg-secondary);
             border-left: 1px solid var(--border);
-            padding: 20px;
+            padding: 15px;
+            overflow-y: auto;
         }
 
-        .panel-title {
-            font-size: 0.9rem;
+        .prop-title {
             font-weight: 600;
             color: var(--accent);
             margin-bottom: 15px;
+            font-size: 0.9rem;
         }
 
-        .property-group {
-            margin-bottom: 15px;
+        .prop-group {
+            margin-bottom: 12px;
         }
 
-        .property-label {
+        .prop-label {
             font-size: 0.75rem;
             color: var(--text-secondary);
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
 
-        .property-input {
+        .prop-input {
             width: 100%;
             padding: 8px;
             background: var(--bg-card);
@@ -159,303 +199,794 @@
             font-size: 0.85rem;
         }
 
-        .symbol-list {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            margin-top: 15px;
-        }
-
-        .symbol-item {
-            padding: 10px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            text-align: center;
-            cursor: pointer;
-            font-size: 0.7rem;
-        }
-
-        .symbol-item:hover {
+        .prop-input:focus {
+            outline: none;
             border-color: var(--accent);
         }
 
-        .symbol-item .sym {
-            font-size: 1.5rem;
-            display: block;
-            margin-bottom: 4px;
+        .delete-btn {
+            width: 100%;
+            padding: 10px;
+            background: #f38ba8;
+            border: none;
+            border-radius: 6px;
+            color: #1e1e2e;
+            cursor: pointer;
+            margin-top: 15px;
+            font-weight: 600;
         }
 
-        .back-link {
-            display: inline-block;
-            padding: 8px 16px;
-            color: var(--accent);
-            text-decoration: none;
-            font-size: 0.85rem;
+        .info-text {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
         }
     </style>
 </head>
 
 <body>
-    <div class="toolbar">
-        <a href="/" class="back-link">← Back</a>
-        <button class="tool-btn active" data-tool="select" title="Select">
-            <span class="icon">↖</span>Select
-        </button>
-        <button class="tool-btn" data-tool="line" title="Pipe/Line">
-            <span class="icon">─</span>Pipe
-        </button>
-        <button class="tool-btn" data-tool="vessel" title="Vessel">
-            <span class="icon">⬭</span>Vessel
-        </button>
-        <button class="tool-btn" data-tool="pump" title="Pump">
-            <span class="icon">⊛</span>Pump
-        </button>
-        <button class="tool-btn" data-tool="valve" title="Valve">
-            <span class="icon">⧖</span>Valve
-        </button>
-        <button class="tool-btn" data-tool="hx" title="Heat Exchanger">
-            <span class="icon">⊞</span>HX
-        </button>
-        <button class="tool-btn" data-tool="text" title="Text Label">
-            <span class="icon">T</span>Text
-        </button>
-    </div>
-
-    <div class="canvas-container">
-        <div class="header">
-            <h1>⚗️ P&ID Sketcher</h1>
-            <div class="header-actions">
-                <button class="btn" onclick="clearCanvas()">Clear</button>
-                <button class="btn" onclick="exportPNG()">Export PNG</button>
-                <button class="btn btn-primary" onclick="saveDiagram()">Save</button>
-            </div>
-        </div>
-        <canvas id="canvas"></canvas>
-    </div>
-
-    <div class="properties-panel">
-        <h3 class="panel-title">Equipment Symbols</h3>
-        <div class="symbol-list">
-            <div class="symbol-item" draggable="true" data-type="tank">
-                <span class="sym">🛢️</span>Tank
-            </div>
-            <div class="symbol-item" draggable="true" data-type="reactor">
-                <span class="sym">⚗️</span>Reactor
-            </div>
-            <div class="symbol-item" draggable="true" data-type="column">
-                <span class="sym">🗼</span>Column
-            </div>
-            <div class="symbol-item" draggable="true" data-type="pump">
-                <span class="sym">⊛</span>Pump
-            </div>
-            <div class="symbol-item" draggable="true" data-type="compressor">
-                <span class="sym">🌀</span>Compressor
-            </div>
-            <div class="symbol-item" draggable="true" data-type="hx_shell">
-                <span class="sym">⊞</span>Shell & Tube
-            </div>
-            <div class="symbol-item" draggable="true" data-type="hx_plate">
-                <span class="sym">≡</span>Plate HX
-            </div>
-            <div class="symbol-item" draggable="true" data-type="valve_control">
-                <span class="sym">⧖</span>Control Valve
-            </div>
-            <div class="symbol-item" draggable="true" data-type="valve_manual">
-                <span class="sym">✕</span>Manual Valve
-            </div>
-            <div class="symbol-item" draggable="true" data-type="valve_check">
-                <span class="sym">◁</span>Check Valve
-            </div>
-            <div class="symbol-item" draggable="true" data-type="instrument">
-                <span class="sym">◯</span>Instrument
-            </div>
-            <div class="symbol-item" draggable="true" data-type="motor">
-                <span class="sym">Ⓜ</span>Motor
-            </div>
+    <!-- Equipment Palette -->
+    <div class="palette">
+        <div class="palette-header">
+            <span>Equipment</span>
+            <a href="/" class="back-btn">← Back</a>
         </div>
 
-        <h3 class="panel-title" style="margin-top: 25px;">Selected Item</h3>
-        <div id="selectedProps">
-            <p style="color: var(--text-secondary); font-size: 0.8rem;">No item selected</p>
+        <div class="palette-section">
+            <div class="palette-section-title">Vessels & Tanks</div>
+            <div class="symbol-grid" id="vesselSymbols"></div>
+        </div>
+
+        <div class="palette-section">
+            <div class="palette-section-title">Rotating Equipment</div>
+            <div class="symbol-grid" id="rotatingSymbols"></div>
+        </div>
+
+        <div class="palette-section">
+            <div class="palette-section-title">Heat Transfer</div>
+            <div class="symbol-grid" id="heatSymbols"></div>
+        </div>
+
+        <div class="palette-section">
+            <div class="palette-section-title">Valves</div>
+            <div class="symbol-grid" id="valveSymbols"></div>
+        </div>
+
+        <div class="palette-section">
+            <div class="palette-section-title">Instruments</div>
+            <div class="symbol-grid" id="instrumentSymbols"></div>
+        </div>
+
+        <div class="palette-section">
+            <div class="palette-section-title">Piping</div>
+            <div class="symbol-grid" id="pipingSymbols"></div>
+        </div>
+    </div>
+
+    <!-- Main Canvas -->
+    <div class="canvas-area">
+        <div class="toolbar">
+            <div class="toolbar-group">
+                <button class="tool-btn active" id="selectTool" onclick="setTool('select')">Select</button>
+                <button class="tool-btn" id="pipeTool" onclick="setTool('pipe')">Draw Pipe</button>
+            </div>
+            <div class="toolbar-group">
+                <button class="tool-btn" onclick="clearCanvas()">Clear</button>
+                <button class="tool-btn" onclick="exportPNG()">Export PNG</button>
+            </div>
+            <div style="margin-left: auto; font-size: 0.8rem; color: var(--text-secondary);">
+                <span id="statusText">Click equipment to place</span>
+            </div>
+        </div>
+        <canvas id="mainCanvas"></canvas>
+    </div>
+
+    <!-- Properties Panel -->
+    <div class="properties">
+        <div class="prop-title">Properties</div>
+        <div id="propsContent">
+            <p class="info-text">Select an item on the canvas to edit its properties, or choose equipment from the
+                palette to place.</p>
         </div>
     </div>
 
     <script>
-        const canvas = document.getElementById('canvas');
+        const canvas = document.getElementById('mainCanvas');
         const ctx = canvas.getContext('2d');
-        let currentTool = 'select';
+
         let elements = [];
         let selectedElement = null;
-        let isDrawing = false;
-        let startX, startY;
+        let currentTool = 'select';
+        let selectedSymbolType = null;
+        let isDrawingPipe = false;
+        let pipeStart = null;
 
-        // Resize canvas
+        // Professional P&ID Symbol Definitions
+        const SYMBOLS = {
+            // Vessels & Tanks
+            vessel: { name: 'Vessel', category: 'vessel', draw: drawVessel },
+            tank: { name: 'Storage Tank', category: 'vessel', draw: drawTank },
+            column: { name: 'Column', category: 'vessel', draw: drawColumn },
+            reactor: { name: 'Reactor', category: 'vessel', draw: drawReactor },
+            drum: { name: 'Drum', category: 'vessel', draw: drawDrum },
+
+            // Rotating Equipment
+            pump_centrifugal: { name: 'Centrifugal Pump', category: 'rotating', draw: drawCentrifugalPump },
+            pump_positive: { name: 'PD Pump', category: 'rotating', draw: drawPDPump },
+            compressor: { name: 'Compressor', category: 'rotating', draw: drawCompressor },
+            blower: { name: 'Blower/Fan', category: 'rotating', draw: drawBlower },
+            motor: { name: 'Motor', category: 'rotating', draw: drawMotor },
+
+            // Heat Transfer
+            hx_shell: { name: 'Shell & Tube HX', category: 'heat', draw: drawShellTubeHX },
+            hx_plate: { name: 'Plate HX', category: 'heat', draw: drawPlateHX },
+            condenser: { name: 'Condenser', category: 'heat', draw: drawCondenser },
+            reboiler: { name: 'Reboiler', category: 'heat', draw: drawReboiler },
+            cooler: { name: 'Air Cooler', category: 'heat', draw: drawAirCooler },
+            heater: { name: 'Fired Heater', category: 'heat', draw: drawFiredHeater },
+
+            // Valves
+            valve_gate: { name: 'Gate Valve', category: 'valve', draw: drawGateValve },
+            valve_globe: { name: 'Globe Valve', category: 'valve', draw: drawGlobeValve },
+            valve_ball: { name: 'Ball Valve', category: 'valve', draw: drawBallValve },
+            valve_check: { name: 'Check Valve', category: 'valve', draw: drawCheckValve },
+            valve_control: { name: 'Control Valve', category: 'valve', draw: drawControlValve },
+            valve_relief: { name: 'Relief Valve', category: 'valve', draw: drawReliefValve },
+            valve_butterfly: { name: 'Butterfly', category: 'valve', draw: drawButterflyValve },
+
+            // Instruments
+            inst_pt: { name: 'Press. Trans.', category: 'instrument', draw: (c, x, y) => drawInstrument(c, x, y, 'PT') },
+            inst_tt: { name: 'Temp. Trans.', category: 'instrument', draw: (c, x, y) => drawInstrument(c, x, y, 'TT') },
+            inst_ft: { name: 'Flow Trans.', category: 'instrument', draw: (c, x, y) => drawInstrument(c, x, y, 'FT') },
+            inst_lt: { name: 'Level Trans.', category: 'instrument', draw: (c, x, y) => drawInstrument(c, x, y, 'LT') },
+            inst_pic: { name: 'Press. Ctrl.', category: 'instrument', draw: (c, x, y) => drawInstrument(c, x, y, 'PIC') },
+            inst_fic: { name: 'Flow Ctrl.', category: 'instrument', draw: (c, x, y) => drawInstrument(c, x, y, 'FIC') },
+
+            // Piping Components
+            reducer: { name: 'Reducer', category: 'piping', draw: drawReducer },
+            tee: { name: 'Tee', category: 'piping', draw: drawTee },
+            elbow: { name: 'Elbow', category: 'piping', draw: drawElbow },
+            flange: { name: 'Flange', category: 'piping', draw: drawFlange },
+            strainer: { name: 'Strainer', category: 'piping', draw: drawStrainer },
+        };
+
+        // Drawing functions for each symbol (professional ISA/ANSI style)
+        function drawVessel(ctx, x, y, selected) {
+            ctx.strokeStyle = selected ? '#a6e3a1' : '#89b4fa';
+            ctx.fillStyle = '#313244';
+            ctx.lineWidth = 2;
+            // Vertical cylinder with dished heads
+            ctx.beginPath();
+            ctx.ellipse(x, y - 25, 20, 8, 0, Math.PI, 2 * Math.PI);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x - 20, y - 25);
+            ctx.lineTo(x - 20, y + 25);
+            ctx.ellipse(x, y + 25, 20, 8, 0, 0, Math.PI);
+            ctx.lineTo(x + 20, y - 25);
+            ctx.stroke();
+        }
+
+        function drawTank(ctx, x, y, selected) {
+            ctx.strokeStyle = selected ? '#a6e3a1' : '#89b4fa';
+            ctx.lineWidth = 2;
+            // Flat bottom tank with cone roof
+            ctx.beginPath();
+            ctx.moveTo(x - 25, y + 30);
+            ctx.lineTo(x - 25, y - 15);
+            ctx.lineTo(x, y - 30);
+            ctx.lineTo(x + 25, y - 15);
+            ctx.lineTo(x + 25, y + 30);
+            ctx.closePath();
+            ctx.stroke();
+        }
+
+        function drawColumn(ctx, x, y, selected) {
+            ctx.strokeStyle = selected ? '#a6e3a1' : '#89b4fa';
+            ctx.lineWidth = 2;
+            // Tall column with trays indicated
+            ctx.beginPath();
+            ctx.ellipse(x, y - 40, 15, 6, 0, Math.PI, 2 * Math.PI);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x - 15, y - 40);
+            ctx.lineTo(x - 15, y + 40);
+            ctx.ellipse(x, y + 40, 15, 6, 0, 0, Math.PI);
+            ctx.lineTo(x + 15, y - 40);
+            ctx.stroke();
+            // Tray lines
+            for (let i = -25; i <= 25; i += 15) {
+                ctx.beginPath();
+                ctx.moveTo(x - 12, y + i);
+                ctx.lineTo(x + 12, y + i);
+                ctx.stroke();
+            }
+        }
+
+        function drawReactor(ctx, x, y, selected) {
+            ctx.strokeStyle = selected ? '#a6e3a1' : '#89b4fa';
+            ctx.lineWidth = 2;
+            // Vessel with agitator
+            drawVessel(ctx, x, y, selected);
+            // Agitator motor
+            ctx.fillStyle = '#313244';
+            ctx.fillRect(x - 8, y - 45, 16, 12);
+            ctx.strokeRect(x - 8, y - 45, 16, 12);
+            // Shaft
+            ctx.beginPath();
+            ctx.moveTo(x, y - 33);
+            ctx.lineTo(x, y + 10);
+            ctx.stroke();
+            // Impeller
+            ctx.beginPath();
+            ctx.moveTo(x - 10, y + 10);
+            ctx.lineTo(x + 10, y + 10);
+            ctx.stroke();
+        }
+
+        function drawDrum(ctx, x, y, selected) {
+            ctx.strokeStyle = selected ? '#a6e3a1' : '#89b4fa';
+            ctx.lineWidth = 2;
+            // Horizontal drum
+            ctx.beginPath();
+            ctx.ellipse(x - 30, y, 8, 15, 0, 0, 2 * Math.PI);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x - 30, y - 15);
+            ctx.lineTo(x + 30, y - 15);
+            ctx.ellipse(x + 30, y, 8, 15, 0, -Math.PI / 2, Math.PI / 2);
+            ctx.lineTo(x - 30, y + 15);
+            ctx.stroke();
+        }
+
+        function drawCentrifugalPump(ctx, x, y, selected) {
+            ctx.strokeStyle = selected ? '#a6e3a1' : '#89b4fa';
+            ctx.fillStyle = '#313244';
+            ctx.lineWidth = 2;
+            // Circle with tangential discharge
+            ctx.beginPath();
+            ctx.arc(x, y, 18, 0, 2 * Math.PI);
+            ctx.stroke();
+            // Suction (horizontal)
+            ctx.beginPath();
+            ctx.moveTo(x - 35, y);
+            ctx.lineTo(x - 18, y);
+            ctx.stroke();
+            // Discharge (vertical up)
+            ctx.beginPath();
+            ctx.moveTo(x, y - 18);
+            ctx.lineTo(x, y - 30);
+            ctx.stroke();
+            // Arrow in circle
+            ctx.beginPath();
+            ctx.moveTo(x - 8, y - 5);
+            ctx.lineTo(x + 5, y);
+            ctx.lineTo(x - 8, y + 5);
+            ctx.stroke();
+        }
+
+        function drawPDPump(ctx, x, y, selected) {
+            ctx.strokeStyle = selected ? '#a6e3a1' : '#89b4fa';
+            ctx.lineWidth = 2;
+            // Rectangle with curved ends
+            ctx.beginPath();
+            ctx.moveTo(x - 20, y - 15);
+            ctx.lineTo(x + 10, y - 15);
+            ctx.arc(x + 10, y, 15, -Math.PI / 2, Math.PI / 2);
+            ctx.lineTo(x - 20, y + 15);
+            ctx.arc(x - 20, y, 15, Math.PI / 2, -Math.PI / 2);
+            ctx.stroke();
+        }
+
+        function drawCompressor(ctx, x, y, selected) {
+            ctx.strokeStyle = selected ? '#a6e3a1' : '#89b4fa';
+            ctx.lineWidth = 2;
+            // Trapezoid shape
+            ctx.beginPath();
+            ctx.moveTo(x - 25, y + 20);
+            ctx.lineTo(x - 15, y - 20);
+            ctx.lineTo(x + 15, y - 20);
+            ctx.lineTo(x + 25, y + 20);
+            ctx.closePath();
+            ctx.stroke();
+        }
+
+        function drawBlower(ctx, x, y, selected) {
+            ctx.strokeStyle = selected ? '#a6e3a1' : '#89b4fa';
+            ctx.lineWidth = 2;
+            // Fan blade symbol
+            ctx.beginPath();
+            ctx.arc(x, y, 20, 0, 2 * Math.PI);
+            ctx.stroke();
+            // Blades
+            for (let a = 0; a < 3; a++) {
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(a * 2 * Math.PI / 3);
+                ctx.beginPath();
+                ctx.ellipse(0, -10, 4, 10, 0, 0, 2 * Math.PI);
+                ctx.stroke();
+                ctx.restore();
+            }
+        }
+
+        function drawMotor(ctx, x, y, selected) {
+            ctx.strokeStyle = selected ? '#a6e3a1' : '#89b4fa';
+            ctx.lineWidth = 2;
+            // Motor rectangle with M
+            ctx.strokeRect(x - 20, y - 12, 40, 24);
+            ctx.font = '14px Inter';
+            ctx.fillStyle = '#89b4fa';
+            ctx.textAlign = 'center';
+            ctx.fillText('M', x, y + 5);
+        }
+
+        function drawShellTubeHX(ctx, x, y, selected) {
+            ctx.strokeStyle = selected ? '#a6e3a1' : '#89b4fa';
+            ctx.lineWidth = 2;
+            // Shell (horizontal)
+            ctx.beginPath();
+            ctx.ellipse(x - 35, y, 8, 20, 0, 0, 2 * Math.PI);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x - 35, y - 20);
+            ctx.lineTo(x + 35, y - 20);
+            ctx.ellipse(x + 35, y, 8, 20, 0, -Math.PI / 2, Math.PI / 2);
+            ctx.lineTo(x - 35, y + 20);
+            ctx.stroke();
+            // Tube lines
+            ctx.beginPath();
+            ctx.moveTo(x - 25, y - 10);
+            ctx.lineTo(x + 25, y - 10);
+            ctx.moveTo(x - 25, y);
+            ctx.lineTo(x + 25, y);
+            ctx.moveTo(x - 25, y + 10);
+            ctx.lineTo(x + 25, y + 10);
+            ctx.stroke();
+        }
+
+        function drawPlateHX(ctx, x, y, selected) {
+            ctx.strokeStyle = selected ? '#a6e3a1' : '#89b4fa';
+            ctx.lineWidth = 2;
+            // Stacked plates
+            for (let i = -15; i <= 15; i += 6) {
+                ctx.beginPath();
+                ctx.moveTo(x - 20, y + i);
+                ctx.lineTo(x + 20, y + i);
+                ctx.stroke();
+            }
+            ctx.strokeRect(x - 25, y - 20, 50, 40);
+        }
+
+        function drawCondenser(ctx, x, y, selected) {
+            drawShellTubeHX(ctx, x, y, selected);
+            ctx.font = '10px Inter';
+            ctx.fillStyle = '#89b4fa';
+            ctx.textAlign = 'center';
+            ctx.fillText('COND', x, y + 35);
+        }
+
+        function drawReboiler(ctx, x, y, selected) {
+            drawShellTubeHX(ctx, x, y, selected);
+            ctx.font = '10px Inter';
+            ctx.fillStyle = '#89b4fa';
+            ctx.textAlign = 'center';
+            ctx.fillText('REB', x, y + 35);
+        }
+
+        function drawAirCooler(ctx, x, y, selected) {
+            ctx.strokeStyle = selected ? '#a6e3a1' : '#89b4fa';
+            ctx.lineWidth = 2;
+            // Header box with fins
+            ctx.strokeRect(x - 30, y - 15, 60, 20);
+            // Fins below
+            for (let i = -25; i <= 25; i += 10) {
+                ctx.beginPath();
+                ctx.moveTo(x + i, y + 5);
+                ctx.lineTo(x + i, y + 20);
+                ctx.stroke();
+            }
+            // Fan circle
+            ctx.beginPath();
+            ctx.arc(x, y + 30, 12, 0, 2 * Math.PI);
+            ctx.stroke();
+        }
+
+        function drawFiredHeater(ctx, x, y, selected) {
+            ctx.strokeStyle = selected ? '#a6e3a1' : '#89b4fa';
+            ctx.lineWidth = 2;
+            // Box with flames
+            ctx.strokeRect(x - 25, y - 25, 50, 50);
+            // Flame shapes
+            ctx.beginPath();
+            ctx.moveTo(x - 10, y + 20);
+            ctx.quadraticCurveTo(x - 15, y, x - 10, y - 15);
+            ctx.quadraticCurveTo(x - 5, y, x - 10, y + 20);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x + 10, y + 20);
+            ctx.quadraticCurveTo(x + 15, y, x + 10, y - 15);
+            ctx.quadraticCurveTo(x + 5, y, x + 10, y + 20);
+            ctx.stroke();
+        }
+
+        function drawGateValve(ctx, x, y, selected) {
+            ctx.strokeStyle = selected ? '#a6e3a1' : '#89b4fa';
+            ctx.fillStyle = '#313244';
+            ctx.lineWidth = 2;
+            // Two triangles meeting
+            ctx.beginPath();
+            ctx.moveTo(x - 15, y - 12);
+            ctx.lineTo(x, y);
+            ctx.lineTo(x - 15, y + 12);
+            ctx.closePath();
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x + 15, y - 12);
+            ctx.lineTo(x, y);
+            ctx.lineTo(x + 15, y + 12);
+            ctx.closePath();
+            ctx.stroke();
+        }
+
+        function drawGlobeValve(ctx, x, y, selected) {
+            drawGateValve(ctx, x, y, selected);
+            // Add circle
+            ctx.beginPath();
+            ctx.arc(x, y, 6, 0, 2 * Math.PI);
+            ctx.stroke();
+        }
+
+        function drawBallValve(ctx, x, y, selected) {
+            drawGateValve(ctx, x, y, selected);
+            // Fill circle
+            ctx.fillStyle = selected ? '#a6e3a1' : '#89b4fa';
+            ctx.beginPath();
+            ctx.arc(x, y, 5, 0, 2 * Math.PI);
+            ctx.fill();
+        }
+
+        function drawCheckValve(ctx, x, y, selected) {
+            ctx.strokeStyle = selected ? '#a6e3a1' : '#89b4fa';
+            ctx.lineWidth = 2;
+            // Triangle pointing right with bar
+            ctx.beginPath();
+            ctx.moveTo(x - 15, y - 12);
+            ctx.lineTo(x + 10, y);
+            ctx.lineTo(x - 15, y + 12);
+            ctx.closePath();
+            ctx.stroke();
+            // Bar
+            ctx.beginPath();
+            ctx.moveTo(x + 12, y - 12);
+            ctx.lineTo(x + 12, y + 12);
+            ctx.stroke();
+        }
+
+        function drawControlValve(ctx, x, y, selected) {
+            drawGlobeValve(ctx, x, y, selected);
+            // Actuator stem
+            ctx.beginPath();
+            ctx.moveTo(x, y - 12);
+            ctx.lineTo(x, y - 25);
+            ctx.stroke();
+            // Diaphragm actuator
+            ctx.beginPath();
+            ctx.arc(x, y - 32, 8, 0, 2 * Math.PI);
+            ctx.stroke();
+        }
+
+        function drawReliefValve(ctx, x, y, selected) {
+            ctx.strokeStyle = selected ? '#a6e3a1' : '#89b4fa';
+            ctx.lineWidth = 2;
+            // Angle body
+            ctx.beginPath();
+            ctx.moveTo(x - 12, y + 15);
+            ctx.lineTo(x - 12, y);
+            ctx.lineTo(x, y);
+            ctx.lineTo(x + 12, y - 12);
+            ctx.lineTo(x + 12, y + 12);
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            // Spring
+            ctx.beginPath();
+            ctx.moveTo(x, y - 5);
+            ctx.lineTo(x, y - 25);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x - 6, y - 25);
+            ctx.lineTo(x + 6, y - 25);
+            ctx.stroke();
+        }
+
+        function drawButterflyValve(ctx, x, y, selected) {
+            ctx.strokeStyle = selected ? '#a6e3a1' : '#89b4fa';
+            ctx.lineWidth = 2;
+            // Two lines meeting at center
+            ctx.beginPath();
+            ctx.moveTo(x - 15, y);
+            ctx.lineTo(x + 15, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y - 12);
+            ctx.lineTo(x, y + 12);
+            ctx.stroke();
+            // Double lines for body
+            ctx.beginPath();
+            ctx.moveTo(x - 15, y - 12);
+            ctx.lineTo(x - 15, y + 12);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x + 15, y - 12);
+            ctx.lineTo(x + 15, y + 12);
+            ctx.stroke();
+        }
+
+        function drawInstrument(ctx, x, y, tag) {
+            ctx.strokeStyle = '#89b4fa';
+            ctx.fillStyle = '#313244';
+            ctx.lineWidth = 2;
+            // Circle (field mounted)
+            ctx.beginPath();
+            ctx.arc(x, y, 18, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.stroke();
+            // Tag text
+            ctx.font = 'bold 10px Inter';
+            ctx.fillStyle = '#cdd6f4';
+            ctx.textAlign = 'center';
+            ctx.fillText(tag, x, y + 4);
+        }
+
+        function drawReducer(ctx, x, y, selected) {
+            ctx.strokeStyle = selected ? '#a6e3a1' : '#89b4fa';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(x - 20, y - 10);
+            ctx.lineTo(x + 10, y - 5);
+            ctx.lineTo(x + 10, y + 5);
+            ctx.lineTo(x - 20, y + 10);
+            ctx.closePath();
+            ctx.stroke();
+        }
+
+        function drawTee(ctx, x, y, selected) {
+            ctx.strokeStyle = selected ? '#a6e3a1' : '#89b4fa';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(x - 20, y);
+            ctx.lineTo(x + 20, y);
+            ctx.moveTo(x, y);
+            ctx.lineTo(x, y - 20);
+            ctx.stroke();
+        }
+
+        function drawElbow(ctx, x, y, selected) {
+            ctx.strokeStyle = selected ? '#a6e3a1' : '#89b4fa';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(x - 15, y);
+            ctx.quadraticCurveTo(x, y, x, y - 15);
+            ctx.stroke();
+        }
+
+        function drawFlange(ctx, x, y, selected) {
+            ctx.strokeStyle = selected ? '#a6e3a1' : '#89b4fa';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(x - 3, y - 12);
+            ctx.lineTo(x - 3, y + 12);
+            ctx.moveTo(x + 3, y - 12);
+            ctx.lineTo(x + 3, y + 12);
+            ctx.stroke();
+        }
+
+        function drawStrainer(ctx, x, y, selected) {
+            ctx.strokeStyle = selected ? '#a6e3a1' : '#89b4fa';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(x - 15, y);
+            ctx.lineTo(x + 15, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x, y + 20);
+            ctx.arc(x, y + 25, 8, -Math.PI / 2, Math.PI * 1.5);
+            ctx.stroke();
+        }
+
+        // Initialize palette
+        function initPalette() {
+            const categories = {
+                vesselSymbols: ['vessel', 'tank', 'column', 'reactor', 'drum'],
+                rotatingSymbols: ['pump_centrifugal', 'pump_positive', 'compressor', 'blower', 'motor'],
+                heatSymbols: ['hx_shell', 'hx_plate', 'condenser', 'reboiler', 'cooler', 'heater'],
+                valveSymbols: ['valve_gate', 'valve_globe', 'valve_ball', 'valve_check', 'valve_control', 'valve_relief', 'valve_butterfly'],
+                instrumentSymbols: ['inst_pt', 'inst_tt', 'inst_ft', 'inst_lt', 'inst_pic', 'inst_fic'],
+                pipingSymbols: ['reducer', 'tee', 'elbow', 'flange', 'strainer']
+            };
+
+            for (const [containerId, symbolList] of Object.entries(categories)) {
+                const container = document.getElementById(containerId);
+                for (const symId of symbolList) {
+                    const sym = SYMBOLS[symId];
+                    const btn = document.createElement('div');
+                    btn.className = 'symbol-btn';
+                    btn.dataset.symbol = symId;
+
+                    const cvs = document.createElement('canvas');
+                    cvs.width = 80;
+                    cvs.height = 80;
+                    const c = cvs.getContext('2d');
+                    c.scale(0.8, 0.8);
+                    sym.draw(c, 50, 50, false);
+
+                    const label = document.createElement('span');
+                    label.textContent = sym.name;
+
+                    btn.appendChild(cvs);
+                    btn.appendChild(label);
+                    btn.onclick = () => selectSymbol(symId);
+                    container.appendChild(btn);
+                }
+            }
+        }
+
+        function selectSymbol(symId) {
+            document.querySelectorAll('.symbol-btn').forEach(b => b.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            selectedSymbolType = symId;
+            currentTool = 'place';
+            document.getElementById('statusText').textContent = `Click canvas to place ${SYMBOLS[symId].name}`;
+        }
+
+        function setTool(tool) {
+            currentTool = tool;
+            selectedSymbolType = null;
+            document.querySelectorAll('.symbol-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tool + 'Tool').classList.add('active');
+            document.getElementById('statusText').textContent = tool === 'pipe' ? 'Click and drag to draw pipe' : 'Click to select items';
+        }
+
+        // Canvas setup
         function resizeCanvas() {
             canvas.width = canvas.offsetWidth;
             canvas.height = canvas.offsetHeight;
             redraw();
         }
         window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        // Tool selection
-        document.querySelectorAll('.tool-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentTool = btn.dataset.tool;
-            });
-        });
-
-        // Symbol drag and drop
-        document.querySelectorAll('.symbol-item').forEach(item => {
-            item.addEventListener('dragstart', e => {
-                e.dataTransfer.setData('type', item.dataset.type);
-            });
-        });
-
-        canvas.addEventListener('dragover', e => e.preventDefault());
-        canvas.addEventListener('drop', e => {
-            e.preventDefault();
-            const type = e.dataTransfer.getData('type');
-            const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            addElement(type, x, y);
-        });
 
         // Drawing
-        canvas.addEventListener('mousedown', e => {
-            const rect = canvas.getBoundingClientRect();
-            startX = e.clientX - rect.left;
-            startY = e.clientY - rect.top;
-            isDrawing = true;
-
-            if (currentTool === 'select') {
-                selectedElement = findElementAt(startX, startY);
-                updatePropertiesPanel();
-            }
-        });
-
-        canvas.addEventListener('mousemove', e => {
-            if (!isDrawing) return;
-            const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-
-            if (currentTool === 'line') {
-                redraw();
-                ctx.strokeStyle = '#89b4fa';
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.moveTo(startX, startY);
-                ctx.lineTo(x, y);
-                ctx.stroke();
-            }
-        });
-
-        canvas.addEventListener('mouseup', e => {
-            if (!isDrawing) return;
-            isDrawing = false;
-
-            const rect = canvas.getBoundingClientRect();
-            const endX = e.clientX - rect.left;
-            const endY = e.clientY - rect.top;
-
-            if (currentTool === 'line' && (Math.abs(endX - startX) > 5 || Math.abs(endY - startY) > 5)) {
-                elements.push({ type: 'line', x1: startX, y1: startY, x2: endX, y2: endY });
-                redraw();
-            }
-        });
-
-        function addElement(type, x, y) {
-            const symbols = {
-                tank: '🛢️', reactor: '⚗️', column: '🗼', pump: '⊛',
-                compressor: '🌀', hx_shell: '⊞', hx_plate: '≡',
-                valve_control: '⧖', valve_manual: '✕', valve_check: '◁',
-                instrument: '◯', motor: 'Ⓜ'
-            };
-            elements.push({ type: 'symbol', symbolType: type, x, y, symbol: symbols[type] || '?', label: type.toUpperCase() });
-            redraw();
-        }
-
-        function findElementAt(x, y) {
-            for (let i = elements.length - 1; i >= 0; i--) {
-                const el = elements[i];
-                if (el.type === 'symbol') {
-                    if (Math.abs(el.x - x) < 30 && Math.abs(el.y - y) < 30) return el;
-                }
-            }
-            return null;
-        }
-
         function redraw() {
             ctx.fillStyle = '#252536';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Draw grid
+            // Grid
             ctx.strokeStyle = '#313244';
             ctx.lineWidth = 1;
-            for (let x = 0; x < canvas.width; x += 50) {
-                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+            for (let x = 0; x < canvas.width; x += 40) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
             }
-            for (let y = 0; y < canvas.height; y += 50) {
-                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+            for (let y = 0; y < canvas.height; y += 40) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
             }
 
             // Draw elements
             elements.forEach(el => {
-                if (el.type === 'line') {
-                    ctx.strokeStyle = '#89b4fa';
+                if (el.type === 'pipe') {
+                    ctx.strokeStyle = '#cdd6f4';
                     ctx.lineWidth = 3;
                     ctx.beginPath();
                     ctx.moveTo(el.x1, el.y1);
                     ctx.lineTo(el.x2, el.y2);
                     ctx.stroke();
                 } else if (el.type === 'symbol') {
-                    ctx.font = '32px Arial';
-                    ctx.textAlign = 'center';
-                    ctx.fillStyle = '#cdd6f4';
-                    ctx.fillText(el.symbol, el.x, el.y);
-                    ctx.font = '10px Inter';
-                    ctx.fillText(el.label, el.x, el.y + 25);
-
-                    if (el === selectedElement) {
-                        ctx.strokeStyle = '#a6e3a1';
-                        ctx.lineWidth = 2;
-                        ctx.strokeRect(el.x - 25, el.y - 25, 50, 50);
+                    SYMBOLS[el.symbolType].draw(ctx, el.x, el.y, el === selectedElement);
+                    if (el.tag) {
+                        ctx.font = '10px Inter';
+                        ctx.fillStyle = '#cdd6f4';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(el.tag, el.x, el.y + 45);
                     }
                 }
             });
         }
 
-        function updatePropertiesPanel() {
-            const panel = document.getElementById('selectedProps');
-            if (selectedElement) {
-                panel.innerHTML = `
-                    <div class="property-group">
-                        <div class="property-label">Type</div>
-                        <input class="property-input" value="${selectedElement.symbolType}" disabled>
-                    </div>
-                    <div class="property-group">
-                        <div class="property-label">Label</div>
-                        <input class="property-input" value="${selectedElement.label}" 
-                            onchange="selectedElement.label = this.value; redraw();">
-                    </div>
-                    <button class="btn" style="width:100%; margin-top:10px;" onclick="deleteSelected()">Delete</button>
-                `;
-            } else {
-                panel.innerHTML = '<p style="color: var(--text-secondary); font-size: 0.8rem;">No item selected</p>';
+        // Mouse events
+        canvas.addEventListener('mousedown', e => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            if (currentTool === 'place' && selectedSymbolType) {
+                elements.push({ type: 'symbol', symbolType: selectedSymbolType, x, y, tag: '' });
+                redraw();
+            } else if (currentTool === 'pipe') {
+                isDrawingPipe = true;
+                pipeStart = { x, y };
+            } else if (currentTool === 'select') {
+                selectedElement = elements.find(el => {
+                    if (el.type === 'symbol') {
+                        return Math.abs(el.x - x) < 30 && Math.abs(el.y - y) < 30;
+                    }
+                    return false;
+                }) || null;
+                updateProperties();
+                redraw();
+            }
+        });
+
+        canvas.addEventListener('mousemove', e => {
+            if (!isDrawingPipe) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            redraw();
+            ctx.strokeStyle = '#89b4fa';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(pipeStart.x, pipeStart.y);
+            ctx.lineTo(x, y);
+            ctx.stroke();
+        });
+
+        canvas.addEventListener('mouseup', e => {
+            if (!isDrawingPipe) return;
+            isDrawingPipe = false;
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            if (Math.abs(x - pipeStart.x) > 5 || Math.abs(y - pipeStart.y) > 5) {
+                elements.push({ type: 'pipe', x1: pipeStart.x, y1: pipeStart.y, x2: x, y2: y });
             }
             redraw();
+        });
+
+        function updateProperties() {
+            const content = document.getElementById('propsContent');
+            if (!selectedElement) {
+                content.innerHTML = '<p class="info-text">Select an item on the canvas to edit.</p>';
+                return;
+            }
+
+            content.innerHTML = `
+                <div class="prop-group">
+                    <div class="prop-label">Type</div>
+                    <input class="prop-input" value="${SYMBOLS[selectedElement.symbolType]?.name || selectedElement.type}" disabled>
+                </div>
+                <div class="prop-group">
+                    <div class="prop-label">Tag / Label</div>
+                    <input class="prop-input" id="tagInput" value="${selectedElement.tag || ''}" placeholder="e.g. P-101">
+                </div>
+                <div class="prop-group">
+                    <div class="prop-label">Position X</div>
+                    <input class="prop-input" type="number" id="posX" value="${Math.round(selectedElement.x)}">
+                </div>
+                <div class="prop-group">
+                    <div class="prop-label">Position Y</div>
+                    <input class="prop-input" type="number" id="posY" value="${Math.round(selectedElement.y)}">
+                </div>
+                <button class="delete-btn" onclick="deleteSelected()">Delete</button>
+            `;
+
+            document.getElementById('tagInput').onchange = e => { selectedElement.tag = e.target.value; redraw(); };
+            document.getElementById('posX').onchange = e => { selectedElement.x = parseInt(e.target.value); redraw(); };
+            document.getElementById('posY').onchange = e => { selectedElement.y = parseInt(e.target.value); redraw(); };
         }
 
         function deleteSelected() {
             if (selectedElement) {
                 elements = elements.filter(e => e !== selectedElement);
                 selectedElement = null;
-                updatePropertiesPanel();
+                updateProperties();
+                redraw();
             }
         }
 
@@ -463,8 +994,8 @@
             if (confirm('Clear all elements?')) {
                 elements = [];
                 selectedElement = null;
+                updateProperties();
                 redraw();
-                updatePropertiesPanel();
             }
         }
 
@@ -475,17 +1006,9 @@
             link.click();
         }
 
-        function saveDiagram() {
-            const data = JSON.stringify(elements);
-            localStorage.setItem('pid_diagram', data);
-            alert('Diagram saved!');
-        }
-
-        // Load saved diagram
-        const saved = localStorage.getItem('pid_diagram');
-        if (saved) {
-            try { elements = JSON.parse(saved); redraw(); } catch (e) { }
-        }
+        // Init
+        initPalette();
+        resizeCanvas();
     </script>
 </body>
 
