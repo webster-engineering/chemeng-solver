@@ -1,5 +1,5 @@
 """
-Chemical Engineering Equation Solver
+Webster Engineering Equation Solver
 Main application entry point.
 """
 
@@ -24,7 +24,7 @@ def main():
     )
     
     app = QApplication(sys.argv)
-    app.setApplicationName("Chemical Engineering Solver")
+    app.setApplicationName("Webster Engineering Equation Solver")
     app.setOrganizationName("ChemE Tools")
     
     # Load settings

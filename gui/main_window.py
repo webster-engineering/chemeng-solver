@@ -68,7 +68,7 @@ class MainWindow(QMainWindow):
         self._apply_theme()
     
     def _setup_ui(self):
-        self.setWindowTitle("Chemical Engineering Equation Solver")
+        self.setWindowTitle("Webster Engineering Equation Solver")
         self.setMinimumSize(1200, 800)
         
         # Central widget

@@ -1,5 +1,5 @@
 """
-FastAPI REST API for Chemical Engineering Equation Solver.
+FastAPI REST API for Webster Engineering Equation Solver.
 Exposes all equations as RESTful endpoints.
 """
 
@@ -53,7 +53,7 @@ EQUATION_REGISTRY = {
 
 # Create FastAPI app
 app = FastAPI(
-    title="Chemical Engineering Solver API",
+    title="Webster Engineering Solver API",
     description="REST API for chemical engineering calculations",
     version="1.0.0"
 )
@@ -130,7 +130,7 @@ async def root():
     index_path = Path(__file__).parent / "web" / "index.html"
     if index_path.exists():
         return FileResponse(index_path)
-    return {"message": "Chemical Engineering Solver API", "docs": "/docs"}
+    return {"message": "Webster Engineering Solver API", "docs": "/docs"}
 
 
 @app.get("/api/categories", response_model=List[CategoryInfo])
@@ -280,7 +280,7 @@ async def search_equations(q: str):
 
 # Run server
 if __name__ == "__main__":
-    print("Starting Chemical Engineering Solver API...")
+    print("Starting Webster Engineering Solver API...")
     print("API Documentation: http://localhost:8000/docs")
     print("Web Interface: http://localhost:8000")
     uvicorn.run(app, host="0.0.0.0", port=8000)

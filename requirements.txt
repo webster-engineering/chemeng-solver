@@ -1,4 +1,4 @@
-# Chemical Engineering Equation Solver - Dependencies
+# Webster Engineering Equation Solver - Dependencies
 
 # GUI Framework
 PySide6>=6.5.0
