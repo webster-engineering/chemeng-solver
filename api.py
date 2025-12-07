@@ -25,15 +25,29 @@ from equations.mass_transfer import MASS_TRANSFER_EQUATIONS
 from equations.reaction_kinetics import REACTION_KINETICS_EQUATIONS
 from equations.thermodynamics import THERMODYNAMICS_EQUATIONS
 from equations.basic_math import BASIC_MATH_EQUATIONS
+from equations.piping import PIPING_EQUATIONS
+from equations.instrumentation import INSTRUMENTATION_EQUATIONS
+from equations.distillation import DISTILLATION_EQUATIONS
+from equations.pumps import PUMPS_EQUATIONS
+from equations.vessels import VESSELS_EQUATIONS
+from equations.safety import SAFETY_EQUATIONS
+from equations.economics import ECONOMICS_EQUATIONS
 
 # All equation categories
 EQUATION_REGISTRY = {
     "process_control": PROCESS_CONTROL_EQUATIONS,
     "fluid_dynamics": FLUID_DYNAMICS_EQUATIONS,
+    "piping": PIPING_EQUATIONS,
     "heat_transfer": HEAT_TRANSFER_EQUATIONS,
     "thermodynamics": THERMODYNAMICS_EQUATIONS,
     "mass_transfer": MASS_TRANSFER_EQUATIONS,
+    "distillation": DISTILLATION_EQUATIONS,
     "reaction_kinetics": REACTION_KINETICS_EQUATIONS,
+    "pumps": PUMPS_EQUATIONS,
+    "vessels": VESSELS_EQUATIONS,
+    "instrumentation": INSTRUMENTATION_EQUATIONS,
+    "safety": SAFETY_EQUATIONS,
+    "economics": ECONOMICS_EQUATIONS,
     "basic_math": BASIC_MATH_EQUATIONS,
 }
 

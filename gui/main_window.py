@@ -27,6 +27,13 @@ from equations.mass_transfer import MASS_TRANSFER_EQUATIONS
 from equations.reaction_kinetics import REACTION_KINETICS_EQUATIONS
 from equations.thermodynamics import THERMODYNAMICS_EQUATIONS
 from equations.basic_math import BASIC_MATH_EQUATIONS
+from equations.piping import PIPING_EQUATIONS
+from equations.instrumentation import INSTRUMENTATION_EQUATIONS
+from equations.distillation import DISTILLATION_EQUATIONS
+from equations.pumps import PUMPS_EQUATIONS
+from equations.vessels import VESSELS_EQUATIONS
+from equations.safety import SAFETY_EQUATIONS
+from equations.economics import ECONOMICS_EQUATIONS
 from core.uncertainty import UncertainParameter, DistributionType
 
 
@@ -34,10 +41,17 @@ from core.uncertainty import UncertainParameter, DistributionType
 EQUATION_REGISTRY = {
     "Process Control": PROCESS_CONTROL_EQUATIONS,
     "Fluid Dynamics": FLUID_DYNAMICS_EQUATIONS,
+    "Piping": PIPING_EQUATIONS,
     "Heat Transfer": HEAT_TRANSFER_EQUATIONS,
     "Thermodynamics": THERMODYNAMICS_EQUATIONS,
     "Mass Transfer": MASS_TRANSFER_EQUATIONS,
+    "Distillation": DISTILLATION_EQUATIONS,
     "Reaction Kinetics": REACTION_KINETICS_EQUATIONS,
+    "Pumps & Compressors": PUMPS_EQUATIONS,
+    "Vessels & Tanks": VESSELS_EQUATIONS,
+    "Instrumentation": INSTRUMENTATION_EQUATIONS,
+    "Safety & Relief": SAFETY_EQUATIONS,
+    "Economics": ECONOMICS_EQUATIONS,
     "Basic Math": BASIC_MATH_EQUATIONS,
 }
 
