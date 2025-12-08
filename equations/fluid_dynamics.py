@@ -396,6 +396,8 @@ NPSHa = (P_atm - P_vapor)/ρg + h_static - h_friction
     prerequisites=["pump_power"],
     related_equations=["pump_power", "pump_head"]
 )
+
+
 class ReynoldsNumber(BaseEquation):
     """Calculate Reynolds number to determine flow regime."""
     
