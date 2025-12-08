@@ -281,6 +281,121 @@ Typically only 55-80% of electrical power reaches the fluid!
 )
 
 
+# ===============================
+# BERNOULLI LEARNING CONTENT
+# ===============================
+BERNOULLI_LEARNING = LearningContent(
+    background_theory="""
+The **Bernoulli Equation** is the energy conservation principle for flowing fluids. 
+It states that total mechanical energy (pressure + kinetic + potential) is constant.
+
+**The Equation:** P₁/ρg + V₁²/2g + z₁ = P₂/ρg + V₂²/2g + z₂
+
+**Each term is a "head" (height equivalent):**
+- **P/ρg** = Pressure head (energy from pressure)
+- **V²/2g** = Velocity head (kinetic energy)
+- **z** = Elevation head (potential energy)
+
+**Key Assumptions:**
+1. Inviscid (frictionless) - no viscous losses
+2. Steady flow
+3. Incompressible fluid
+4. Along a streamline
+
+For real flows with friction, add head loss: h_L on the downstream side.
+""",
+    key_concepts=[
+        "Conservation of mechanical energy for flowing fluids",
+        "Pressure decreases when velocity increases (and vice versa)",
+        "Each term has units of length (head)",
+        "Real flows need friction loss correction"
+    ],
+    real_world_applications=[
+        "Pipe flow velocity calculations",
+        "Venturi flow meters",
+        "Airplane wing lift explanation",
+        "Siphon and tank drain calculations"
+    ],
+    common_mistakes=[
+        "Applying to viscous flows without friction correction",
+        "Forgetting to use absolute pressure",
+        "Using different reference elevations for z₁ and z₂",
+        "Applying between points not on the same streamline"
+    ],
+    quiz_questions=[
+        QuizQuestion(
+            id="bern_q1",
+            question="If velocity increases in a horizontal pipe, what happens to pressure?",
+            question_type=QuestionType.MULTIPLE_CHOICE,
+            options=["Pressure decreases", "Pressure increases", "Pressure stays same", "Cannot determine"],
+            correct_answer="Pressure decreases",
+            explanation="Bernoulli: P + ½ρV² = constant. If V ↑, then P ↓ to keep sum constant.",
+            difficulty=Difficulty.BEGINNER,
+            points=10
+        )
+    ],
+    difficulty=Difficulty.BEGINNER,
+    estimated_time_minutes=10,
+    prerequisites=[],
+    related_equations=["reynolds_number", "darcy_weisbach"]
+)
+
+
+# ===============================
+# NPSH LEARNING CONTENT
+# ===============================
+NPSH_LEARNING = LearningContent(
+    background_theory="""
+**Net Positive Suction Head (NPSH)** determines if a pump will cavitate. Cavitation occurs 
+when liquid pressure drops below its vapor pressure, forming bubbles that damage the pump.
+
+**NPSHa (Available):** Energy available at pump suction
+NPSHa = (P_atm - P_vapor)/ρg + h_static - h_friction
+
+**NPSHr (Required):** Manufacturer specification for the pump
+
+**The Rule:** NPSHa > NPSHr + margin (typically 2-3 ft)
+
+**Why It Matters:**
+- Cavitation causes noise, vibration, and rapid impeller erosion
+- Can reduce pump performance dramatically
+- Worse at high altitudes (lower P_atm) and high temperatures (higher P_vapor)
+""",
+    key_concepts=[
+        "NPSHa must exceed NPSHr to avoid cavitation",
+        "Increases with: suction pressure, suction head, cooler liquid",
+        "Decreases with: friction losses, altitude, hot liquids",
+        "Always maintain 2-3 ft margin over NPSHr"
+    ],
+    real_world_applications=[
+        "Pump installation elevation determination",
+        "Suction line sizing to minimize losses",
+        "Hot liquid pumping (boiler feed, etc.)",
+        "High-altitude pump installations"
+    ],
+    common_mistakes=[
+        "Ignoring NPSHr from pump curves",
+        "Forgetting vapor pressure increases with temperature",
+        "Not accounting for suction line losses",
+        "Using gauge pressure instead of absolute"
+    ],
+    quiz_questions=[
+        QuizQuestion(
+            id="npsh_q1",
+            question="What happens when NPSHa < NPSHr?",
+            question_type=QuestionType.MULTIPLE_CHOICE,
+            options=["Cavitation occurs", "Pump runs more efficiently", "Flow rate doubles", "Nothing changes"],
+            correct_answer="Cavitation occurs",
+            explanation="When available NPSH is less than required, liquid vaporizes in the pump causing cavitation damage.",
+            difficulty=Difficulty.BEGINNER,
+            points=10
+        )
+    ],
+    difficulty=Difficulty.INTERMEDIATE,
+    estimated_time_minutes=15,
+    prerequisites=["pump_power"],
+    related_equations=["pump_power", "pump_head"]
+)
 class ReynoldsNumber(BaseEquation):
     """Calculate Reynolds number to determine flow regime."""
     
@@ -366,6 +481,7 @@ class BernoulliEquation(BaseEquation):
     category = "Fluid Dynamics"
     description = "Energy balance between two points in a flowing fluid (no friction)"
     reference = "Fundamentals of Fluid Mechanics"
+    learning_content = BERNOULLI_LEARNING
     
     def get_parameters(self) -> List[EquationParameter]:
         return [
@@ -706,6 +822,7 @@ class NPSH(BaseEquation):
     category = "Fluid Dynamics"
     description = "Calculate available NPSH to compare against pump NPSHr"
     reference = "Hydraulic Institute Standards"
+    learning_content = NPSH_LEARNING
     
     def get_parameters(self) -> List[EquationParameter]:
         return [

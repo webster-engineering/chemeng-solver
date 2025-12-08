@@ -660,6 +660,126 @@ Flash drums are used everywhere: crude oil processing, refrigeration, chemical p
 )
 
 
+# ===============================
+# COMPRESSOR WORK LEARNING CONTENT
+# ===============================
+COMPRESSOR_WORK_LEARNING = LearningContent(
+    background_theory="""
+**Compressor work** calculations are essential for sizing gas compression equipment and 
+estimating energy costs. The isentropic (reversible adiabatic) process is the theoretical limit.
+
+**The Equation:** W = [k/(k-1)] × R × T₁ × [(P₂/P₁)^((k-1)/k) - 1]
+
+Where:
+- **W** = Specific work (per unit mass)
+- **k** = Ratio of specific heats (Cp/Cv) 
+- **R** = Gas constant (specific to gas)
+- **T₁** = Suction temperature (absolute!)
+- **P₂/P₁** = Compression ratio
+
+**Efficiency:**
+- Actual work = Ideal work / η_isentropic
+- Typical η: 70-85% for centrifugal, 80-90% for reciprocating
+
+**Stage Limits:** 
+Single-stage compression ratio typically limited to 3-4:1 to control discharge temperature.
+""",
+    key_concepts=[
+        "Isentropic = reversible adiabatic (no heat loss, no friction)",
+        "Compression ratio P₂/P₁ is key driver of work and discharge temperature",
+        "Multi-stage with intercooling reduces total work",
+        "Discharge temperature rises significantly - can damage equipment"
+    ],
+    real_world_applications=[
+        "Natural gas pipeline compression",
+        "Refrigeration compressor sizing",
+        "Air separation plant design",
+        "Process gas recycle compressors"
+    ],
+    common_mistakes=[
+        "Using °F or °C instead of absolute temperature (R or K)",
+        "Forgetting that k varies with temperature and composition",
+        "Not accounting for isentropic efficiency",
+        "Ignoring interstage cooling requirements"
+    ],
+    quiz_questions=[
+        QuizQuestion(
+            id="cw_q1",
+            question="What is a typical compression ratio limit per stage?",
+            question_type=QuestionType.MULTIPLE_CHOICE,
+            options=["2:1 to 4:1", "10:1 to 20:1", "50:1 to 100:1", "No limit"],
+            correct_answer="2:1 to 4:1",
+            explanation="High ratios cause excessive discharge temperatures. Multi-stage with intercooling is used for higher overall ratios.",
+            difficulty=Difficulty.BEGINNER,
+            points=10
+        )
+    ],
+    difficulty=Difficulty.INTERMEDIATE,
+    estimated_time_minutes=15,
+    prerequisites=["ideal_gas"],
+    related_equations=["ideal_gas"]
+)
+
+
+# ===============================
+# VAN DER WAALS LEARNING CONTENT
+# ===============================
+VAN_DER_WAALS_LEARNING = LearningContent(
+    background_theory="""
+The **Van der Waals equation** was the first equation of state to account for **real gas behavior** 
+by correcting the ideal gas law for molecular volume and intermolecular attractions.
+
+**The Equation:** (P + a/V²)(V - b) = RT
+
+Where:
+- **a** = Attraction parameter (accounts for intermolecular forces)
+- **b** = Covolume (accounts for molecular volume)
+- These are calculated from critical properties: Tc and Pc
+
+**The Compressibility Factor (Z):** Z = PV/RT
+- Z = 1 for ideal gas
+- Z < 1: Attractive forces dominate (gas more compressible)
+- Z > 1: Repulsive forces dominate (gas less compressible)
+
+Van der Waals laid the foundation for modern cubic equations of state (Peng-Robinson, SRK).
+""",
+    key_concepts=[
+        "Corrects for molecular size (b) and attractions (a)",
+        "Compressibility factor Z = PV/RT deviates from 1",
+        "Foundation for Peng-Robinson, SRK equations",
+        "a and b calculated from critical temperature and pressure"
+    ],
+    real_world_applications=[
+        "High-pressure gas behavior predictions",
+        "Natural gas processing calculations",
+        "Supercritical fluid applications",
+        "Understanding why ideal gas law fails"
+    ],
+    common_mistakes=[
+        "Applying ideal gas law at high pressure",
+        "Using wrong units for a and b coefficients",
+        "Forgetting that VdW is qualitative - PR/SRK are better for design",
+        "Not iterating properly to solve cubic equation"
+    ],
+    quiz_questions=[
+        QuizQuestion(
+            id="vdw_q1",
+            question="If Z < 1, what does this indicate about the gas?",
+            question_type=QuestionType.MULTIPLE_CHOICE,
+            options=["Attractive forces dominate", "Repulsive forces dominate", "Ideal behavior", "Liquid phase"],
+            correct_answer="Attractive forces dominate",
+            explanation="Z < 1 means PV < nRT, indicating the gas occupies less volume than ideal - attractive forces pull molecules together.",
+            difficulty=Difficulty.INTERMEDIATE,
+            points=15
+        )
+    ],
+    difficulty=Difficulty.INTERMEDIATE,
+    estimated_time_minutes=15,
+    prerequisites=["ideal_gas"],
+    related_equations=["ideal_gas", "compressor_work"]
+)
+
+
 class AntoineVaporPressure(BaseEquation):
     """Antoine equation for vapor pressure."""
     
@@ -861,6 +981,7 @@ class CompressorWork(BaseEquation):
     category = "Thermodynamics"
     description = "Calculate ideal isentropic work for gas compression"
     reference = "Perry's Chemical Engineers' Handbook"
+    learning_content = COMPRESSOR_WORK_LEARNING
     
     def get_parameters(self) -> List[EquationParameter]:
         return [
@@ -936,6 +1057,7 @@ class VanDerWaals(BaseEquation):
     category = "Thermodynamics"
     description = "(P + a/V²)(V - b) = RT - real gas behavior"
     reference = "Van der Waals, 1873"
+    learning_content = VAN_DER_WAALS_LEARNING
     
     def get_parameters(self) -> List[EquationParameter]:
         return [
