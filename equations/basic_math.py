@@ -277,57 +277,6 @@ class CylinderVolume(BaseEquation):
         }
 
 
-class UnitConversion(BaseEquation):
-    """Common unit conversions."""
-    
-    equation_id = "unit_convert"
-    name = "Common Unit Conversions"
-    category = "Basic Math"
-    description = "Convert between common engineering units"
-    reference = "Standard conversions"
-    
-    def get_parameters(self) -> List[EquationParameter]:
-        return [
-            EquationParameter("value", "Value to convert", 
-                              "dimensionless", "", ParameterType.INPUT, symbol="Value"),
-            EquationParameter("conversion_type", "Conversion type (see tooltip)", 
-                              "dimensionless", "", ParameterType.INPUT, symbol="Type",
-                              tooltip="1=psi↔kPa, 2=°F↔°C, 3=gpm↔m³/h, 4=ft↔m, 5=lb↔kg"),
-            EquationParameter("result", "Converted value", 
-                              "dimensionless", "", ParameterType.OUTPUT, symbol="Result"),
-            EquationParameter("formula", "Conversion factor used", 
-                              "dimensionless", "", ParameterType.OUTPUT, symbol="Factor"),
-        ]
-    
-    def _calculate(self, value: pint.Quantity, conversion_type: pint.Quantity,
-                   **kwargs) -> Dict[str, pint.Quantity]:
-        val = value.magnitude if hasattr(value, 'magnitude') else float(value)
-        conv = conversion_type.magnitude if hasattr(conversion_type, 'magnitude') else 1
-        
-        conversions = {
-            1: (6.89476, "psi to kPa"),  # psi to kPa
-            2: (lambda x: (x - 32) * 5/9, "°F to °C"),  # °F to °C
-            3: (0.2271, "gpm to m³/h"),  # gpm to m³/h
-            4: (0.3048, "ft to m"),  # ft to m
-            5: (0.453592, "lb to kg"),  # lb to kg
-        }
-        
-        if conv in conversions:
-            factor_or_func = conversions[conv][0]
-            if callable(factor_or_func):
-                result = factor_or_func(val)
-                factor = 0  # Non-linear
-            else:
-                result = val * factor_or_func
-                factor = factor_or_func
-        else:
-            result = val
-            factor = 1
-        
-        return {
-            "result": ureg.Quantity(result, ""),
-            "formula": ureg.Quantity(factor, "")
-        }
 
 
 class PythagoreanTheorem(BaseEquation):
@@ -427,7 +376,6 @@ BASIC_MATH_EQUATIONS = {
     'statistics': MeanAndStdDev,
     'circle': CircleCalculations,
     'cylinder': CylinderVolume,
-    'unit_convert': UnitConversion,
     'pythagorean': PythagoreanTheorem,
     'exponential': ExponentialDecay,
 }
