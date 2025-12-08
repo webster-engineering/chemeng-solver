@@ -282,6 +282,160 @@ Typically only 55-80% of electrical power reaches the fluid!
 
 
 # ===============================
+# ORIFICE FLOW LEARNING CONTENT
+# ===============================
+ORIFICE_LEARNING = LearningContent(
+    background_theory="""
+**Orifice plates** are the most common flow measurement device in process industries.
+They create a pressure drop that correlates with flow rate.
+
+**The Equation:** Q = Cd × A × √(2·ΔP/ρ)
+
+Simplified for practical use: Q = Cd × d² × K × √(ΔP/SG)
+
+Where:
+- **Cd** = Discharge coefficient (typically 0.60-0.65)
+- **d** = Orifice bore diameter  
+- **ΔP** = Differential pressure across orifice
+- **ρ** = Fluid density
+
+**Why the Square Root?**
+Flow is proportional to √ΔP, so doubling flow quadruples ΔP!
+This is why orifice sizing is critical for turndown ratio.
+""",
+    key_concepts=[
+        "Q ∝ √ΔP - square root relationship",
+        "Cd accounts for vena contracta and other real effects",
+        "Beta ratio (β = d/D) affects permanent pressure loss",
+        "Typical turndown ~4:1 (16:1 ΔP range)"
+    ],
+    common_mistakes=[
+        "Incorrect tap location (flange, corner, D-D/2)",
+        "Not accounting for gas expansion (Y factor)",
+        "Using wrong Cd for beta ratio",
+        "Ignoring temperature effects on orifice bore"
+    ],
+    quiz_questions=[
+        QuizQuestion(
+            id="orif_q1",
+            question="If flow doubles, what happens to ΔP across an orifice?",
+            question_type=QuestionType.MULTIPLE_CHOICE,
+            options=["Doubles", "Quadruples", "Halves", "Stays same"],
+            correct_answer="Quadruples",
+            explanation="Q ∝ √ΔP, so ΔP ∝ Q². If Q doubles, ΔP increases 4×.",
+            difficulty=Difficulty.BEGINNER,
+            points=10
+        )
+    ],
+    difficulty=Difficulty.INTERMEDIATE,
+    estimated_time_minutes=15,
+    prerequisites=["bernoulli"],
+    related_equations=["bernoulli", "reynolds_number"]
+)
+
+
+# ===============================
+# FRICTION FACTOR LEARNING CONTENT
+# ===============================
+FRICTION_FACTOR_LEARNING = LearningContent(
+    background_theory="""
+The **Darcy friction factor (f)** is the key to pressure drop calculations.
+It depends on Reynolds number and pipe roughness.
+
+**For Laminar Flow (Re < 2100):** f = 64/Re (exact solution!)
+
+**For Turbulent Flow:** Use Colebrook equation or Swamee-Jain approximation:
+f = 0.25 / [log₁₀(ε/3.7D + 5.74/Re⁰·⁹)]²
+
+**Key Parameters:**
+- **ε/D** = Relative roughness (roughness/diameter)
+- **Re** = Reynolds number
+
+**Moody Chart:** The classic graphical solution showing f vs Re for various ε/D values.
+""",
+    key_concepts=[
+        "Laminar: f = 64/Re (exact)",
+        "Turbulent: f depends on Re AND relative roughness ε/D",
+        "Smooth pipe limit: f approaches constant at high Re",
+        "Rough pipe limit: f independent of Re at very high Re"
+    ],
+    common_mistakes=[
+        "Confusing Darcy (f) and Fanning (f_f) friction factors: Darcy = 4×Fanning",
+        "Using wrong roughness values (new vs aged pipe)",
+        "Applying turbulent formula in laminar regime"
+    ],
+    quiz_questions=[
+        QuizQuestion(
+            id="ff_q1",
+            question="For laminar flow with Re = 800, what is the Darcy friction factor?",
+            question_type=QuestionType.NUMERIC,
+            options=[],
+            correct_answer="0.08",
+            explanation="f = 64/Re = 64/800 = 0.08",
+            difficulty=Difficulty.BEGINNER,
+            hint="f = 64/Re for laminar flow",
+            points=10
+        )
+    ],
+    difficulty=Difficulty.INTERMEDIATE,
+    estimated_time_minutes=12,
+    prerequisites=["reynolds_number"],
+    related_equations=["reynolds_number", "darcy_weisbach"]
+)
+
+
+# ===============================
+# PUMP HEAD LEARNING CONTENT
+# ===============================
+PUMP_HEAD_LEARNING = LearningContent(
+    background_theory="""
+**Total Dynamic Head (TDH)** is what the pump must provide. It's the sum of all 
+resistances the pump must overcome.
+
+**The Equation:** TDH = h_static + h_friction + h_pressure
+
+Where:
+- **h_static** = Elevation change (discharge - suction level)
+- **h_friction** = Pipe losses from Darcy-Weisbach or Hazen-Williams
+- **h_pressure** = Pressure difference converted to head: ΔP × 2.31/SG
+
+**Why Head Instead of Pressure?**
+Head (ft or m) is independent of fluid density - same pump handles water and 
+gasoline at same head (but different pressures!).
+""",
+    key_concepts=[
+        "TDH = static + friction + pressure head",
+        "Static head: positive if pumping uphill",
+        "Convert psi to ft: multiply by 2.31/SG",
+        "Pump curves show head vs flow"
+    ],
+    common_mistakes=[
+        "Forgetting friction losses in suction line",
+        "Using gauge pressure when absolute is needed",
+        "Not accounting for velocity head difference",
+        "Ignoring suction lift limitations"
+    ],
+    quiz_questions=[
+        QuizQuestion(
+            id="ph_q1",
+            question="A pump lifts water 50 ft with 10 ft friction loss and 20 psi discharge pressure. What's TDH?",
+            question_type=QuestionType.NUMERIC,
+            options=[],
+            correct_answer="106.2",
+            explanation="TDH = 50 + 10 + (20×2.31/1) = 50 + 10 + 46.2 = 106.2 ft",
+            difficulty=Difficulty.INTERMEDIATE,
+            hint="Convert psi to ft: psi × 2.31/SG",
+            points=15
+        )
+    ],
+    difficulty=Difficulty.INTERMEDIATE,
+    estimated_time_minutes=15,
+    prerequisites=["pump_power", "darcy_weisbach"],
+    related_equations=["pump_power", "npsh", "darcy_weisbach"]
+)
+
+
+# ===============================
 # BERNOULLI LEARNING CONTENT
 # ===============================
 BERNOULLI_LEARNING = LearningContent(
@@ -529,6 +683,7 @@ class OrificeFlow(BaseEquation):
     category = "Fluid Dynamics"
     description = "Calculate volumetric flow through an orifice plate"
     reference = "ISA/ASME Standards"
+    learning_content = ORIFICE_LEARNING
     
     def get_parameters(self) -> List[EquationParameter]:
         return [
@@ -569,6 +724,7 @@ class PipeFrictionFactor(BaseEquation):
     category = "Fluid Dynamics"
     description = "Calculate Darcy friction factor for turbulent flow (Re > 4000)"
     reference = "Swamee & Jain, 1976"
+    learning_content = FRICTION_FACTOR_LEARNING
     
     def get_parameters(self) -> List[EquationParameter]:
         return [
@@ -782,6 +938,7 @@ class PumpHead(BaseEquation):
     category = "Fluid Dynamics"
     description = "Calculate TDH = static head + friction head + pressure head"
     reference = "Hydraulic Institute Standards"
+    learning_content = PUMP_HEAD_LEARNING
     
     def get_parameters(self) -> List[EquationParameter]:
         return [
