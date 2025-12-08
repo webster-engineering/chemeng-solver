@@ -765,7 +765,7 @@
             transform: rotate(20deg);
         }
 
-        /* Tips Carousel - Fixed bottom right */
+        /* Tips Carousel - Fixed bottom right (stays on top while scrolling) */
         .tips-carousel {
             position: fixed;
             bottom: 20px;
@@ -773,12 +773,14 @@
             width: 320px;
             background: var(--bg-card);
             backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border);
             border-radius: 12px;
             padding: 16px;
-            z-index: 100;
+            z-index: 9999;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
         }
+
 
         .tips-carousel .tip {
             display: none;
