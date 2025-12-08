@@ -3182,6 +3182,11 @@
                                     <option value="benzene-toluene">Benzene-Toluene</option>
                                     <option value="methanol-water">Methanol-Water</option>
                                     <option value="ethanol-water">Ethanol-Water</option>
+                                    <option value="acetone-water">Acetone-Water</option>
+                                    <option value="hexane-ethanol">n-Hexane-Ethanol</option>
+                                    <option value="propanol-water">n-Propanol-Water</option>
+                                    <option value="acetone-chloroform">Acetone-Chloroform</option>
+                                    <option value="pentane-hexane">n-Pentane-n-Hexane</option>
                                 </select>
                             </div>
                             <div class="input-group">
@@ -3189,12 +3194,12 @@
                                 <input type="number" id="txyP" value="101.325" step="1">
                             </div>
                             <div class="input-group">
-                                <label>Feed Composition (xF):</label>
+                                <label>Feed Composition (zF):</label>
                                 <input type="number" id="txyXf" value="0.5" step="0.05" min="0" max="1">
                             </div>
                             <div class="input-group">
-                                <label>Reflux Ratio (R):</label>
-                                <input type="number" id="txyR" value="2" step="0.1" min="0.5">
+                                <label>Feed Temperature (°C):</label>
+                                <input type="number" id="txyTf" value="90" step="1">
                             </div>
                             <button class="calculate-btn" onclick="plotTxy()">Plot Diagram</button>
                         </div>
@@ -5245,7 +5250,7 @@
 
         // ===== T-xy Diagram (VLE) =====
         // Antoine coefficients for log10(P_mmHg) = A - B/(T+C), T in °C
-        // We convert to kPa by multiplying result by 0.133322
+        // Data from NIST Chemistry WebBook
         const vleData = {
             'benzene-toluene': {
                 Tb1: 80.1, Tb2: 110.6,
@@ -5264,6 +5269,36 @@
                 A1: 8.11220, B1: 1592.864, C1: 226.184,
                 A2: 7.96681, B2: 1668.21, C2: 228.0,
                 name1: 'Ethanol', name2: 'Water'
+            },
+            'acetone-water': {
+                Tb1: 56.1, Tb2: 100,
+                A1: 7.11714, B1: 1210.595, C1: 229.664,
+                A2: 7.96681, B2: 1668.21, C2: 228.0,
+                name1: 'Acetone', name2: 'Water'
+            },
+            'hexane-ethanol': {
+                Tb1: 68.7, Tb2: 78.4,
+                A1: 6.87601, B1: 1171.17, C1: 224.41,
+                A2: 8.11220, B2: 1592.864, C2: 226.184,
+                name1: 'n-Hexane', name2: 'Ethanol'
+            },
+            'propanol-water': {
+                Tb1: 97.2, Tb2: 100,
+                A1: 7.74416, B1: 1437.686, C1: 198.463,
+                A2: 7.96681, B2: 1668.21, C2: 228.0,
+                name1: 'n-Propanol', name2: 'Water'
+            },
+            'acetone-chloroform': {
+                Tb1: 56.1, Tb2: 61.2,
+                A1: 7.11714, B1: 1210.595, C1: 229.664,
+                A2: 6.95465, B2: 1170.966, C2: 226.232,
+                name1: 'Acetone', name2: 'Chloroform'
+            },
+            'pentane-hexane': {
+                Tb1: 36.1, Tb2: 68.7,
+                A1: 6.85221, B1: 1064.63, C1: 232.00,
+                A2: 6.87601, B2: 1171.17, C2: 224.41,
+                name1: 'n-Pentane', name2: 'n-Hexane'
             }
         };
 
@@ -5323,7 +5358,70 @@
                 dewT.push(T);
             }
 
+            // Get user's feed point
+            const zF = parseFloat(document.getElementById('txyXf')?.value || 0.5);
+            const Tf = parseFloat(document.getElementById('txyTf')?.value || 90);
+
+            // Create feed point dataset (single point)
+            const feedPointData = compositions.map((comp, i) => {
+                const compNum = parseFloat(comp);
+                // Only plot at the user's feed composition
+                if (Math.abs(compNum - zF) < 0.02) {
+                    return Tf;
+                }
+                return null;
+            });
+
+            // Determine which phase the feed point is in
+            const zIdx = Math.round(zF / 0.02);
+            const bubbleAtZ = bubbleT[zIdx] || bubbleT[0];
+            const dewAtZ = dewT[zIdx] || dewT[0];
+            let phaseLabel = '';
+            if (Tf <= bubbleAtZ) {
+                phaseLabel = 'Subcooled Liquid';
+            } else if (Tf >= dewAtZ) {
+                phaseLabel = 'Superheated Vapor';
+            } else {
+                phaseLabel = 'Two-Phase (V+L)';
+            }
+
             if (txyChartInstance) txyChartInstance.destroy();
+
+            // Custom plugin for phase region labels
+            const phaseLabelsPlugin = {
+                id: 'phaseLabels',
+                afterDraw: (chart) => {
+                    const ctx = chart.ctx;
+                    const xAxis = chart.scales.x;
+                    const yAxis = chart.scales.y;
+
+                    ctx.save();
+                    ctx.font = '12px Inter, sans-serif';
+                    ctx.textAlign = 'center';
+
+                    // Calculate Y positions for labels
+                    const yMin = yAxis.min;
+                    const yMax = yAxis.max;
+                    const midY = (yMax + yMin) / 2;
+
+                    // Liquid region label (below bubble line)
+                    ctx.fillStyle = 'rgba(88, 166, 255, 0.8)';
+                    const liquidY = yAxis.getPixelForValue(yMin + (bubbleT[25] - yMin) * 0.3);
+                    ctx.fillText('LIQUID', xAxis.getPixelForValue(0.5), liquidY);
+
+                    // Two-phase region label (between lines)
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+                    const twoPhaseY = yAxis.getPixelForValue((bubbleT[25] + dewT[25]) / 2);
+                    ctx.fillText('VAPOR + LIQUID', xAxis.getPixelForValue(0.5), twoPhaseY);
+
+                    // Vapor region label (above dew line)
+                    ctx.fillStyle = 'rgba(248, 81, 73, 0.8)';
+                    const vaporY = yAxis.getPixelForValue(dewT[25] + (yMax - dewT[25]) * 0.5);
+                    ctx.fillText('VAPOR', xAxis.getPixelForValue(0.5), vaporY);
+
+                    ctx.restore();
+                }
+            };
 
             txyChartInstance = new Chart(ctx, {
                 type: 'line',
@@ -5331,36 +5429,78 @@
                     labels: compositions,
                     datasets: [
                         {
-                            label: 'Bubble Line (Liquid)',
+                            label: 'Bubble Line (Saturated Liquid)',
                             data: bubbleT,
-                            borderColor: '#5b6eae',
-                            backgroundColor: 'rgba(91, 110, 174, 0.15)',
-                            fill: '+1',
+                            borderColor: '#58a6ff',
+                            backgroundColor: 'rgba(88, 166, 255, 0.1)',
+                            fill: false,
                             tension: 0.4,
                             pointRadius: 0,
-                            borderWidth: 2
+                            borderWidth: 2.5
                         },
                         {
-                            label: 'Dew Line (Vapor)',
+                            label: 'Dew Line (Saturated Vapor)',
                             data: dewT,
-                            borderColor: '#ef4444',
+                            borderColor: '#f85149',
+                            backgroundColor: 'rgba(248, 81, 73, 0.1)',
+                            fill: '-1',
                             tension: 0.4,
                             pointRadius: 0,
-                            borderWidth: 2
+                            borderWidth: 2.5
+                        },
+                        {
+                            label: `Feed Point (z=${zF}, T=${Tf}°C) - ${phaseLabel}`,
+                            data: feedPointData,
+                            borderColor: '#3fb950',
+                            backgroundColor: '#3fb950',
+                            pointRadius: 10,
+                            pointStyle: 'star',
+                            showLine: false,
+                            pointBorderWidth: 2,
+                            pointBorderColor: '#ffffff'
                         }
                     ]
                 },
                 options: {
                     responsive: true,
                     plugins: {
-                        title: { display: true, text: `${data.name1}-${data.name2} T-xy Diagram at ${P_kPa} kPa`, color: '#f0f6fc' },
-                        legend: { labels: { color: '#8a8a9a' } }
+                        title: {
+                            display: true,
+                            text: `${data.name1}-${data.name2} T-xy Diagram at ${P_kPa} kPa`,
+                            color: '#f0f6fc',
+                            font: { size: 14, weight: 'bold' }
+                        },
+                        legend: {
+                            labels: { color: '#8b949e' },
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    if (context.dataset.label.includes('Feed')) {
+                                        return `Feed: z=${zF}, T=${Tf}°C (${phaseLabel})`;
+                                    }
+                                    return `${context.dataset.label}: ${context.parsed.y.toFixed(1)}°C`;
+                                }
+                            }
+                        }
                     },
                     scales: {
-                        x: { title: { display: true, text: `Mole Fraction ${data.name1} (x, y)`, color: '#8a8a9a' }, ticks: { color: '#8a8a9a' }, grid: { color: 'rgba(255,255,255,0.05)' } },
-                        y: { title: { display: true, text: 'Temperature (°C)', color: '#8a8a9a' }, ticks: { color: '#8a8a9a' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                        x: {
+                            title: { display: true, text: `Mole Fraction ${data.name1} (x, y)`, color: '#8b949e' },
+                            ticks: { color: '#8b949e' },
+                            grid: { color: 'rgba(48, 54, 61, 0.5)' },
+                            min: 0,
+                            max: 1
+                        },
+                        y: {
+                            title: { display: true, text: 'Temperature (°C)', color: '#8b949e' },
+                            ticks: { color: '#8b949e' },
+                            grid: { color: 'rgba(48, 54, 61, 0.5)' }
+                        }
                     }
-                }
+                },
+                plugins: [phaseLabelsPlugin]
             });
         }
 
