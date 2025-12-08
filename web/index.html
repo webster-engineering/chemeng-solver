@@ -2436,6 +2436,11 @@
                         <button class="graph-type-btn" onclick="selectGraph('pump')">Pump Curves</button>
                         <button class="graph-type-btn" onclick="selectGraph('txy')">T-xy Diagram</button>
                         <button class="graph-type-btn" onclick="selectGraph('moody')">Moody Diagram</button>
+                        <button class="graph-type-btn" onclick="selectGraph('phase')">Phase Diagram</button>
+                        <button class="graph-type-btn" onclick="selectGraph('arrhenius')">Arrhenius Plot</button>
+                        <button class="graph-type-btn" onclick="selectGraph('ntu')">Effectiveness-NTU</button>
+                        <button class="graph-type-btn" onclick="selectGraph('bode')">Bode Plot</button>
+                        <button class="graph-type-btn" onclick="selectGraph('heat')">Heat Curves</button>
                     </div>
 
                     <!-- PID Step Response -->
@@ -2540,6 +2545,153 @@
                         <div class="moody-result" id="moodyResult"></div>
                         <div class="chart-wrapper">
                             <canvas id="moodyChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Phase Diagram -->
+                    <div id="phaseGraph" class="graph-container">
+                        <h3>Phase Diagram (T-P)</h3>
+                        <div class="graph-controls">
+                            <div class="input-group">
+                                <label>Substance:</label>
+                                <select id="phaseSubstance" onchange="updatePhaseParams()">
+                                    <option value="water">Water</option>
+                                    <option value="co2">Carbon Dioxide</option>
+                                    <option value="ammonia">Ammonia</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label>Temperature (K):</label>
+                                <input type="number" id="phaseT" value="300" step="10">
+                            </div>
+                            <div class="input-group">
+                                <label>Pressure (kPa):</label>
+                                <input type="number" id="phaseP" value="101.325" step="10">
+                            </div>
+                            <button class="calculate-btn" onclick="plotPhase()">Plot Diagram</button>
+                        </div>
+                        <div class="moody-result" id="phaseResult"></div>
+                        <div class="chart-wrapper">
+                            <canvas id="phaseChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Arrhenius Plot -->
+                    <div id="arrheniusGraph" class="graph-container">
+                        <h3>Arrhenius Plot (ln k vs 1/T)</h3>
+                        <div class="graph-controls">
+                            <div class="input-group">
+                                <label>Pre-exponential (A, s⁻¹):</label>
+                                <input type="number" id="arrA" value="1e13" step="1e12">
+                            </div>
+                            <div class="input-group">
+                                <label>Activation Energy (Ea, kJ/mol):</label>
+                                <input type="number" id="arrEa" value="80" step="5">
+                            </div>
+                            <div class="input-group">
+                                <label>T min (K):</label>
+                                <input type="number" id="arrTmin" value="300" step="10">
+                            </div>
+                            <div class="input-group">
+                                <label>T max (K):</label>
+                                <input type="number" id="arrTmax" value="600" step="10">
+                            </div>
+                            <button class="calculate-btn" onclick="plotArrhenius()">Plot</button>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="arrheniusChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Effectiveness-NTU -->
+                    <div id="ntuGraph" class="graph-container">
+                        <h3>Heat Exchanger Effectiveness-NTU</h3>
+                        <div class="graph-controls">
+                            <div class="input-group">
+                                <label>HX Type:</label>
+                                <select id="ntuType">
+                                    <option value="counterflow">Counterflow</option>
+                                    <option value="parallelflow">Parallel Flow</option>
+                                    <option value="shell1">Shell & Tube (1 shell)</option>
+                                    <option value="crossflow">Crossflow (unmixed)</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label>Capacity Ratio (Cr):</label>
+                                <input type="number" id="ntuCr" value="0.5" step="0.1" min="0" max="1">
+                            </div>
+                            <div class="input-group">
+                                <label>NTU (to calculate):</label>
+                                <input type="number" id="ntuValue" value="2" step="0.5">
+                            </div>
+                            <button class="calculate-btn" onclick="plotNTU()">Plot Curves</button>
+                        </div>
+                        <div class="moody-result" id="ntuResult"></div>
+                        <div class="chart-wrapper">
+                            <canvas id="ntuChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Bode Plot -->
+                    <div id="bodeGraph" class="graph-container">
+                        <h3>Bode Plot (Frequency Response)</h3>
+                        <div class="graph-controls">
+                            <div class="input-group">
+                                <label>Process Gain (K):</label>
+                                <input type="number" id="bodeK" value="2" step="0.1">
+                            </div>
+                            <div class="input-group">
+                                <label>Time Constant (τ, s):</label>
+                                <input type="number" id="bodeTau" value="5" step="0.5">
+                            </div>
+                            <div class="input-group">
+                                <label>Dead Time (θ, s):</label>
+                                <input type="number" id="bodeTheta" value="1" step="0.1">
+                            </div>
+                            <div class="input-group">
+                                <label>Order:</label>
+                                <select id="bodeOrder">
+                                    <option value="1">First Order</option>
+                                    <option value="2">Second Order</option>
+                                </select>
+                            </div>
+                            <button class="calculate-btn" onclick="plotBode()">Plot</button>
+                        </div>
+                        <div class="chart-wrapper" style="display: flex; gap: 20px;">
+                            <div style="flex: 1;"><canvas id="bodeMagChart"></canvas></div>
+                            <div style="flex: 1;"><canvas id="bodePhaseChart"></canvas></div>
+                        </div>
+                    </div>
+
+                    <!-- Heat Curves -->
+                    <div id="heatGraph" class="graph-container">
+                        <h3>Heat Curves (Pinch Analysis)</h3>
+                        <div class="graph-controls">
+                            <div class="input-group">
+                                <label>Hot Stream Inlet (°C):</label>
+                                <input type="number" id="heatThi" value="200" step="10">
+                            </div>
+                            <div class="input-group">
+                                <label>Hot Stream Outlet (°C):</label>
+                                <input type="number" id="heatTho" value="80" step="10">
+                            </div>
+                            <div class="input-group">
+                                <label>Cold Stream Inlet (°C):</label>
+                                <input type="number" id="heatTci" value="30" step="10">
+                            </div>
+                            <div class="input-group">
+                                <label>Cold Stream Outlet (°C):</label>
+                                <input type="number" id="heatTco" value="150" step="10">
+                            </div>
+                            <div class="input-group">
+                                <label>Heat Duty (kW):</label>
+                                <input type="number" id="heatQ" value="500" step="50">
+                            </div>
+                            <button class="calculate-btn" onclick="plotHeatCurves()">Plot</button>
+                        </div>
+                        <div class="moody-result" id="heatResult"></div>
+                        <div class="chart-wrapper">
+                            <canvas id="heatChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -4074,6 +4226,11 @@
                 case 'pump': plotPumpCurves(); break;
                 case 'txy': plotTxy(); break;
                 case 'moody': plotMoody(); break;
+                case 'phase': plotPhase(); break;
+                case 'arrhenius': plotArrhenius(); break;
+                case 'ntu': plotNTU(); break;
+                case 'bode': plotBode(); break;
+                case 'heat': plotHeatCurves(); break;
             }
         }
 
@@ -4412,6 +4569,323 @@
                             min: 0.005,
                             max: 0.1
                         }
+                    }
+                }
+            });
+        }
+
+        // ===== Additional Chart Instances =====
+        let phaseChartInstance = null;
+        let arrheniusChartInstance = null;
+        let ntuChartInstance = null;
+        let bodeMagChartInstance = null;
+        let bodePhaseChartInstance = null;
+        let heatChartInstance = null;
+
+        // ===== Phase Diagram =====
+        const phaseData = {
+            'water': { Tt: 273.16, Pt: 0.611, Tc: 647.1, Pc: 22064, name: 'Water' },
+            'co2': { Tt: 216.55, Pt: 517, Tc: 304.2, Pc: 7380, name: 'CO₂' },
+            'ammonia': { Tt: 195.5, Pt: 6.1, Tc: 405.5, Pc: 11280, name: 'Ammonia' }
+        };
+
+        function plotPhase() {
+            const substance = document.getElementById('phaseSubstance')?.value || 'water';
+            const userT = parseFloat(document.getElementById('phaseT')?.value || 300);
+            const userP = parseFloat(document.getElementById('phaseP')?.value || 101.325);
+
+            const ctx = document.getElementById('phaseChart');
+            if (!ctx) return;
+
+            const data = phaseData[substance];
+
+            // Determine phase
+            let phase = 'Supercritical';
+            if (userT < data.Tc && userP < data.Pc) {
+                // Simplified Antoine-like vapor pressure curve
+                const Psat = data.Pt * Math.exp((data.Tc / data.Tt - data.Tc / userT) * Math.log(data.Pc / data.Pt));
+                if (userP > Psat) phase = 'Liquid';
+                else phase = 'Vapor';
+                if (userT < data.Tt) phase = 'Solid';
+            }
+
+            document.getElementById('phaseResult').innerHTML = `
+                <strong>State Point:</strong> T = ${userT} K, P = ${userP} kPa<br>
+                <strong>Phase:</strong> <span style="color: var(--accent-light)">${phase}</span><br>
+                <strong>Critical Point:</strong> Tc = ${data.Tc} K, Pc = ${data.Pc} kPa
+            `;
+
+            // Generate phase boundary curves
+            const temps = [];
+            const vaporPressure = [];
+            const sublimationP = [];
+
+            for (let T = data.Tt * 0.6; T <= data.Tc * 1.1; T += 5) {
+                temps.push(T.toFixed(0));
+                if (T >= data.Tt && T <= data.Tc) {
+                    const P = data.Pt * Math.exp((data.Tc / data.Tt - data.Tc / T) * Math.log(data.Pc / data.Pt));
+                    vaporPressure.push(Math.min(P, data.Pc));
+                } else {
+                    vaporPressure.push(null);
+                }
+                if (T <= data.Tt) {
+                    sublimationP.push(data.Pt * Math.pow(T / data.Tt, 3));
+                } else {
+                    sublimationP.push(null);
+                }
+            }
+
+            if (phaseChartInstance) phaseChartInstance.destroy();
+
+            phaseChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: temps,
+                    datasets: [
+                        { label: 'Vapor-Liquid', data: vaporPressure, borderColor: '#5b6eae', tension: 0.4, pointRadius: 0 },
+                        { label: 'Solid-Vapor', data: sublimationP, borderColor: '#22c55e', tension: 0.4, pointRadius: 0 },
+                        { label: 'Your Point', data: temps.map(t => Math.abs(parseFloat(t) - userT) < 10 ? userP : null), borderColor: '#ef4444', backgroundColor: '#ef4444', pointRadius: 10, pointStyle: 'star', showLine: false }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { title: { display: true, text: `${data.name} Phase Diagram`, color: '#e0e0e6' }, legend: { labels: { color: '#8a8a9a' } } },
+                    scales: {
+                        x: { title: { display: true, text: 'Temperature (K)', color: '#8a8a9a' }, ticks: { color: '#8a8a9a' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        y: { type: 'logarithmic', title: { display: true, text: 'Pressure (kPa)', color: '#8a8a9a' }, ticks: { color: '#8a8a9a' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                    }
+                }
+            });
+        }
+
+        // ===== Arrhenius Plot =====
+        function plotArrhenius() {
+            const A = parseFloat(document.getElementById('arrA')?.value || 1e13);
+            const Ea = parseFloat(document.getElementById('arrEa')?.value || 80) * 1000; // Convert to J/mol
+            const Tmin = parseFloat(document.getElementById('arrTmin')?.value || 300);
+            const Tmax = parseFloat(document.getElementById('arrTmax')?.value || 600);
+            const R = 8.314; // J/(mol·K)
+
+            const ctx = document.getElementById('arrheniusChart');
+            if (!ctx) return;
+
+            const invT = [];
+            const lnk = [];
+
+            for (let T = Tmax; T >= Tmin; T -= 10) {
+                invT.push((1000 / T).toFixed(3));
+                const k = A * Math.exp(-Ea / (R * T));
+                lnk.push(Math.log(k));
+            }
+
+            if (arrheniusChartInstance) arrheniusChartInstance.destroy();
+
+            arrheniusChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: invT,
+                    datasets: [{
+                        label: 'ln(k)',
+                        data: lnk,
+                        borderColor: '#5b6eae',
+                        backgroundColor: 'rgba(91, 110, 174, 0.1)',
+                        fill: true,
+                        tension: 0.1,
+                        pointRadius: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: { display: true, text: `Arrhenius Plot: Ea = ${(Ea / 1000).toFixed(1)} kJ/mol, A = ${A.toExponential(2)} s⁻¹`, color: '#e0e0e6' },
+                        legend: { labels: { color: '#8a8a9a' } }
+                    },
+                    scales: {
+                        x: { title: { display: true, text: '1000/T (K⁻¹)', color: '#8a8a9a' }, ticks: { color: '#8a8a9a' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        y: { title: { display: true, text: 'ln(k)', color: '#8a8a9a' }, ticks: { color: '#8a8a9a' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                    }
+                }
+            });
+        }
+
+        // ===== Effectiveness-NTU =====
+        function calcEffectiveness(NTU, Cr, type) {
+            if (Cr === 0) return 1 - Math.exp(-NTU);
+            switch (type) {
+                case 'counterflow':
+                    if (Cr === 1) return NTU / (1 + NTU);
+                    return (1 - Math.exp(-NTU * (1 - Cr))) / (1 - Cr * Math.exp(-NTU * (1 - Cr)));
+                case 'parallelflow':
+                    return (1 - Math.exp(-NTU * (1 + Cr))) / (1 + Cr);
+                case 'shell1':
+                    const E = Math.exp(-NTU * Math.sqrt(1 + Cr * Cr));
+                    return 2 / (1 + Cr + Math.sqrt(1 + Cr * Cr) * (1 + E) / (1 - E));
+                case 'crossflow':
+                    return 1 - Math.exp((Math.pow(NTU, 0.78) / Cr) * (Math.exp(-Cr * Math.pow(NTU, 0.22)) - 1));
+                default:
+                    return (1 - Math.exp(-NTU * (1 - Cr))) / (1 - Cr * Math.exp(-NTU * (1 - Cr)));
+            }
+        }
+
+        function plotNTU() {
+            const type = document.getElementById('ntuType')?.value || 'counterflow';
+            const Cr = parseFloat(document.getElementById('ntuCr')?.value || 0.5);
+            const userNTU = parseFloat(document.getElementById('ntuValue')?.value || 2);
+
+            const ctx = document.getElementById('ntuChart');
+            if (!ctx) return;
+
+            const userEff = calcEffectiveness(userNTU, Cr, type);
+            document.getElementById('ntuResult').innerHTML = `
+                <strong>Results:</strong> NTU = ${userNTU}, Cr = ${Cr}<br>
+                <strong>Effectiveness (ε):</strong> <span style="color: var(--accent-light)">${(userEff * 100).toFixed(1)}%</span>
+            `;
+
+            const ntuValues = [];
+            const datasets = [];
+            const crValues = [0, 0.25, 0.5, 0.75, 1.0];
+            const colors = ['#22c55e', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444'];
+
+            for (let n = 0; n <= 6; n += 0.2) ntuValues.push(n.toFixed(1));
+
+            crValues.forEach((cr, idx) => {
+                datasets.push({
+                    label: `Cr = ${cr}`,
+                    data: ntuValues.map(n => calcEffectiveness(parseFloat(n), cr, type) * 100),
+                    borderColor: colors[idx],
+                    pointRadius: 0,
+                    tension: 0.4
+                });
+            });
+
+            if (ntuChartInstance) ntuChartInstance.destroy();
+
+            ntuChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: { labels: ntuValues, datasets: datasets },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: { display: true, text: `Effectiveness-NTU (${type})`, color: '#e0e0e6' },
+                        legend: { labels: { color: '#8a8a9a' } }
+                    },
+                    scales: {
+                        x: { title: { display: true, text: 'NTU', color: '#8a8a9a' }, ticks: { color: '#8a8a9a' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        y: { title: { display: true, text: 'Effectiveness (%)', color: '#8a8a9a' }, ticks: { color: '#8a8a9a' }, grid: { color: 'rgba(255,255,255,0.05)' }, min: 0, max: 100 }
+                    }
+                }
+            });
+        }
+
+        // ===== Bode Plot =====
+        function plotBode() {
+            const K = parseFloat(document.getElementById('bodeK')?.value || 2);
+            const tau = parseFloat(document.getElementById('bodeTau')?.value || 5);
+            const theta = parseFloat(document.getElementById('bodeTheta')?.value || 1);
+            const order = parseInt(document.getElementById('bodeOrder')?.value || 1);
+
+            const ctxMag = document.getElementById('bodeMagChart');
+            const ctxPhase = document.getElementById('bodePhaseChart');
+            if (!ctxMag || !ctxPhase) return;
+
+            const frequencies = [];
+            const magnitude = [];
+            const phase = [];
+
+            for (let logW = -2; logW <= 2; logW += 0.1) {
+                const w = Math.pow(10, logW);
+                frequencies.push(w.toFixed(3));
+
+                // Magnitude: 20*log10(|G(jw)|)
+                let mag, ph;
+                if (order === 1) {
+                    mag = 20 * Math.log10(K / Math.sqrt(1 + Math.pow(w * tau, 2)));
+                    ph = -Math.atan(w * tau) * 180 / Math.PI - w * theta * 180 / Math.PI;
+                } else {
+                    const denom = Math.sqrt(Math.pow(1 - Math.pow(w * tau, 2), 2) + Math.pow(2 * 0.5 * w * tau, 2));
+                    mag = 20 * Math.log10(K / denom);
+                    ph = -Math.atan2(2 * 0.5 * w * tau, 1 - Math.pow(w * tau, 2)) * 180 / Math.PI - w * theta * 180 / Math.PI;
+                }
+                magnitude.push(mag);
+                phase.push(ph);
+            }
+
+            if (bodeMagChartInstance) bodeMagChartInstance.destroy();
+            if (bodePhaseChartInstance) bodePhaseChartInstance.destroy();
+
+            bodeMagChartInstance = new Chart(ctxMag, {
+                type: 'line',
+                data: { labels: frequencies, datasets: [{ label: 'Magnitude (dB)', data: magnitude, borderColor: '#5b6eae', pointRadius: 0, tension: 0.3 }] },
+                options: {
+                    responsive: true,
+                    plugins: { title: { display: true, text: 'Magnitude Plot', color: '#e0e0e6' }, legend: { display: false } },
+                    scales: {
+                        x: { type: 'logarithmic', title: { display: true, text: 'Frequency (rad/s)', color: '#8a8a9a' }, ticks: { color: '#8a8a9a' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        y: { title: { display: true, text: 'Magnitude (dB)', color: '#8a8a9a' }, ticks: { color: '#8a8a9a' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                    }
+                }
+            });
+
+            bodePhaseChartInstance = new Chart(ctxPhase, {
+                type: 'line',
+                data: { labels: frequencies, datasets: [{ label: 'Phase (°)', data: phase, borderColor: '#f59e0b', pointRadius: 0, tension: 0.3 }] },
+                options: {
+                    responsive: true,
+                    plugins: { title: { display: true, text: 'Phase Plot', color: '#e0e0e6' }, legend: { display: false } },
+                    scales: {
+                        x: { type: 'logarithmic', title: { display: true, text: 'Frequency (rad/s)', color: '#8a8a9a' }, ticks: { color: '#8a8a9a' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        y: { title: { display: true, text: 'Phase (°)', color: '#8a8a9a' }, ticks: { color: '#8a8a9a' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                    }
+                }
+            });
+        }
+
+        // ===== Heat Curves (Pinch Analysis) =====
+        function plotHeatCurves() {
+            const Thi = parseFloat(document.getElementById('heatThi')?.value || 200);
+            const Tho = parseFloat(document.getElementById('heatTho')?.value || 80);
+            const Tci = parseFloat(document.getElementById('heatTci')?.value || 30);
+            const Tco = parseFloat(document.getElementById('heatTco')?.value || 150);
+            const Q = parseFloat(document.getElementById('heatQ')?.value || 500);
+
+            const ctx = document.getElementById('heatChart');
+            if (!ctx) return;
+
+            // Calculate pinch point
+            const dTmin = Math.min(Thi - Tco, Tho - Tci);
+            const pinchT = Tho;
+
+            document.getElementById('heatResult').innerHTML = `
+                <strong>Heat Duty:</strong> ${Q} kW<br>
+                <strong>Minimum ΔT:</strong> <span style="color: var(--accent-light)">${dTmin.toFixed(1)} °C</span><br>
+                <strong>Approach Temperature:</strong> Hot out = ${Tho}°C, Cold in = ${Tci}°C
+            `;
+
+            // Hot composite curve (Temperature vs Enthalpy)
+            const enthalpy = [0, Q * 0.5, Q];
+            const hotT = [Thi, (Thi + Tho) / 2, Tho];
+            const coldT = [Tci, (Tci + Tco) / 2, Tco];
+
+            if (heatChartInstance) heatChartInstance.destroy();
+
+            heatChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: enthalpy.map(h => h.toFixed(0)),
+                    datasets: [
+                        { label: 'Hot Stream', data: hotT, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', fill: true, tension: 0.1, pointRadius: 4 },
+                        { label: 'Cold Stream', data: coldT, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.1, pointRadius: 4 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: { display: true, text: 'Temperature-Enthalpy (T-H) Diagram', color: '#e0e0e6' },
+                        legend: { labels: { color: '#8a8a9a' } }
+                    },
+                    scales: {
+                        x: { title: { display: true, text: 'Enthalpy (kW)', color: '#8a8a9a' }, ticks: { color: '#8a8a9a' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        y: { title: { display: true, text: 'Temperature (°C)', color: '#8a8a9a' }, ticks: { color: '#8a8a9a' }, grid: { color: 'rgba(255,255,255,0.05)' } }
                     }
                 }
             });
