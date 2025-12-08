@@ -1730,6 +1730,246 @@
             margin: 8px 0;
         }
 
+        /* ===== Tab Navigation ===== */
+        .main-tabs {
+            display: flex;
+            gap: 4px;
+            padding: 0 20px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .main-tab {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .main-tab:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .main-tab.active {
+            color: var(--accent-light);
+            border-bottom-color: var(--accent);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* ===== Scientific Calculator ===== */
+        .sci-calculator {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .calc-display {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .calc-history {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            min-height: 20px;
+            text-align: right;
+            padding-right: 5px;
+        }
+
+        .calc-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 2rem;
+            font-family: 'Consolas', 'Monaco', monospace;
+            text-align: right;
+            outline: none;
+        }
+
+        .calc-buttons {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+        }
+
+        .calc-btn {
+            padding: 15px 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .calc-btn:hover {
+            background: var(--bg-secondary);
+            border-color: var(--accent);
+        }
+
+        .calc-btn:active {
+            transform: scale(0.95);
+        }
+
+        .calc-btn.number {
+            background: var(--bg-secondary);
+            font-weight: 600;
+        }
+
+        .calc-btn.number.wide {
+            grid-column: span 2;
+        }
+
+        .calc-btn.operator {
+            background: rgba(91, 110, 174, 0.2);
+            color: var(--accent-light);
+        }
+
+        .calc-btn.function {
+            background: rgba(91, 110, 174, 0.1);
+            font-size: 0.85rem;
+        }
+
+        .calc-btn.memory {
+            background: rgba(122, 139, 196, 0.1);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .calc-btn.clear {
+            background: rgba(220, 80, 80, 0.15);
+            color: #e57373;
+        }
+
+        .calc-btn.equals {
+            background: var(--accent);
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .calc-btn.equals:hover {
+            background: var(--accent-light);
+        }
+
+        .calc-btn.const {
+            background: rgba(150, 180, 220, 0.15);
+            font-style: italic;
+        }
+
+        .calc-info {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* ===== Reference Data Panels ===== */
+        .reference-panel {
+            padding: 20px;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .reference-panel h2 {
+            margin: 0 0 5px 0;
+            color: var(--text-primary);
+        }
+
+        .ref-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .ref-controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .ref-controls input,
+        .ref-controls select {
+            padding: 8px 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .ref-controls input {
+            min-width: 200px;
+        }
+
+        .ref-controls input:focus,
+        .ref-controls select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .ref-table-container {
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg-card);
+        }
+
+        .ref-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .ref-table th,
+        .ref-table td {
+            padding: 10px 12px;
+            text-align: right;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        .ref-table th {
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            font-weight: 500;
+            position: sticky;
+            top: 0;
+        }
+
+        .ref-table th:first-child,
+        .ref-table td:first-child {
+            text-align: left;
+        }
+
+        .ref-table tbody tr:hover {
+            background: rgba(91, 110, 174, 0.1);
+        }
+
+        .ref-table tbody tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
         @media (max-width: 1200px) {
             .container {
                 grid-template-columns: 1fr;
@@ -1843,154 +2083,328 @@
 
         <!-- Main Content -->
         <main class="main-content">
-            <div id="welcomeState" class="empty-state">
-                <div class="flask-3d-container" id="flask3DContainer"
-                    style="width: 480px; height: 480px; position: relative; margin: 0 auto; perspective: 1000px;">
-                    <svg class="flask-3d" width="100%" height="100%" viewBox="0 0 100 100" fill="none"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <linearGradient id="flaskGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#5b6eae" />
-                                <stop offset="50%" style="stop-color:#6b7db8" />
-                                <stop offset="100%" style="stop-color:#7a8bc4" />
-                            </linearGradient>
-                            <linearGradient id="liquidGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#5b6eae" />
-                                <stop offset="100%" style="stop-color:#7a8bc4" />
-                            </linearGradient>
-                            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-                                <feGaussianBlur stdDeviation="2" result="coloredBlur" />
-                                <feMerge>
-                                    <feMergeNode in="coloredBlur" />
-                                    <feMergeNode in="SourceGraphic" />
-                                </feMerge>
-                            </filter>
-                        </defs>
-                        <!-- Flask body -->
-                        <path class="flask-body"
-                            d="M40 10 L40 35 L20 75 Q15 85 25 90 L75 90 Q85 85 80 75 L60 35 L60 10 Z"
-                            stroke="url(#flaskGrad)" stroke-width="2" fill="rgba(91, 110, 174, 0.1)"
-                            stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)" />
-                        <!-- Flask neck rim -->
-                        <path d="M35 10 L65 10" stroke="url(#flaskGrad)" stroke-width="3" stroke-linecap="round"
-                            filter="url(#glow)" />
-                        <!-- Liquid at bottom of flask -->
-                        <path class="flask-liquid" d="M26 80 L74 80 L74 86 Q50 90 26 86 Z" fill="url(#liquidGrad)"
-                            opacity="0.6" />
-                        <!-- Bubbles with animation -->
-                        <circle class="flask-bubble" cx="35" cy="75" r="2" fill="url(#flaskGrad)" opacity="0.6">
-                            <animate attributeName="cy" dur="2s" repeatCount="indefinite" values="75;50;45" />
-                            <animate attributeName="opacity" dur="2s" repeatCount="indefinite" values="0.8;0.4;0" />
-                            <animate attributeName="r" dur="2s" repeatCount="indefinite" values="2;3;2" />
-                        </circle>
-                        <circle class="flask-bubble" cx="50" cy="78" r="3" fill="url(#flaskGrad)" opacity="0.5">
-                            <animate attributeName="cy" dur="2.5s" repeatCount="indefinite" values="78;48;40"
-                                begin="0.3s" />
-                            <animate attributeName="opacity" dur="2.5s" repeatCount="indefinite" values="0.7;0.3;0"
-                                begin="0.3s" />
-                            <animate attributeName="r" dur="2.5s" repeatCount="indefinite" values="3;4;2"
-                                begin="0.3s" />
-                        </circle>
-                        <circle class="flask-bubble" cx="60" cy="76" r="2" fill="url(#flaskGrad)" opacity="0.7">
-                            <animate attributeName="cy" dur="3s" repeatCount="indefinite" values="76;52;48"
-                                begin="0.7s" />
-                            <animate attributeName="opacity" dur="3s" repeatCount="indefinite" values="0.6;0.3;0"
-                                begin="0.7s" />
-                            <animate attributeName="r" dur="3s" repeatCount="indefinite" values="2;2.5;1.5"
-                                begin="0.7s" />
-                        </circle>
-                        <circle class="flask-bubble" cx="42" cy="80" r="1.5" fill="url(#flaskGrad)" opacity="0.5">
-                            <animate attributeName="cy" dur="2.2s" repeatCount="indefinite" values="80;55;50"
-                                begin="1s" />
-                            <animate attributeName="opacity" dur="2.2s" repeatCount="indefinite" values="0.5;0.2;0"
-                                begin="1s" />
-                        </circle>
-                        <!-- Reflection highlight -->
-                        <ellipse cx="35" cy="50" rx="8" ry="15" fill="white" opacity="0.08" />
-                        <!-- Steam/Vapor rising from neck -->
-                        <g class="steam-group">
-                            <path class="steam" d="M45 8 Q42 2 45 -5 Q48 -12 45 -18" stroke="rgba(122, 139, 196, 0.3)"
-                                stroke-width="2" fill="none" stroke-linecap="round">
-                                <animate attributeName="d" dur="3s" repeatCount="indefinite"
-                                    values="M45 8 Q42 2 45 -5 Q48 -12 45 -18;M45 8 Q48 2 45 -5 Q42 -12 45 -18;M45 8 Q42 2 45 -5 Q48 -12 45 -18" />
-                                <animate attributeName="opacity" dur="3s" repeatCount="indefinite"
-                                    values="0.4;0.1;0.4" />
-                            </path>
-                            <path class="steam" d="M50 8 Q53 0 50 -8 Q47 -16 50 -22" stroke="rgba(122, 139, 196, 0.25)"
-                                stroke-width="1.5" fill="none" stroke-linecap="round">
-                                <animate attributeName="d" dur="4s" repeatCount="indefinite"
-                                    values="M50 8 Q53 0 50 -8 Q47 -16 50 -22;M50 8 Q47 0 50 -8 Q53 -16 50 -22;M50 8 Q53 0 50 -8 Q47 -16 50 -22"
-                                    begin="0.5s" />
-                                <animate attributeName="opacity" dur="4s" repeatCount="indefinite" values="0.3;0.08;0.3"
-                                    begin="0.5s" />
-                            </path>
-                            <path class="steam" d="M55 8 Q58 3 55 -3 Q52 -9 55 -15" stroke="rgba(122, 139, 196, 0.2)"
-                                stroke-width="1" fill="none" stroke-linecap="round">
-                                <animate attributeName="d" dur="3.5s" repeatCount="indefinite"
-                                    values="M55 8 Q58 3 55 -3 Q52 -9 55 -15;M55 8 Q52 3 55 -3 Q58 -9 55 -15;M55 8 Q58 3 55 -3 Q52 -9 55 -15"
+            <!-- Tab Navigation -->
+            <div class="main-tabs">
+                <button class="main-tab active" onclick="switchTab('equations')">Equations</button>
+                <button class="main-tab" onclick="switchTab('scientific')">Calculator</button>
+                <button class="main-tab" onclick="switchTab('steam')">Steam Tables</button>
+                <button class="main-tab" onclick="switchTab('fluids')">Fluids</button>
+            </div>
+
+            <!-- Equations Tab Content -->
+            <div id="equationsTab" class="tab-content active">
+                <div id="welcomeState" class="empty-state">
+                    <div class="flask-3d-container" id="flask3DContainer"
+                        style="width: 480px; height: 480px; position: relative; margin: 0 auto; perspective: 1000px;">
+                        <svg class="flask-3d" width="100%" height="100%" viewBox="0 0 100 100" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="flaskGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#5b6eae" />
+                                    <stop offset="50%" style="stop-color:#6b7db8" />
+                                    <stop offset="100%" style="stop-color:#7a8bc4" />
+                                </linearGradient>
+                                <linearGradient id="liquidGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#5b6eae" />
+                                    <stop offset="100%" style="stop-color:#7a8bc4" />
+                                </linearGradient>
+                                <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                                    <feGaussianBlur stdDeviation="2" result="coloredBlur" />
+                                    <feMerge>
+                                        <feMergeNode in="coloredBlur" />
+                                        <feMergeNode in="SourceGraphic" />
+                                    </feMerge>
+                                </filter>
+                            </defs>
+                            <!-- Flask body -->
+                            <path class="flask-body"
+                                d="M40 10 L40 35 L20 75 Q15 85 25 90 L75 90 Q85 85 80 75 L60 35 L60 10 Z"
+                                stroke="url(#flaskGrad)" stroke-width="2" fill="rgba(91, 110, 174, 0.1)"
+                                stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)" />
+                            <!-- Flask neck rim -->
+                            <path d="M35 10 L65 10" stroke="url(#flaskGrad)" stroke-width="3" stroke-linecap="round"
+                                filter="url(#glow)" />
+                            <!-- Liquid at bottom of flask -->
+                            <path class="flask-liquid" d="M26 80 L74 80 L74 86 Q50 90 26 86 Z" fill="url(#liquidGrad)"
+                                opacity="0.6" />
+                            <!-- Bubbles with animation -->
+                            <circle class="flask-bubble" cx="35" cy="75" r="2" fill="url(#flaskGrad)" opacity="0.6">
+                                <animate attributeName="cy" dur="2s" repeatCount="indefinite" values="75;50;45" />
+                                <animate attributeName="opacity" dur="2s" repeatCount="indefinite" values="0.8;0.4;0" />
+                                <animate attributeName="r" dur="2s" repeatCount="indefinite" values="2;3;2" />
+                            </circle>
+                            <circle class="flask-bubble" cx="50" cy="78" r="3" fill="url(#flaskGrad)" opacity="0.5">
+                                <animate attributeName="cy" dur="2.5s" repeatCount="indefinite" values="78;48;40"
+                                    begin="0.3s" />
+                                <animate attributeName="opacity" dur="2.5s" repeatCount="indefinite" values="0.7;0.3;0"
+                                    begin="0.3s" />
+                                <animate attributeName="r" dur="2.5s" repeatCount="indefinite" values="3;4;2"
+                                    begin="0.3s" />
+                            </circle>
+                            <circle class="flask-bubble" cx="60" cy="76" r="2" fill="url(#flaskGrad)" opacity="0.7">
+                                <animate attributeName="cy" dur="3s" repeatCount="indefinite" values="76;52;48"
+                                    begin="0.7s" />
+                                <animate attributeName="opacity" dur="3s" repeatCount="indefinite" values="0.6;0.3;0"
+                                    begin="0.7s" />
+                                <animate attributeName="r" dur="3s" repeatCount="indefinite" values="2;2.5;1.5"
+                                    begin="0.7s" />
+                            </circle>
+                            <circle class="flask-bubble" cx="42" cy="80" r="1.5" fill="url(#flaskGrad)" opacity="0.5">
+                                <animate attributeName="cy" dur="2.2s" repeatCount="indefinite" values="80;55;50"
                                     begin="1s" />
-                                <animate attributeName="opacity" dur="3.5s" repeatCount="indefinite"
-                                    values="0.25;0.05;0.25" begin="1s" />
-                            </path>
-                        </g>
-                        <!-- Chemistry particles (molecules) -->
-                        <g class="molecules">
-                            <circle cx="38" cy="65" r="1.5" fill="url(#flaskGrad)" opacity="0.4">
-                                <animate attributeName="cx" dur="5s" repeatCount="indefinite" values="38;42;38" />
-                                <animate attributeName="cy" dur="4s" repeatCount="indefinite" values="65;60;65" />
+                                <animate attributeName="opacity" dur="2.2s" repeatCount="indefinite" values="0.5;0.2;0"
+                                    begin="1s" />
                             </circle>
-                            <circle cx="55" cy="60" r="1" fill="url(#flaskGrad)" opacity="0.3">
-                                <animate attributeName="cx" dur="6s" repeatCount="indefinite" values="55;50;55" />
-                                <animate attributeName="cy" dur="5s" repeatCount="indefinite" values="60;68;60" />
-                            </circle>
-                            <circle cx="45" cy="70" r="1.2" fill="url(#flaskGrad)" opacity="0.35">
-                                <animate attributeName="cx" dur="4.5s" repeatCount="indefinite" values="45;50;45" />
-                                <animate attributeName="cy" dur="6s" repeatCount="indefinite" values="70;62;70" />
-                            </circle>
-                            <circle cx="62" cy="68" r="0.8" fill="url(#flaskGrad)" opacity="0.25">
-                                <animate attributeName="cx" dur="5.5s" repeatCount="indefinite" values="62;58;62" />
-                                <animate attributeName="cy" dur="4.5s" repeatCount="indefinite" values="68;72;68" />
-                            </circle>
-                        </g>
-                    </svg>
+                            <!-- Reflection highlight -->
+                            <ellipse cx="35" cy="50" rx="8" ry="15" fill="white" opacity="0.08" />
+                            <!-- Steam/Vapor rising from neck -->
+                            <g class="steam-group">
+                                <path class="steam" d="M45 8 Q42 2 45 -5 Q48 -12 45 -18"
+                                    stroke="rgba(122, 139, 196, 0.3)" stroke-width="2" fill="none"
+                                    stroke-linecap="round">
+                                    <animate attributeName="d" dur="3s" repeatCount="indefinite"
+                                        values="M45 8 Q42 2 45 -5 Q48 -12 45 -18;M45 8 Q48 2 45 -5 Q42 -12 45 -18;M45 8 Q42 2 45 -5 Q48 -12 45 -18" />
+                                    <animate attributeName="opacity" dur="3s" repeatCount="indefinite"
+                                        values="0.4;0.1;0.4" />
+                                </path>
+                                <path class="steam" d="M50 8 Q53 0 50 -8 Q47 -16 50 -22"
+                                    stroke="rgba(122, 139, 196, 0.25)" stroke-width="1.5" fill="none"
+                                    stroke-linecap="round">
+                                    <animate attributeName="d" dur="4s" repeatCount="indefinite"
+                                        values="M50 8 Q53 0 50 -8 Q47 -16 50 -22;M50 8 Q47 0 50 -8 Q53 -16 50 -22;M50 8 Q53 0 50 -8 Q47 -16 50 -22"
+                                        begin="0.5s" />
+                                    <animate attributeName="opacity" dur="4s" repeatCount="indefinite"
+                                        values="0.3;0.08;0.3" begin="0.5s" />
+                                </path>
+                                <path class="steam" d="M55 8 Q58 3 55 -3 Q52 -9 55 -15"
+                                    stroke="rgba(122, 139, 196, 0.2)" stroke-width="1" fill="none"
+                                    stroke-linecap="round">
+                                    <animate attributeName="d" dur="3.5s" repeatCount="indefinite"
+                                        values="M55 8 Q58 3 55 -3 Q52 -9 55 -15;M55 8 Q52 3 55 -3 Q58 -9 55 -15;M55 8 Q58 3 55 -3 Q52 -9 55 -15"
+                                        begin="1s" />
+                                    <animate attributeName="opacity" dur="3.5s" repeatCount="indefinite"
+                                        values="0.25;0.05;0.25" begin="1s" />
+                                </path>
+                            </g>
+                            <!-- Chemistry particles (molecules) -->
+                            <g class="molecules">
+                                <circle cx="38" cy="65" r="1.5" fill="url(#flaskGrad)" opacity="0.4">
+                                    <animate attributeName="cx" dur="5s" repeatCount="indefinite" values="38;42;38" />
+                                    <animate attributeName="cy" dur="4s" repeatCount="indefinite" values="65;60;65" />
+                                </circle>
+                                <circle cx="55" cy="60" r="1" fill="url(#flaskGrad)" opacity="0.3">
+                                    <animate attributeName="cx" dur="6s" repeatCount="indefinite" values="55;50;55" />
+                                    <animate attributeName="cy" dur="5s" repeatCount="indefinite" values="60;68;60" />
+                                </circle>
+                                <circle cx="45" cy="70" r="1.2" fill="url(#flaskGrad)" opacity="0.35">
+                                    <animate attributeName="cx" dur="4.5s" repeatCount="indefinite" values="45;50;45" />
+                                    <animate attributeName="cy" dur="6s" repeatCount="indefinite" values="70;62;70" />
+                                </circle>
+                                <circle cx="62" cy="68" r="0.8" fill="url(#flaskGrad)" opacity="0.25">
+                                    <animate attributeName="cx" dur="5.5s" repeatCount="indefinite" values="62;58;62" />
+                                    <animate attributeName="cy" dur="4.5s" repeatCount="indefinite" values="68;72;68" />
+                                </circle>
+                            </g>
+                        </svg>
+                    </div>
+                    <h2>Welcome to the Webster Engineering Solver</h2>
+                    <p class="tagline-fade">Select an equation from the sidebar to get started</p>
+                    <div style="display: flex; gap: 15px; justify-content: center; margin-top: 30px;">
+                        <a href="/pid.html" class="tool-card">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" />
+                                <line x1="3" y1="9" x2="21" y2="9" />
+                                <line x1="9" y1="21" x2="9" y2="9" />
+                            </svg>
+                            P&ID Sketcher
+                        </a>
+                        <a href="/wizard.html" class="tool-card">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="12" r="3" />
+                                <path
+                                    d="M12 1v6m0 6v10M4.22 4.22l4.24 4.24m7.07 7.07l4.24 4.24M1 12h6m6 0h10M4.22 19.78l4.24-4.24m7.07-7.07l4.24-4.24" />
+                            </svg>
+                            Unit Ops Wizard
+                        </a>
+                    </div>
+                    <div style="display: flex; gap: 15px; justify-content: center; margin-top: 15px;">
+                        <button onclick="switchTab('scientific')" class="tool-card" style="cursor: pointer;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="4" y="2" width="16" height="20" rx="2" />
+                                <line x1="8" y1="6" x2="16" y2="6" />
+                                <line x1="8" y1="10" x2="16" y2="10" />
+                                <rect x="8" y="14" width="8" height="6" rx="1" />
+                            </svg>
+                            Scientific Calculator
+                        </button>
+                        <button onclick="switchTab('steam')" class="tool-card" style="cursor: pointer;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M12 2v4m0 0a4 4 0 1 1 0 8m0-8a4 4 0 1 0 0 8m0 0v8" />
+                                <path d="M8 14s-2 2-2 4a4 4 0 0 0 8 0c0-2-2-4-2-4" />
+                            </svg>
+                            Steam Tables
+                        </button>
+                        <button onclick="switchTab('fluids')" class="tool-card" style="cursor: pointer;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+                            </svg>
+                            Fluid Properties
+                        </button>
+                    </div>
                 </div>
-                <h2>Welcome to the Webster Engineering Solver</h2>
-                <p class="tagline-fade">Select an equation from the sidebar to get started</p>
-                <div style="display: flex; gap: 15px; justify-content: center; margin-top: 30px;">
-                    <a href="/pid.html" class="tool-card">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <rect x="3" y="3" width="18" height="18" rx="2" />
-                            <line x1="3" y1="9" x2="21" y2="9" />
-                            <line x1="9" y1="21" x2="9" y2="9" />
-                        </svg>
-                        P&ID Sketcher
-                    </a>
-                    <a href="/wizard.html" class="tool-card">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <circle cx="12" cy="12" r="3" />
-                            <path
-                                d="M12 1v6m0 6v10M4.22 4.22l4.24 4.24m7.07 7.07l4.24 4.24M1 12h6m6 0h10M4.22 19.78l4.24-4.24m7.07-7.07l4.24-4.24" />
-                        </svg>
-                        Unit Ops Wizard
-                    </a>
+                <div id="equationView" style="display:none;">
+                    <div class="equation-header">
+                        <h1 class="equation-title" id="eqTitle"></h1>
+                        <p class="equation-description" id="eqDescription"></p>
+                        <p class="equation-reference" id="eqReference"></p>
+                        <div id="externalLinks" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px;">
+                        </div>
+                    </div>
+                    <div class="input-section">
+                        <h3 class="section-title">Inputs</h3>
+                        <div class="input-grid" id="inputGrid"></div>
+                    </div>
+                    <button class="calculate-btn" id="calculateBtn" onclick="calculate()">
+                        Calculate
+                    </button>
+                </div>
+            </div><!-- End equationsTab -->
+
+            <!-- Scientific Calculator Tab -->
+            <div id="scientificTab" class="tab-content">
+                <div class="sci-calculator">
+                    <h2 style="margin: 0 0 15px 0; color: var(--text-primary);">Scientific Calculator</h2>
+                    <div class="calc-display">
+                        <div class="calc-history" id="calcHistory"></div>
+                        <input type="text" class="calc-input" id="calcDisplay" value="0" readonly>
+                    </div>
+                    <div class="calc-buttons">
+                        <!-- Row 1: Memory and Clear -->
+                        <button class="calc-btn memory" onclick="calcMemory('MC')">MC</button>
+                        <button class="calc-btn memory" onclick="calcMemory('MR')">MR</button>
+                        <button class="calc-btn memory" onclick="calcMemory('M+')">M+</button>
+                        <button class="calc-btn memory" onclick="calcMemory('M-')">M−</button>
+                        <button class="calc-btn clear" onclick="calcClear()">C</button>
+                        <button class="calc-btn clear" onclick="calcBackspace()">⌫</button>
+                        <!-- Row 2: Scientific -->
+                        <button class="calc-btn function" onclick="calcFunction('sin')">sin</button>
+                        <button class="calc-btn function" onclick="calcFunction('cos')">cos</button>
+                        <button class="calc-btn function" onclick="calcFunction('tan')">tan</button>
+                        <button class="calc-btn function" onclick="calcFunction('log')">log</button>
+                        <button class="calc-btn function" onclick="calcFunction('ln')">ln</button>
+                        <button class="calc-btn function" onclick="calcFunction('sqrt')">√</button>
+                        <!-- Row 3: More Scientific -->
+                        <button class="calc-btn function" onclick="calcFunction('asin')">sin⁻¹</button>
+                        <button class="calc-btn function" onclick="calcFunction('acos')">cos⁻¹</button>
+                        <button class="calc-btn function" onclick="calcFunction('atan')">tan⁻¹</button>
+                        <button class="calc-btn function" onclick="calcFunction('exp')">eˣ</button>
+                        <button class="calc-btn function" onclick="calcFunction('pow10')">10ˣ</button>
+                        <button class="calc-btn function" onclick="calcFunction('square')">x²</button>
+                        <!-- Row 4: Constants and operators -->
+                        <button class="calc-btn const" onclick="calcConst('pi')">π</button>
+                        <button class="calc-btn const" onclick="calcConst('e')">e</button>
+                        <button class="calc-btn operator" onclick="calcOperator('(')">(</button>
+                        <button class="calc-btn operator" onclick="calcOperator(')')">)</button>
+                        <button class="calc-btn operator" onclick="calcOperator('^')">xʸ</button>
+                        <button class="calc-btn operator" onclick="calcOperator('!')">n!</button>
+                        <!-- Row 5: Numbers 7-9 and operators -->
+                        <button class="calc-btn number" onclick="calcDigit('7')">7</button>
+                        <button class="calc-btn number" onclick="calcDigit('8')">8</button>
+                        <button class="calc-btn number" onclick="calcDigit('9')">9</button>
+                        <button class="calc-btn operator" onclick="calcOperator('/')">÷</button>
+                        <button class="calc-btn operator" onclick="calcOperator('%')">%</button>
+                        <button class="calc-btn function" onclick="calcFunction('abs')">|x|</button>
+                        <!-- Row 6: Numbers 4-6 -->
+                        <button class="calc-btn number" onclick="calcDigit('4')">4</button>
+                        <button class="calc-btn number" onclick="calcDigit('5')">5</button>
+                        <button class="calc-btn number" onclick="calcDigit('6')">6</button>
+                        <button class="calc-btn operator" onclick="calcOperator('*')">×</button>
+                        <button class="calc-btn function" onclick="calcFunction('inv')">1/x</button>
+                        <button class="calc-btn function" onclick="calcFunction('negate')">±</button>
+                        <!-- Row 7: Numbers 1-3 -->
+                        <button class="calc-btn number" onclick="calcDigit('1')">1</button>
+                        <button class="calc-btn number" onclick="calcDigit('2')">2</button>
+                        <button class="calc-btn number" onclick="calcDigit('3')">3</button>
+                        <button class="calc-btn operator" onclick="calcOperator('-')">−</button>
+                        <button class="calc-btn equals" onclick="calcEquals()">=</button>
+                        <button class="calc-btn function" onclick="calcToggleDegRad()">DEG</button>
+                        <!-- Row 8: Zero and decimal -->
+                        <button class="calc-btn number wide" onclick="calcDigit('0')">0</button>
+                        <button class="calc-btn number" onclick="calcDigit('.')">.</button>
+                        <button class="calc-btn operator" onclick="calcOperator('+')">+</button>
+                        <button class="calc-btn function" onclick="calcAns()">ANS</button>
+                    </div>
+                    <div class="calc-info">
+                        <span id="calcMode">DEG</span> | <span id="calcMemoryIndicator"></span>
+                    </div>
                 </div>
             </div>
-            <div id="equationView" style="display:none;">
-                <div class="equation-header">
-                    <h1 class="equation-title" id="eqTitle"></h1>
-                    <p class="equation-description" id="eqDescription"></p>
-                    <p class="equation-reference" id="eqReference"></p>
-                    <div id="externalLinks" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px;"></div>
+
+            <!-- Steam Tables Tab -->
+            <div id="steamTab" class="tab-content">
+                <div class="reference-panel">
+                    <h2>Steam Tables</h2>
+                    <p class="ref-description">Saturated steam properties at common temperatures and pressures</p>
+                    <div class="ref-controls">
+                        <label>View by:
+                            <select id="steamViewType" onchange="updateSteamTable()">
+                                <option value="temp">Temperature</option>
+                                <option value="pressure">Pressure</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="ref-table-container">
+                        <table class="ref-table" id="steamTable">
+                            <thead>
+                                <tr>
+                                    <th>T (°C)</th>
+                                    <th>P (kPa)</th>
+                                    <th>vf (m³/kg)</th>
+                                    <th>vg (m³/kg)</th>
+                                    <th>hf (kJ/kg)</th>
+                                    <th>hfg (kJ/kg)</th>
+                                    <th>hg (kJ/kg)</th>
+                                    <th>sf (kJ/kg·K)</th>
+                                    <th>sg (kJ/kg·K)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="steamTableBody"></tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="input-section">
-                    <h3 class="section-title">Inputs</h3>
-                    <div class="input-grid" id="inputGrid"></div>
+            </div>
+
+            <!-- Fluid Properties Tab -->
+            <div id="fluidsTab" class="tab-content">
+                <div class="reference-panel">
+                    <h2>Fluid Properties</h2>
+                    <p class="ref-description">Common fluid properties at 25°C and 1 atm (unless noted)</p>
+                    <div class="ref-controls">
+                        <input type="text" id="fluidSearch" placeholder="Search fluids..." oninput="filterFluids()">
+                    </div>
+                    <div class="ref-table-container">
+                        <table class="ref-table" id="fluidsTable">
+                            <thead>
+                                <tr>
+                                    <th>Fluid</th>
+                                    <th>ρ (kg/m³)</th>
+                                    <th>μ (mPa·s)</th>
+                                    <th>Cp (kJ/kg·K)</th>
+                                    <th>k (W/m·K)</th>
+                                    <th>Tb (°C)</th>
+                                    <th>Tc (°C)</th>
+                                    <th>Pc (MPa)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="fluidsTableBody"></tbody>
+                        </table>
+                    </div>
                 </div>
-                <button class="calculate-btn" id="calculateBtn" onclick="calculate()">
-                    Calculate
-                </button>
             </div>
         </main>
 
@@ -3005,7 +3419,252 @@
             calcBtn.addEventListener('click', createRipple);
         }
 
+        // ===== Tab Switching =====
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.main-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            // Find the button that matches by checking its onclick attribute or text
+            document.querySelectorAll('.main-tab').forEach(tab => {
+                if (tab.textContent.toLowerCase().includes(tabName.substring(0, 4))) {
+                    tab.classList.add('active');
+                }
+            });
+
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Show selected tab
+            const tabIds = {
+                'equations': 'equationsTab',
+                'scientific': 'scientificTab',
+                'steam': 'steamTab',
+                'fluids': 'fluidsTab'
+            };
+            const tabEl = document.getElementById(tabIds[tabName]);
+            if (tabEl) tabEl.classList.add('active');
+
+            // Initialize tab content if needed
+            if (tabName === 'steam') updateSteamTable();
+            if (tabName === 'fluids') filterFluids();
+        }
+
+        // ===== Scientific Calculator =====
+        let calcExpression = '';
+        let calcMemoryValue = 0;
+        let calcLastAnswer = 0;
+        let calcDegrees = true;
+
+        function updateCalcDisplay() {
+            document.getElementById('calcDisplay').value = calcExpression || '0';
+        }
+
+        function calcDigit(d) {
+            if (calcExpression === '0' && d !== '.') calcExpression = '';
+            calcExpression += d;
+            updateCalcDisplay();
+        }
+
+        function calcOperator(op) {
+            calcExpression += op;
+            updateCalcDisplay();
+        }
+
+        function calcFunction(fn) {
+            const val = parseFloat(calcExpression) || 0;
+            let result;
+            const toRad = calcDegrees ? Math.PI / 180 : 1;
+            const toDeg = calcDegrees ? 180 / Math.PI : 1;
+
+            switch (fn) {
+                case 'sin': result = Math.sin(val * toRad); break;
+                case 'cos': result = Math.cos(val * toRad); break;
+                case 'tan': result = Math.tan(val * toRad); break;
+                case 'asin': result = Math.asin(val) * toDeg; break;
+                case 'acos': result = Math.acos(val) * toDeg; break;
+                case 'atan': result = Math.atan(val) * toDeg; break;
+                case 'log': result = Math.log10(val); break;
+                case 'ln': result = Math.log(val); break;
+                case 'sqrt': result = Math.sqrt(val); break;
+                case 'exp': result = Math.exp(val); break;
+                case 'pow10': result = Math.pow(10, val); break;
+                case 'square': result = val * val; break;
+                case 'abs': result = Math.abs(val); break;
+                case 'inv': result = 1 / val; break;
+                case 'negate': result = -val; break;
+                default: return;
+            }
+            calcExpression = result.toString();
+            updateCalcDisplay();
+        }
+
+        function calcConst(c) {
+            if (c === 'pi') calcExpression += Math.PI.toString();
+            else if (c === 'e') calcExpression += Math.E.toString();
+            updateCalcDisplay();
+        }
+
+        function factorial(n) {
+            if (n < 0) return NaN;
+            if (n === 0 || n === 1) return 1;
+            let result = 1;
+            for (let i = 2; i <= n; i++) result *= i;
+            return result;
+        }
+
+        function calcEquals() {
+            try {
+                // Replace operators for eval
+                let expr = calcExpression
+                    .replace(/×/g, '*')
+                    .replace(/÷/g, '/')
+                    .replace(/−/g, '-')
+                    .replace(/\^/g, '**');
+
+                // Handle factorial
+                expr = expr.replace(/(\d+)!/g, (m, n) => factorial(parseInt(n)));
+
+                const result = Function('"use strict"; return (' + expr + ')')();
+                document.getElementById('calcHistory').textContent = calcExpression + ' =';
+                calcLastAnswer = result;
+                calcExpression = result.toString();
+                updateCalcDisplay();
+            } catch (e) {
+                calcExpression = 'Error';
+                updateCalcDisplay();
+            }
+        }
+
+        function calcClear() {
+            calcExpression = '';
+            document.getElementById('calcHistory').textContent = '';
+            updateCalcDisplay();
+        }
+
+        function calcBackspace() {
+            calcExpression = calcExpression.slice(0, -1);
+            updateCalcDisplay();
+        }
+
+        function calcMemory(action) {
+            const val = parseFloat(calcExpression) || 0;
+            switch (action) {
+                case 'MC': calcMemoryValue = 0; break;
+                case 'MR': calcExpression = calcMemoryValue.toString(); updateCalcDisplay(); break;
+                case 'M+': calcMemoryValue += val; break;
+                case 'M-': calcMemoryValue -= val; break;
+            }
+            document.getElementById('calcMemoryIndicator').textContent = calcMemoryValue !== 0 ? 'M' : '';
+        }
+
+        function calcToggleDegRad() {
+            calcDegrees = !calcDegrees;
+            document.getElementById('calcMode').textContent = calcDegrees ? 'DEG' : 'RAD';
+            // Update button text
+            document.querySelectorAll('.calc-btn.function').forEach(btn => {
+                if (btn.textContent === 'DEG' || btn.textContent === 'RAD') {
+                    btn.textContent = calcDegrees ? 'DEG' : 'RAD';
+                }
+            });
+        }
+
+        function calcAns() {
+            calcExpression += calcLastAnswer.toString();
+            updateCalcDisplay();
+        }
+
+        // ===== Steam Tables Data =====
+        const steamData = [
+            { T: 0, P: 0.6113, vf: 0.001000, vg: 206.14, hf: 0.00, hfg: 2501.4, hg: 2501.4, sf: 0.0000, sg: 9.1562 },
+            { T: 5, P: 0.8721, vf: 0.001000, vg: 147.12, hf: 20.98, hfg: 2489.6, hg: 2510.6, sf: 0.0761, sg: 9.0257 },
+            { T: 10, P: 1.2276, vf: 0.001000, vg: 106.38, hf: 42.01, hfg: 2477.7, hg: 2519.8, sf: 0.1510, sg: 8.9008 },
+            { T: 15, P: 1.7051, vf: 0.001001, vg: 77.93, hf: 62.99, hfg: 2465.9, hg: 2528.9, sf: 0.2245, sg: 8.7814 },
+            { T: 20, P: 2.339, vf: 0.001002, vg: 57.79, hf: 83.96, hfg: 2454.1, hg: 2538.1, sf: 0.2966, sg: 8.6672 },
+            { T: 25, P: 3.169, vf: 0.001003, vg: 43.36, hf: 104.89, hfg: 2442.3, hg: 2547.2, sf: 0.3674, sg: 8.5580 },
+            { T: 30, P: 4.246, vf: 0.001004, vg: 32.89, hf: 125.79, hfg: 2430.5, hg: 2556.3, sf: 0.4369, sg: 8.4533 },
+            { T: 40, P: 7.384, vf: 0.001008, vg: 19.52, hf: 167.57, hfg: 2406.7, hg: 2574.3, sf: 0.5725, sg: 8.2570 },
+            { T: 50, P: 12.35, vf: 0.001012, vg: 12.03, hf: 209.33, hfg: 2382.7, hg: 2592.1, sf: 0.7038, sg: 8.0763 },
+            { T: 60, P: 19.94, vf: 0.001017, vg: 7.671, hf: 251.13, hfg: 2358.5, hg: 2609.6, sf: 0.8312, sg: 7.9096 },
+            { T: 70, P: 31.19, vf: 0.001023, vg: 5.042, hf: 292.98, hfg: 2333.8, hg: 2626.8, sf: 0.9549, sg: 7.7553 },
+            { T: 80, P: 47.39, vf: 0.001029, vg: 3.407, hf: 334.91, hfg: 2308.8, hg: 2643.7, sf: 1.0753, sg: 7.6122 },
+            { T: 90, P: 70.14, vf: 0.001036, vg: 2.361, hf: 376.92, hfg: 2283.2, hg: 2660.1, sf: 1.1925, sg: 7.4791 },
+            { T: 100, P: 101.35, vf: 0.001044, vg: 1.6729, hf: 419.04, hfg: 2257.0, hg: 2676.1, sf: 1.3069, sg: 7.3549 },
+            { T: 120, P: 198.53, vf: 0.001060, vg: 0.8919, hf: 503.50, hfg: 2202.6, hg: 2706.1, sf: 1.5276, sg: 7.1296 },
+            { T: 140, P: 361.3, vf: 0.001080, vg: 0.5089, hf: 589.13, hfg: 2144.7, hg: 2733.9, sf: 1.7391, sg: 6.9299 },
+            { T: 160, P: 617.8, vf: 0.001102, vg: 0.3071, hf: 675.55, hfg: 2082.6, hg: 2758.1, sf: 1.9427, sg: 6.7502 },
+            { T: 180, P: 1002.1, vf: 0.001127, vg: 0.1941, hf: 763.22, hfg: 2015.0, hg: 2778.2, sf: 2.1396, sg: 6.5863 },
+            { T: 200, P: 1553.8, vf: 0.001157, vg: 0.1274, hf: 852.45, hfg: 1940.7, hg: 2793.2, sf: 2.3309, sg: 6.4323 },
+            { T: 250, P: 3973.0, vf: 0.001251, vg: 0.05013, hf: 1085.36, hfg: 1716.2, hg: 2801.5, sf: 2.7927, sg: 6.0730 },
+            { T: 300, P: 8581.0, vf: 0.001404, vg: 0.02167, hf: 1344.0, hfg: 1404.9, hg: 2749.0, sf: 3.2534, sg: 5.7045 }
+        ];
+
+        function updateSteamTable() {
+            const tbody = document.getElementById('steamTableBody');
+            if (!tbody) return;
+
+            tbody.innerHTML = steamData.map(row => `
+                <tr>
+                    <td>${row.T}</td>
+                    <td>${row.P.toFixed(2)}</td>
+                    <td>${row.vf.toFixed(6)}</td>
+                    <td>${row.vg.toFixed(4)}</td>
+                    <td>${row.hf.toFixed(2)}</td>
+                    <td>${row.hfg.toFixed(1)}</td>
+                    <td>${row.hg.toFixed(1)}</td>
+                    <td>${row.sf.toFixed(4)}</td>
+                    <td>${row.sg.toFixed(4)}</td>
+                </tr>
+            `).join('');
+        }
+
+        // ===== Fluid Properties Data =====
+        const fluidData = [
+            { name: 'Water', rho: 997, mu: 0.890, Cp: 4.18, k: 0.607, Tb: 100, Tc: 374, Pc: 22.06 },
+            { name: 'Ethanol', rho: 789, mu: 1.074, Cp: 2.44, k: 0.171, Tb: 78.4, Tc: 241, Pc: 6.14 },
+            { name: 'Methanol', rho: 792, mu: 0.544, Cp: 2.53, k: 0.203, Tb: 64.7, Tc: 240, Pc: 8.09 },
+            { name: 'Acetone', rho: 784, mu: 0.306, Cp: 2.15, k: 0.161, Tb: 56.2, Tc: 235, Pc: 4.70 },
+            { name: 'Benzene', rho: 876, mu: 0.604, Cp: 1.74, k: 0.144, Tb: 80.1, Tc: 289, Pc: 4.89 },
+            { name: 'Toluene', rho: 867, mu: 0.560, Cp: 1.70, k: 0.131, Tb: 110.6, Tc: 319, Pc: 4.11 },
+            { name: 'n-Hexane', rho: 659, mu: 0.294, Cp: 2.27, k: 0.124, Tb: 68.7, Tc: 234, Pc: 3.03 },
+            { name: 'n-Heptane', rho: 684, mu: 0.386, Cp: 2.24, k: 0.127, Tb: 98.4, Tc: 267, Pc: 2.74 },
+            { name: 'Chloroform', rho: 1483, mu: 0.537, Cp: 0.96, k: 0.117, Tb: 61.2, Tc: 263, Pc: 5.47 },
+            { name: 'Carbon tetrachloride', rho: 1594, mu: 0.908, Cp: 0.86, k: 0.103, Tb: 76.7, Tc: 283, Pc: 4.56 },
+            { name: 'Sulfuric acid (98%)', rho: 1840, mu: 24.0, Cp: 1.38, k: 0.35, Tb: 337, Tc: 654, Pc: 6.40 },
+            { name: 'Glycerol', rho: 1261, mu: 934, Cp: 2.43, k: 0.285, Tb: 290, Tc: 453, Pc: 6.69 },
+            { name: 'Acetic acid', rho: 1049, mu: 1.056, Cp: 2.05, k: 0.158, Tb: 118, Tc: 319, Pc: 5.79 },
+            { name: 'Ammonia (liq)', rho: 682, mu: 0.255, Cp: 4.70, k: 0.507, Tb: -33, Tc: 132, Pc: 11.33 },
+            { name: 'Ethylene glycol', rho: 1113, mu: 16.1, Cp: 2.35, k: 0.258, Tb: 197, Tc: 372, Pc: 7.70 }
+        ];
+
+        function filterFluids() {
+            const search = (document.getElementById('fluidSearch')?.value || '').toLowerCase();
+            const tbody = document.getElementById('fluidsTableBody');
+            if (!tbody) return;
+
+            const filtered = fluidData.filter(f => f.name.toLowerCase().includes(search));
+            tbody.innerHTML = filtered.map(row => `
+                <tr>
+                    <td>${row.name}</td>
+                    <td>${row.rho}</td>
+                    <td>${row.mu}</td>
+                    <td>${row.Cp.toFixed(2)}</td>
+                    <td>${row.k.toFixed(3)}</td>
+                    <td>${row.Tb}</td>
+                    <td>${row.Tc}</td>
+                    <td>${row.Pc.toFixed(2)}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Initialize reference tables
+        updateSteamTable();
+        filterFluids();
+
     </script>
+
 </body>
 
 </html>
