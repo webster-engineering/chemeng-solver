@@ -2313,6 +2313,46 @@
             }
         }
 
+        /* Chemical Database Detail Panel */
+        .chem-detail-panel {
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(91, 110, 174, 0.15), rgba(91, 110, 174, 0.05));
+            border: 1px solid var(--accent);
+            border-radius: 12px;
+        }
+
+        .chem-detail-panel h3 {
+            color: var(--accent-light);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .chem-detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .chem-prop {
+            background: var(--bg-secondary);
+            padding: 12px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .chem-prop span {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .chem-prop strong {
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
         @media (max-width: 1200px) {
             .container {
                 grid-template-columns: 1fr;
@@ -2494,6 +2534,19 @@
                                 <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
                             </svg>
                             Fluid Properties
+                        </button>
+                        <button onclick="switchTab('chemicals')" class="tool-card" style="cursor: pointer;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="12" r="3" />
+                                <circle cx="12" cy="5" r="1.5" />
+                                <circle cx="17" cy="8" r="1.5" />
+                                <circle cx="17" cy="16" r="1.5" />
+                                <circle cx="12" cy="19" r="1.5" />
+                                <circle cx="7" cy="16" r="1.5" />
+                                <circle cx="7" cy="8" r="1.5" />
+                            </svg>
+                            Chemical Database
                         </button>
                     </div>
                 </div>
@@ -2767,6 +2820,47 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chemical Database Tab -->
+            <div id="chemicalsTab" class="tab-content">
+                <div class="ref-panel">
+                    <h2>🧪 Chemical Database</h2>
+                    <p class="ref-description">Thermophysical properties for common chemicals (DIPPR/NIST data)</p>
+                    <div class="ref-controls">
+                        <input type="text" id="chemSearch" placeholder="Search chemicals..."
+                            oninput="filterChemicals()">
+                        <select id="chemCategory" onchange="filterChemicals()">
+                            <option value="all">All Categories</option>
+                            <option value="alkane">Alkanes</option>
+                            <option value="alcohol">Alcohols</option>
+                            <option value="aromatic">Aromatics</option>
+                            <option value="inorganic">Inorganics</option>
+                            <option value="organic">Other Organics</option>
+                        </select>
+                    </div>
+                    <div class="ref-table-container">
+                        <table class="ref-table" id="chemicalsTable">
+                            <thead>
+                                <tr>
+                                    <th>Chemical</th>
+                                    <th>Formula</th>
+                                    <th>MW</th>
+                                    <th>Tb (°C)</th>
+                                    <th>Tc (K)</th>
+                                    <th>Pc (MPa)</th>
+                                    <th>ω</th>
+                                    <th>ρ @ 25°C</th>
+                                </tr>
+                            </thead>
+                            <tbody id="chemicalsTableBody"></tbody>
+                        </table>
+                    </div>
+                    <div class="chem-detail-panel" id="chemDetailPanel" style="display: none;">
+                        <h3 id="chemDetailName"></h3>
+                        <div class="chem-detail-grid" id="chemDetailGrid"></div>
                     </div>
                 </div>
             </div>
@@ -5399,6 +5493,146 @@
             if (document.getElementById('convCategory')) {
                 updateConversionUnits();
             }
+        });
+
+        // ===== Chemical Database =====
+        const chemicalDatabase = [
+            // Alkanes
+            { name: 'Methane', formula: 'CH₄', mw: 16.04, tb: -161.5, tc: 190.6, pc: 4.60, omega: 0.011, rho: 0.657, cat: 'alkane', antoineA: 6.61184, antoineB: 389.93, antoineC: 266.0 },
+            { name: 'Ethane', formula: 'C₂H₆', mw: 30.07, tb: -88.6, tc: 305.3, pc: 4.87, omega: 0.099, rho: 0.546, cat: 'alkane', antoineA: 6.80266, antoineB: 656.40, antoineC: 256.0 },
+            { name: 'Propane', formula: 'C₃H₈', mw: 44.10, tb: -42.1, tc: 369.8, pc: 4.25, omega: 0.152, rho: 0.493, cat: 'alkane', antoineA: 6.82973, antoineB: 803.81, antoineC: 247.04 },
+            { name: 'n-Butane', formula: 'C₄H₁₀', mw: 58.12, tb: -0.5, tc: 425.1, pc: 3.80, omega: 0.200, rho: 0.573, cat: 'alkane', antoineA: 6.82485, antoineB: 943.453, antoineC: 239.711 },
+            { name: 'n-Pentane', formula: 'C₅H₁₂', mw: 72.15, tb: 36.1, tc: 469.7, pc: 3.37, omega: 0.252, rho: 0.626, cat: 'alkane', antoineA: 6.87632, antoineB: 1075.78, antoineC: 233.205 },
+            { name: 'n-Hexane', formula: 'C₆H₁₄', mw: 86.18, tb: 68.7, tc: 507.6, pc: 3.03, omega: 0.301, rho: 0.659, cat: 'alkane', antoineA: 6.87601, antoineB: 1171.17, antoineC: 224.41 },
+            { name: 'n-Heptane', formula: 'C₇H₁₆', mw: 100.20, tb: 98.4, tc: 540.2, pc: 2.74, omega: 0.350, rho: 0.684, cat: 'alkane', antoineA: 6.89386, antoineB: 1264.37, antoineC: 216.64 },
+            { name: 'n-Octane', formula: 'C₈H₁₈', mw: 114.23, tb: 125.7, tc: 568.7, pc: 2.49, omega: 0.399, rho: 0.703, cat: 'alkane', antoineA: 6.91868, antoineB: 1351.99, antoineC: 209.155 },
+            { name: 'n-Decane', formula: 'C₁₀H₂₂', mw: 142.28, tb: 174.1, tc: 617.7, pc: 2.11, omega: 0.492, rho: 0.730, cat: 'alkane', antoineA: 6.94365, antoineB: 1495.17, antoineC: 193.86 },
+            { name: 'Isobutane', formula: 'C₄H₁₀', mw: 58.12, tb: -11.7, tc: 408.1, pc: 3.64, omega: 0.181, rho: 0.551, cat: 'alkane', antoineA: 6.74808, antoineB: 882.80, antoineC: 240.0 },
+            { name: 'Cyclohexane', formula: 'C₆H₁₂', mw: 84.16, tb: 80.7, tc: 553.5, pc: 4.07, omega: 0.210, rho: 0.779, cat: 'alkane', antoineA: 6.84498, antoineB: 1203.526, antoineC: 222.863 },
+
+            // Aromatics
+            { name: 'Benzene', formula: 'C₆H₆', mw: 78.11, tb: 80.1, tc: 562.2, pc: 4.89, omega: 0.210, rho: 0.879, cat: 'aromatic', antoineA: 6.90565, antoineB: 1211.033, antoineC: 220.79 },
+            { name: 'Toluene', formula: 'C₇H₈', mw: 92.14, tb: 110.6, tc: 591.8, pc: 4.11, omega: 0.262, rho: 0.867, cat: 'aromatic', antoineA: 6.95464, antoineB: 1344.8, antoineC: 219.48 },
+            { name: 'Ethylbenzene', formula: 'C₈H₁₀', mw: 106.17, tb: 136.2, tc: 617.2, pc: 3.61, omega: 0.304, rho: 0.867, cat: 'aromatic', antoineA: 6.95719, antoineB: 1424.255, antoineC: 213.21 },
+            { name: 'o-Xylene', formula: 'C₈H₁₀', mw: 106.17, tb: 144.4, tc: 630.3, pc: 3.73, omega: 0.310, rho: 0.880, cat: 'aromatic', antoineA: 6.99891, antoineB: 1474.679, antoineC: 213.69 },
+            { name: 'p-Xylene', formula: 'C₈H₁₀', mw: 106.17, tb: 138.4, tc: 616.2, pc: 3.51, omega: 0.321, rho: 0.861, cat: 'aromatic', antoineA: 6.99052, antoineB: 1453.43, antoineC: 215.31 },
+            { name: 'Styrene', formula: 'C₈H₈', mw: 104.15, tb: 145.2, tc: 636.0, pc: 3.81, omega: 0.297, rho: 0.909, cat: 'aromatic', antoineA: 7.14016, antoineB: 1574.51, antoineC: 224.09 },
+            { name: 'Naphthalene', formula: 'C₁₀H₈', mw: 128.17, tb: 218.0, tc: 748.4, pc: 4.05, omega: 0.302, rho: 0.962, cat: 'aromatic', antoineA: 7.01065, antoineB: 1733.71, antoineC: 201.86 },
+
+            // Alcohols
+            { name: 'Methanol', formula: 'CH₃OH', mw: 32.04, tb: 64.7, tc: 512.6, pc: 8.09, omega: 0.565, rho: 0.791, cat: 'alcohol', antoineA: 7.89750, antoineB: 1474.08, antoineC: 229.13 },
+            { name: 'Ethanol', formula: 'C₂H₅OH', mw: 46.07, tb: 78.4, tc: 513.9, pc: 6.14, omega: 0.644, rho: 0.789, cat: 'alcohol', antoineA: 8.11220, antoineB: 1592.864, antoineC: 226.184 },
+            { name: 'n-Propanol', formula: 'C₃H₇OH', mw: 60.10, tb: 97.2, tc: 536.8, pc: 5.17, omega: 0.623, rho: 0.804, cat: 'alcohol', antoineA: 7.99733, antoineB: 1569.70, antoineC: 209.50 },
+            { name: 'Isopropanol', formula: 'C₃H₇OH', mw: 60.10, tb: 82.3, tc: 508.3, pc: 4.76, omega: 0.665, rho: 0.786, cat: 'alcohol', antoineA: 8.11778, antoineB: 1580.92, antoineC: 219.61 },
+            { name: 'n-Butanol', formula: 'C₄H₉OH', mw: 74.12, tb: 117.7, tc: 563.1, pc: 4.42, omega: 0.593, rho: 0.810, cat: 'alcohol', antoineA: 7.36366, antoineB: 1305.198, antoineC: 173.427 },
+            { name: 'Ethylene Glycol', formula: 'C₂H₆O₂', mw: 62.07, tb: 197.3, tc: 720.0, pc: 8.20, omega: 0.487, rho: 1.113, cat: 'alcohol', antoineA: 8.0908, antoineB: 2088.94, antoineC: 203.454 },
+
+            // Inorganics
+            { name: 'Water', formula: 'H₂O', mw: 18.02, tb: 100.0, tc: 647.1, pc: 22.06, omega: 0.344, rho: 0.997, cat: 'inorganic', antoineA: 7.96681, antoineB: 1668.21, antoineC: 228.0 },
+            { name: 'Ammonia', formula: 'NH₃', mw: 17.03, tb: -33.3, tc: 405.5, pc: 11.28, omega: 0.253, rho: 0.682, cat: 'inorganic', antoineA: 7.55466, antoineB: 1002.711, antoineC: 247.885 },
+            { name: 'Carbon Dioxide', formula: 'CO₂', mw: 44.01, tb: -78.5, tc: 304.2, pc: 7.38, omega: 0.224, rho: 1.98, cat: 'inorganic', antoineA: 6.81228, antoineB: 1301.679, antoineC: 266.0 },
+            { name: 'Hydrogen Sulfide', formula: 'H₂S', mw: 34.08, tb: -60.3, tc: 373.5, pc: 9.01, omega: 0.094, rho: 1.19, cat: 'inorganic', antoineA: 6.99358, antoineB: 768.129, antoineC: 248.13 },
+            { name: 'Sulfur Dioxide', formula: 'SO₂', mw: 64.07, tb: -10.0, tc: 430.8, pc: 7.88, omega: 0.245, rho: 1.46, cat: 'inorganic', antoineA: 7.28316, antoineB: 999.90, antoineC: 237.19 },
+            { name: 'Nitrogen', formula: 'N₂', mw: 28.01, tb: -195.8, tc: 126.2, pc: 3.40, omega: 0.037, rho: 0.808, cat: 'inorganic', antoineA: 6.49457, antoineB: 255.68, antoineC: 266.55 },
+            { name: 'Oxygen', formula: 'O₂', mw: 32.00, tb: -183.0, tc: 154.6, pc: 5.04, omega: 0.022, rho: 1.14, cat: 'inorganic', antoineA: 6.69144, antoineB: 319.01, antoineC: 266.70 },
+            { name: 'Hydrogen', formula: 'H₂', mw: 2.02, tb: -252.9, tc: 33.2, pc: 1.30, omega: -0.216, rho: 0.071, cat: 'inorganic', antoineA: 5.93324, antoineB: 71.55, antoineC: 276.34 },
+            { name: 'Carbon Monoxide', formula: 'CO', mw: 28.01, tb: -191.5, tc: 132.9, pc: 3.50, omega: 0.048, rho: 0.789, cat: 'inorganic', antoineA: 6.24021, antoineB: 230.27, antoineC: 260.0 },
+            { name: 'Chlorine', formula: 'Cl₂', mw: 70.91, tb: -34.0, tc: 417.2, pc: 7.98, omega: 0.069, rho: 1.56, cat: 'inorganic', antoineA: 6.9318, antoineB: 861.34, antoineC: 246.33 },
+
+            // Other Organics
+            { name: 'Acetone', formula: 'C₃H₆O', mw: 58.08, tb: 56.1, tc: 508.2, pc: 4.70, omega: 0.307, rho: 0.790, cat: 'organic', antoineA: 7.11714, antoineB: 1210.595, antoineC: 229.664 },
+            { name: 'Acetic Acid', formula: 'C₂H₄O₂', mw: 60.05, tb: 117.9, tc: 591.9, pc: 5.79, omega: 0.467, rho: 1.049, cat: 'organic', antoineA: 7.38782, antoineB: 1533.313, antoineC: 222.309 },
+            { name: 'Acetaldehyde', formula: 'C₂H₄O', mw: 44.05, tb: 20.2, tc: 466.0, pc: 5.57, omega: 0.291, rho: 0.788, cat: 'organic', antoineA: 7.05648, antoineB: 1070.60, antoineC: 236.0 },
+            { name: 'Formaldehyde', formula: 'CH₂O', mw: 30.03, tb: -19.1, tc: 408.0, pc: 6.59, omega: 0.282, rho: 0.815, cat: 'organic', antoineA: 7.1960, antoineB: 970.0, antoineC: 244.0 },
+            { name: 'Diethyl Ether', formula: 'C₄H₁₀O', mw: 74.12, tb: 34.6, tc: 466.7, pc: 3.64, omega: 0.281, rho: 0.713, cat: 'organic', antoineA: 6.92032, antoineB: 1064.07, antoineC: 228.80 },
+            { name: 'Tetrahydrofuran', formula: 'C₄H₈O', mw: 72.11, tb: 65.0, tc: 540.1, pc: 5.19, omega: 0.225, rho: 0.889, cat: 'organic', antoineA: 6.99515, antoineB: 1202.29, antoineC: 226.254 },
+            { name: 'Chloroform', formula: 'CHCl₃', mw: 119.38, tb: 61.2, tc: 536.4, pc: 5.47, omega: 0.222, rho: 1.489, cat: 'organic', antoineA: 6.95465, antoineB: 1170.966, antoineC: 226.232 },
+            { name: 'Carbon Tetrachloride', formula: 'CCl₄', mw: 153.82, tb: 76.7, tc: 556.4, pc: 4.56, omega: 0.193, rho: 1.594, cat: 'organic', antoineA: 6.93390, antoineB: 1242.43, antoineC: 230.0 },
+            { name: 'Dichloromethane', formula: 'CH₂Cl₂', mw: 84.93, tb: 39.6, tc: 510.0, pc: 6.08, omega: 0.199, rho: 1.326, cat: 'organic', antoineA: 7.08030, antoineB: 1138.91, antoineC: 231.45 },
+            { name: 'Ethyl Acetate', formula: 'C₄H₈O₂', mw: 88.11, tb: 77.1, tc: 523.3, pc: 3.88, omega: 0.366, rho: 0.902, cat: 'organic', antoineA: 7.10179, antoineB: 1244.95, antoineC: 217.88 },
+            { name: 'Dimethyl Sulfoxide', formula: 'C₂H₆OS', mw: 78.13, tb: 189.0, tc: 729.0, pc: 5.65, omega: 0.281, rho: 1.100, cat: 'organic', antoineA: 6.75790, antoineB: 1518.61, antoineC: 179.81 },
+            { name: 'N,N-Dimethylformamide', formula: 'C₃H₇NO', mw: 73.09, tb: 153.0, tc: 649.6, pc: 4.42, omega: 0.317, rho: 0.948, cat: 'organic', antoineA: 6.92817, antoineB: 1400.87, antoineC: 196.43 },
+            { name: 'Acetonitrile', formula: 'C₂H₃N', mw: 41.05, tb: 81.6, tc: 545.5, pc: 4.83, omega: 0.338, rho: 0.786, cat: 'organic', antoineA: 7.11988, antoineB: 1314.4, antoineC: 230.0 },
+            { name: 'Pyridine', formula: 'C₅H₅N', mw: 79.10, tb: 115.2, tc: 620.0, pc: 5.63, omega: 0.239, rho: 0.982, cat: 'organic', antoineA: 6.99752, antoineB: 1373.8, antoineC: 214.98 }
+        ];
+
+        function populateChemicalsTable() {
+            const tbody = document.getElementById('chemicalsTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = chemicalDatabase.map(chem => `
+                <tr onclick="showChemDetail('${chem.name}')" style="cursor: pointer;">
+                    <td><strong>${chem.name}</strong></td>
+                    <td>${chem.formula}</td>
+                    <td>${chem.mw.toFixed(2)}</td>
+                    <td>${chem.tb.toFixed(1)}</td>
+                    <td>${chem.tc.toFixed(1)}</td>
+                    <td>${chem.pc.toFixed(2)}</td>
+                    <td>${chem.omega.toFixed(3)}</td>
+                    <td>${chem.rho.toFixed(3)} g/mL</td>
+                </tr>
+            `).join('');
+        }
+
+        function filterChemicals() {
+            const search = document.getElementById('chemSearch')?.value.toLowerCase() || '';
+            const category = document.getElementById('chemCategory')?.value || 'all';
+            const tbody = document.getElementById('chemicalsTableBody');
+            if (!tbody) return;
+
+            const filtered = chemicalDatabase.filter(chem => {
+                const matchSearch = chem.name.toLowerCase().includes(search) ||
+                    chem.formula.toLowerCase().includes(search);
+                const matchCat = category === 'all' || chem.cat === category;
+                return matchSearch && matchCat;
+            });
+
+            tbody.innerHTML = filtered.map(chem => `
+                <tr onclick="showChemDetail('${chem.name}')" style="cursor: pointer;">
+                    <td><strong>${chem.name}</strong></td>
+                    <td>${chem.formula}</td>
+                    <td>${chem.mw.toFixed(2)}</td>
+                    <td>${chem.tb.toFixed(1)}</td>
+                    <td>${chem.tc.toFixed(1)}</td>
+                    <td>${chem.pc.toFixed(2)}</td>
+                    <td>${chem.omega.toFixed(3)}</td>
+                    <td>${chem.rho.toFixed(3)} g/mL</td>
+                </tr>
+            `).join('');
+        }
+
+        function showChemDetail(name) {
+            const chem = chemicalDatabase.find(c => c.name === name);
+            if (!chem) return;
+
+            const panel = document.getElementById('chemDetailPanel');
+            const nameEl = document.getElementById('chemDetailName');
+            const grid = document.getElementById('chemDetailGrid');
+
+            nameEl.textContent = `${chem.name} (${chem.formula})`;
+            grid.innerHTML = `
+                <div class="chem-prop"><span>Molecular Weight</span><strong>${chem.mw.toFixed(2)} g/mol</strong></div>
+                <div class="chem-prop"><span>Boiling Point</span><strong>${chem.tb.toFixed(1)} °C</strong></div>
+                <div class="chem-prop"><span>Critical Temperature</span><strong>${chem.tc.toFixed(1)} K</strong></div>
+                <div class="chem-prop"><span>Critical Pressure</span><strong>${chem.pc.toFixed(2)} MPa</strong></div>
+                <div class="chem-prop"><span>Acentric Factor (ω)</span><strong>${chem.omega.toFixed(3)}</strong></div>
+                <div class="chem-prop"><span>Density @ 25°C</span><strong>${chem.rho.toFixed(3)} g/mL</strong></div>
+                <div class="chem-prop"><span>Antoine A</span><strong>${chem.antoineA.toFixed(5)}</strong></div>
+                <div class="chem-prop"><span>Antoine B</span><strong>${chem.antoineB.toFixed(3)}</strong></div>
+                <div class="chem-prop"><span>Antoine C</span><strong>${chem.antoineC.toFixed(2)}</strong></div>
+                <div class="chem-prop"><span>Vapor Pressure at 25°C</span><strong>${calcVaporPressure(chem, 25).toFixed(2)} kPa</strong></div>
+            `;
+            panel.style.display = 'block';
+        }
+
+        function calcVaporPressure(chem, tempC) {
+            // Antoine equation: log10(P) = A - B/(T+C), P in mmHg, T in °C
+            const logP = chem.antoineA - chem.antoineB / (tempC + chem.antoineC);
+            return Math.pow(10, logP) * 0.133322; // Convert mmHg to kPa
+        }
+
+        // Initialize chemicals table
+        document.addEventListener('DOMContentLoaded', () => {
+            populateChemicalsTable();
         });
 
     </script>
