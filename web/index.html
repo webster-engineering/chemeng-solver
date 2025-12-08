@@ -4403,42 +4403,48 @@
         function plotTxy() {
             const system = document.getElementById('txySystem')?.value || 'benzene-toluene';
             const P = parseFloat(document.getElementById('txyP')?.value || 101.325);
-            const xF = parseFloat(document.getElementById('txyXf')?.value || 0.5);
-            const R = parseFloat(document.getElementById('txyR')?.value || 2);
 
             const ctx = document.getElementById('txyChart');
             if (!ctx) return;
 
             const data = vleData[system];
             const compositions = [];
-            const liquidLine = [];
-            const vaporLine = [];
-            const diagonal = [];
+            const bubbleT = [];  // Temperature at bubble point (liquid composition x)
+            const dewT = [];     // Temperature at dew point (vapor composition y)
 
-            // Antoine equation: log10(P) = A - B/(T+C), solve for T
-            function antoineT(P, A, B, C) {
-                return B / (A - Math.log10(P)) - C;
-            }
-
-            for (let x = 0; x <= 1.01; x += 0.02) {
+            // Calculate bubble point temperatures (T vs x)
+            for (let x = 0; x <= 1.001; x += 0.02) {
                 compositions.push(x.toFixed(2));
 
-                // Bubble point calculation (simplified Raoult's Law)
-                // Iteratively find T where x1*P1sat + x2*P2sat = P
+                // Bubble point: find T where x1*P1sat + x2*P2sat = P
                 let T = data.Tb1 * x + data.Tb2 * (1 - x);
-                for (let i = 0; i < 20; i++) {
+                for (let iter = 0; iter < 30; iter++) {
                     const P1sat = Math.pow(10, data.A1 - data.B1 / (T + data.C1));
                     const P2sat = Math.pow(10, data.A2 - data.B2 / (T + data.C2));
                     const Pcalc = x * P1sat + (1 - x) * P2sat;
-                    T = T + (P - Pcalc) * 0.05;
+                    const dT = (P - Pcalc) * 0.02;
+                    T = T + dT;
+                    if (Math.abs(dT) < 0.001) break;
                 }
-                liquidLine.push(T);
+                bubbleT.push(T);
+            }
 
-                // Vapor composition
-                const P1sat = Math.pow(10, data.A1 - data.B1 / (T + data.C1));
-                const y = x * P1sat / P;
-                vaporLine.push(T);
-                diagonal.push(T);
+            // Calculate dew point temperatures (T vs y)
+            // For a given vapor composition y, find T where y = x*P1sat/P and x1+x2=1
+            for (let y = 0; y <= 1.001; y += 0.02) {
+                // Dew point: find T where y1/P1sat + y2/P2sat = 1/P
+                let T = data.Tb1 * y + data.Tb2 * (1 - y);
+                for (let iter = 0; iter < 30; iter++) {
+                    const P1sat = Math.pow(10, data.A1 - data.B1 / (T + data.C1));
+                    const P2sat = Math.pow(10, data.A2 - data.B2 / (T + data.C2));
+                    // For ideal mixture: sum(yi/Pisat) = 1/P
+                    const sumYP = y / P1sat + (1 - y) / P2sat;
+                    const Pcalc = 1 / sumYP;
+                    const dT = (P - Pcalc) * 0.02;
+                    T = T + dT;
+                    if (Math.abs(dT) < 0.001) break;
+                }
+                dewT.push(T);
             }
 
             if (txyChartInstance) txyChartInstance.destroy();
@@ -4450,30 +4456,32 @@
                     datasets: [
                         {
                             label: 'Bubble Line (Liquid)',
-                            data: liquidLine,
+                            data: bubbleT,
                             borderColor: '#5b6eae',
-                            backgroundColor: 'rgba(91, 110, 174, 0.2)',
+                            backgroundColor: 'rgba(91, 110, 174, 0.15)',
                             fill: '+1',
                             tension: 0.4,
-                            pointRadius: 0
+                            pointRadius: 0,
+                            borderWidth: 2
                         },
                         {
                             label: 'Dew Line (Vapor)',
-                            data: vaporLine.map((t, i) => liquidLine[i] + (vaporLine[i] - liquidLine[i]) * 0.3),
+                            data: dewT,
                             borderColor: '#ef4444',
                             tension: 0.4,
-                            pointRadius: 0
+                            pointRadius: 0,
+                            borderWidth: 2
                         }
                     ]
                 },
                 options: {
                     responsive: true,
                     plugins: {
-                        title: { display: true, text: `${data.name1}-${data.name2} VLE at ${P} kPa`, color: '#e0e0e6' },
+                        title: { display: true, text: `${data.name1}-${data.name2} T-xy Diagram at ${P} kPa`, color: '#e0e0e6' },
                         legend: { labels: { color: '#8a8a9a' } }
                     },
                     scales: {
-                        x: { title: { display: true, text: `Mole Fraction ${data.name1}`, color: '#8a8a9a' }, ticks: { color: '#8a8a9a' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        x: { title: { display: true, text: `Mole Fraction ${data.name1} (x, y)`, color: '#8a8a9a' }, ticks: { color: '#8a8a9a' }, grid: { color: 'rgba(255,255,255,0.05)' } },
                         y: { title: { display: true, text: 'Temperature (°C)', color: '#8a8a9a' }, ticks: { color: '#8a8a9a' }, grid: { color: 'rgba(255,255,255,0.05)' } }
                     }
                 }
