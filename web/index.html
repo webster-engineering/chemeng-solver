@@ -2098,6 +2098,221 @@
             color: var(--accent-light);
         }
 
+        /* Unit Converter Styles */
+        .converter-panel {
+            padding: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .converter-panel h2 {
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .converter-layout {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .converter-main {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 25px;
+        }
+
+        .converter-category-select {
+            margin-bottom: 20px;
+        }
+
+        .converter-category-select label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .converter-category-select select {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .converter-inputs {
+            display: flex;
+            align-items: flex-end;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .conv-input-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .conv-input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .conv-input-group input {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px 8px 0 0;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .conv-input-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .conv-input-group input[readonly] {
+            background: rgba(91, 110, 174, 0.1);
+            color: var(--accent-light);
+        }
+
+        .conv-input-group select {
+            width: 100%;
+            padding: 10px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .swap-btn {
+            background: var(--accent);
+            border: none;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            margin-bottom: 20px;
+        }
+
+        .swap-btn:hover {
+            background: var(--accent-light);
+            transform: rotate(180deg);
+        }
+
+        .conv-formula {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 8px;
+            color: var(--success);
+            font-family: monospace;
+            font-size: 1rem;
+        }
+
+        .conv-history {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .conv-history h4 {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        #convHistoryList {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .history-item {
+            padding: 10px;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .history-item:hover {
+            background: rgba(91, 110, 174, 0.2);
+        }
+
+        /* Cheat Sheet */
+        .cheat-sheet {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            height: fit-content;
+        }
+
+        .cheat-sheet h3 {
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .cheat-section {
+            margin-bottom: 15px;
+        }
+
+        .cheat-section h4 {
+            color: var(--accent);
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .cheat-items {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .cheat-item {
+            padding: 8px 10px;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-family: monospace;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .cheat-item:hover {
+            background: rgba(91, 110, 174, 0.2);
+            color: var(--text-primary);
+        }
+
+        @media (max-width: 900px) {
+            .converter-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
         @media (max-width: 1200px) {
             .container {
                 grid-template-columns: 1fr;
@@ -2265,6 +2480,14 @@
                             </svg>
                             Steam Tables
                         </button>
+                        <button onclick="switchTab('converter')" class="tool-card" style="cursor: pointer;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M7 16V4m0 0L3 8m4-4l4 4" />
+                                <path d="M17 8v12m0 0l4-4m-4 4l-4-4" />
+                            </svg>
+                            Unit Converter
+                        </button>
                         <button onclick="switchTab('fluids')" class="tool-card" style="cursor: pointer;">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-width="2">
@@ -2420,6 +2643,130 @@
                             </thead>
                             <tbody id="fluidsTableBody"></tbody>
                         </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Unit Converter Tab -->
+            <div id="converterTab" class="tab-content">
+                <div class="converter-panel">
+                    <h2>🔄 Unit Converter</h2>
+                    <p class="ref-description">Quick unit conversions for chemical engineering</p>
+
+                    <div class="converter-layout">
+                        <!-- Main Converter -->
+                        <div class="converter-main">
+                            <div class="converter-category-select">
+                                <label>Category:</label>
+                                <select id="convCategory" onchange="updateConversionUnits()">
+                                    <option value="length">Length</option>
+                                    <option value="mass">Mass</option>
+                                    <option value="temperature">Temperature</option>
+                                    <option value="pressure" selected>Pressure</option>
+                                    <option value="flow">Flow Rate</option>
+                                    <option value="volume">Volume</option>
+                                    <option value="energy">Energy</option>
+                                    <option value="power">Power</option>
+                                    <option value="density">Density</option>
+                                    <option value="viscosity">Viscosity</option>
+                                    <option value="velocity">Velocity</option>
+                                    <option value="area">Area</option>
+                                </select>
+                            </div>
+
+                            <div class="converter-inputs">
+                                <div class="conv-input-group">
+                                    <label>From:</label>
+                                    <input type="number" id="convFromValue" value="1" oninput="convertUnits()">
+                                    <select id="convFromUnit" onchange="convertUnits()"></select>
+                                </div>
+
+                                <button class="swap-btn" onclick="swapUnits()" title="Swap units">⇄</button>
+
+                                <div class="conv-input-group">
+                                    <label>To:</label>
+                                    <input type="number" id="convToValue" readonly>
+                                    <select id="convToUnit" onchange="convertUnits()"></select>
+                                </div>
+                            </div>
+
+                            <div class="conv-formula" id="convFormula"></div>
+
+                            <!-- Conversion History -->
+                            <div class="conv-history">
+                                <h4>Recent Conversions</h4>
+                                <div id="convHistoryList"></div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Reference Cheat Sheet -->
+                        <div class="cheat-sheet">
+                            <h3>📋 ChemE Quick Reference</h3>
+
+                            <div class="cheat-section">
+                                <h4>Pressure</h4>
+                                <div class="cheat-items">
+                                    <div class="cheat-item" onclick="quickConvert('pressure', 1, 'atm', 'kPa')">1 atm =
+                                        101.325 kPa</div>
+                                    <div class="cheat-item" onclick="quickConvert('pressure', 1, 'bar', 'psi')">1 bar =
+                                        14.504 psi</div>
+                                    <div class="cheat-item" onclick="quickConvert('pressure', 1, 'psi', 'kPa')">1 psi =
+                                        6.895 kPa</div>
+                                    <div class="cheat-item" onclick="quickConvert('pressure', 1, 'mmHg', 'kPa')">1 mmHg
+                                        = 0.133 kPa</div>
+                                </div>
+                            </div>
+
+                            <div class="cheat-section">
+                                <h4>Flow Rate</h4>
+                                <div class="cheat-items">
+                                    <div class="cheat-item" onclick="quickConvert('flow', 1, 'gpm', 'm3/h')">1 gpm =
+                                        0.227 m³/h</div>
+                                    <div class="cheat-item" onclick="quickConvert('flow', 1, 'm3/h', 'gpm')">1 m³/h =
+                                        4.403 gpm</div>
+                                    <div class="cheat-item" onclick="quickConvert('flow', 1, 'L/s', 'gpm')">1 L/s =
+                                        15.85 gpm</div>
+                                    <div class="cheat-item" onclick="quickConvert('flow', 1, 'bbl/day', 'm3/h')">1
+                                        bbl/day = 0.00663 m³/h</div>
+                                </div>
+                            </div>
+
+                            <div class="cheat-section">
+                                <h4>Energy & Power</h4>
+                                <div class="cheat-items">
+                                    <div class="cheat-item" onclick="quickConvert('energy', 1, 'BTU', 'kJ')">1 BTU =
+                                        1.055 kJ</div>
+                                    <div class="cheat-item" onclick="quickConvert('power', 1, 'hp', 'kW')">1 hp = 0.746
+                                        kW</div>
+                                    <div class="cheat-item" onclick="quickConvert('power', 1000000, 'BTU/hr', 'kW')">1
+                                        MM BTU/hr = 293 kW</div>
+                                </div>
+                            </div>
+
+                            <div class="cheat-section">
+                                <h4>Density & Viscosity</h4>
+                                <div class="cheat-items">
+                                    <div class="cheat-item" onclick="quickConvert('density', 1, 'lb/ft3', 'kg/m3')">1
+                                        lb/ft³ = 16.02 kg/m³</div>
+                                    <div class="cheat-item" onclick="quickConvert('viscosity', 1, 'cP', 'Pa·s')">1 cP =
+                                        0.001 Pa·s</div>
+                                    <div class="cheat-item" onclick="quickConvert('viscosity', 1, 'cSt', 'mm2/s')">1 cSt
+                                        = 1 mm²/s</div>
+                                </div>
+                            </div>
+
+                            <div class="cheat-section">
+                                <h4>Temperature</h4>
+                                <div class="cheat-items">
+                                    <div class="cheat-item" onclick="quickConvert('temperature', 0, '°C', '°F')">0°C =
+                                        32°F</div>
+                                    <div class="cheat-item" onclick="quickConvert('temperature', 100, '°C', '°F')">100°C
+                                        = 212°F</div>
+                                    <div class="cheat-item" onclick="quickConvert('temperature', 25, '°C', 'K')">25°C =
+                                        298.15 K</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -4899,6 +5246,160 @@
             });
         }
 
+
+        // ===== Unit Converter =====
+        const conversionHistory = [];
+
+        const unitConversions = {
+            length: {
+                units: ['m', 'ft', 'in', 'cm', 'mm', 'km', 'mi', 'yd'],
+                toBase: { 'm': 1, 'ft': 0.3048, 'in': 0.0254, 'cm': 0.01, 'mm': 0.001, 'km': 1000, 'mi': 1609.34, 'yd': 0.9144 }
+            },
+            mass: {
+                units: ['kg', 'lb', 'g', 'oz', 'ton', 'tonne'],
+                toBase: { 'kg': 1, 'lb': 0.453592, 'g': 0.001, 'oz': 0.0283495, 'ton': 907.185, 'tonne': 1000 }
+            },
+            temperature: {
+                units: ['°C', '°F', 'K', '°R'],
+                special: true
+            },
+            pressure: {
+                units: ['kPa', 'bar', 'psi', 'atm', 'mmHg', 'Pa', 'MPa', 'inHg', 'inH2O'],
+                toBase: { 'kPa': 1, 'bar': 100, 'psi': 6.89476, 'atm': 101.325, 'mmHg': 0.133322, 'Pa': 0.001, 'MPa': 1000, 'inHg': 3.38639, 'inH2O': 0.249089 }
+            },
+            flow: {
+                units: ['m3/h', 'gpm', 'L/s', 'L/min', 'ft3/min', 'bbl/day', 'm3/s'],
+                toBase: { 'm3/h': 1, 'gpm': 0.227125, 'L/s': 3.6, 'L/min': 0.06, 'ft3/min': 1.69901, 'bbl/day': 0.00663, 'm3/s': 3600 }
+            },
+            volume: {
+                units: ['L', 'gal', 'm3', 'ft3', 'mL', 'bbl', 'in3'],
+                toBase: { 'L': 1, 'gal': 3.78541, 'm3': 1000, 'ft3': 28.3168, 'mL': 0.001, 'bbl': 158.987, 'in3': 0.0163871 }
+            },
+            energy: {
+                units: ['kJ', 'BTU', 'cal', 'kcal', 'J', 'kWh', 'MJ'],
+                toBase: { 'kJ': 1, 'BTU': 1.05506, 'cal': 0.004184, 'kcal': 4.184, 'J': 0.001, 'kWh': 3600, 'MJ': 1000 }
+            },
+            power: {
+                units: ['kW', 'hp', 'W', 'BTU/hr', 'MW', 'kcal/hr'],
+                toBase: { 'kW': 1, 'hp': 0.7457, 'W': 0.001, 'BTU/hr': 0.000293071, 'MW': 1000, 'kcal/hr': 0.001163 }
+            },
+            density: {
+                units: ['kg/m3', 'lb/ft3', 'g/cm3', 'g/mL', 'lb/gal'],
+                toBase: { 'kg/m3': 1, 'lb/ft3': 16.0185, 'g/cm3': 1000, 'g/mL': 1000, 'lb/gal': 119.826 }
+            },
+            viscosity: {
+                units: ['Pa·s', 'cP', 'mPa·s', 'lb/(ft·s)', 'poise'],
+                toBase: { 'Pa·s': 1, 'cP': 0.001, 'mPa·s': 0.001, 'lb/(ft·s)': 1.48816, 'poise': 0.1 }
+            },
+            velocity: {
+                units: ['m/s', 'ft/s', 'km/h', 'mph', 'knot'],
+                toBase: { 'm/s': 1, 'ft/s': 0.3048, 'km/h': 0.277778, 'mph': 0.44704, 'knot': 0.514444 }
+            },
+            area: {
+                units: ['m2', 'ft2', 'cm2', 'in2', 'acre', 'ha'],
+                toBase: { 'm2': 1, 'ft2': 0.092903, 'cm2': 0.0001, 'in2': 0.00064516, 'acre': 4046.86, 'ha': 10000 }
+            }
+        };
+
+        function updateConversionUnits() {
+            const category = document.getElementById('convCategory').value;
+            const fromSelect = document.getElementById('convFromUnit');
+            const toSelect = document.getElementById('convToUnit');
+            const data = unitConversions[category];
+
+            fromSelect.innerHTML = data.units.map((u, i) => `<option value="${u}" ${i === 0 ? 'selected' : ''}>${u}</option>`).join('');
+            toSelect.innerHTML = data.units.map((u, i) => `<option value="${u}" ${i === 1 ? 'selected' : ''}>${u}</option>`).join('');
+
+            convertUnits();
+        }
+
+        function convertUnits() {
+            const category = document.getElementById('convCategory').value;
+            const fromValue = parseFloat(document.getElementById('convFromValue').value) || 0;
+            const fromUnit = document.getElementById('convFromUnit').value;
+            const toUnit = document.getElementById('convToUnit').value;
+
+            let result;
+            const data = unitConversions[category];
+
+            if (category === 'temperature') {
+                // Special handling for temperature
+                let celsius;
+                switch (fromUnit) {
+                    case '°C': celsius = fromValue; break;
+                    case '°F': celsius = (fromValue - 32) * 5 / 9; break;
+                    case 'K': celsius = fromValue - 273.15; break;
+                    case '°R': celsius = (fromValue - 491.67) * 5 / 9; break;
+                }
+                switch (toUnit) {
+                    case '°C': result = celsius; break;
+                    case '°F': result = celsius * 9 / 5 + 32; break;
+                    case 'K': result = celsius + 273.15; break;
+                    case '°R': result = (celsius + 273.15) * 9 / 5; break;
+                }
+            } else {
+                // Standard conversion through base unit
+                const baseValue = fromValue * data.toBase[fromUnit];
+                result = baseValue / data.toBase[toUnit];
+            }
+
+            document.getElementById('convToValue').value = result.toPrecision(6);
+
+            // Update formula display
+            const factor = result / fromValue;
+            document.getElementById('convFormula').innerHTML =
+                `${fromValue} ${fromUnit} = <strong>${result.toPrecision(6)}</strong> ${toUnit}<br>` +
+                `<small>Factor: 1 ${fromUnit} = ${(factor || 0).toPrecision(6)} ${toUnit}</small>`;
+
+            // Add to history
+            addToHistory(fromValue, fromUnit, result, toUnit);
+        }
+
+        function swapUnits() {
+            const fromSelect = document.getElementById('convFromUnit');
+            const toSelect = document.getElementById('convToUnit');
+            const fromValue = document.getElementById('convFromValue');
+            const toValue = document.getElementById('convToValue');
+
+            const tempUnit = fromSelect.value;
+            fromSelect.value = toSelect.value;
+            toSelect.value = tempUnit;
+
+            fromValue.value = toValue.value;
+
+            convertUnits();
+        }
+
+        function addToHistory(fromVal, fromUnit, toVal, toUnit) {
+            const entry = `${fromVal} ${fromUnit} → ${parseFloat(toVal).toPrecision(6)} ${toUnit}`;
+
+            // Don't add duplicates
+            if (conversionHistory[0] === entry) return;
+
+            conversionHistory.unshift(entry);
+            if (conversionHistory.length > 8) conversionHistory.pop();
+
+            const historyDiv = document.getElementById('convHistoryList');
+            historyDiv.innerHTML = conversionHistory.map(h =>
+                `<div class="history-item">${h}</div>`
+            ).join('');
+        }
+
+        function quickConvert(category, value, fromUnit, toUnit) {
+            document.getElementById('convCategory').value = category;
+            updateConversionUnits();
+            document.getElementById('convFromValue').value = value;
+            document.getElementById('convFromUnit').value = fromUnit;
+            document.getElementById('convToUnit').value = toUnit;
+            convertUnits();
+        }
+
+        // Initialize converter on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            if (document.getElementById('convCategory')) {
+                updateConversionUnits();
+            }
+        });
 
     </script>
 
