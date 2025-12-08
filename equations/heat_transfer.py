@@ -443,6 +443,59 @@ class OverallU(BaseEquation):
         return {"U": ureg.Quantity(u, "BTU/(hr*ft**2*delta_degF)")}
 
 
+# ===============================
+# CONVECTION COEFFICIENT LEARNING
+# ===============================
+CONVECTION_LEARNING = LearningContent(
+    background_theory="""
+The **Dittus-Boelter correlation** estimates the convection heat transfer 
+coefficient for turbulent flow inside tubes.
+
+**The Equation:** Nu = 0.023 × Re^0.8 × Pr^n
+
+Where:
+- Nu = Nusselt number = h×D/k
+- Re = Reynolds number (must be > 10,000)
+- Pr = Prandtl number = Cp×μ/k
+- n = 0.4 for heating, 0.3 for cooling
+
+**Rearranged for h:** h = 0.023 × (k/D) × Re^0.8 × Pr^n
+
+**Valid Range:**
+- Re > 10,000 (turbulent flow)
+- 0.6 < Pr < 160
+- L/D > 10 (fully developed)
+""",
+    key_concepts=[
+        "Nu = hD/k is dimensionless heat transfer",
+        "Re^0.8 shows turbulence enhances transfer",
+        "n = 0.4 (heating) or 0.3 (cooling)",
+        "Only valid for turbulent flow in tubes"
+    ],
+    common_mistakes=[
+        "Using for laminar flow (Re < 2300)",
+        "Forgetting heating vs cooling exponent",
+        "Not using bulk fluid properties"
+    ],
+    quiz_questions=[
+        QuizQuestion(
+            id="conv_q1",
+            question="In Dittus-Boelter, what is the Prandtl exponent for heating?",
+            question_type=QuestionType.MULTIPLE_CHOICE,
+            options=["0.4", "0.3", "0.8", "1.0"],
+            correct_answer="0.4",
+            explanation="For heating, use Pr^0.4. For cooling, use Pr^0.3.",
+            difficulty=Difficulty.BEGINNER,
+            points=10
+        )
+    ],
+    difficulty=Difficulty.INTERMEDIATE,
+    estimated_time_minutes=12,
+    prerequisites=["reynolds_number"],
+    related_equations=["overall_u", "ntu_eff"]
+)
+
+
 class ConvectionCoefficient(BaseEquation):
     """Estimate convection coefficient using Dittus-Boelter correlation."""
     
@@ -451,6 +504,7 @@ class ConvectionCoefficient(BaseEquation):
     category = "Heat Transfer"
     description = "Estimate film coefficient for turbulent flow in tubes"
     reference = "Dittus-Boelter correlation (Re > 10000)"
+    learning_content = CONVECTION_LEARNING
     
     def get_parameters(self) -> List[EquationParameter]:
         return [
