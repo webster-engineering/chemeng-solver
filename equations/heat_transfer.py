@@ -188,6 +188,64 @@ This is the fundamental energy balance that links both sides of the exchanger.
 )
 
 
+# ===============================
+# NTU-EFFECTIVENESS LEARNING CONTENT
+# ===============================
+NTU_EFF_LEARNING = LearningContent(
+    background_theory="""
+The **NTU-Effectiveness (ε-NTU) method** is an alternative to LMTD for heat exchanger analysis.
+It's especially useful when **outlet temperatures are unknown**.
+
+**The Number of Transfer Units (NTU):** NTU = UA / C_min
+
+Where C = ṁ·Cp (heat capacity rate)
+
+**Effectiveness (ε):** ε = Q_actual / Q_max = Q / (C_min × (T_h,in - T_c,in))
+
+**For Counterflow:**
+ε = [1 - exp(-NTU(1-Cr))] / [1 - Cr·exp(-NTU(1-Cr))]  (Cr ≠ 1)
+
+Where Cr = C_min / C_max (heat capacity ratio)
+
+**Special Cases:**
+- Cr = 0 (condenser/evaporator): ε = 1 - exp(-NTU)
+- Cr = 1: ε = NTU / (1 + NTU)
+""",
+    key_concepts=[
+        "NTU is a dimensionless measure of exchanger size",
+        "ε tells you what fraction of maximum possible heat is transferred",
+        "C_min determines maximum possible heat transfer",
+        "Use ε-NTU when outlet temps are unknown (rating problem)"
+    ],
+    real_world_applications=[
+        "Rating existing heat exchangers",
+        "Performance prediction after fouling",
+        "Optimizing exchanger networks",
+        "Pinch analysis in process integration"
+    ],
+    common_mistakes=[
+        "Confusing C_min and C_max assignment",
+        "Using wrong ε-NTU formula for the exchanger type",
+        "Forgetting Cr = C_min/C_max, not C_max/C_min"
+    ],
+    quiz_questions=[
+        QuizQuestion(
+            id="ntu_q1",
+            question="What does effectiveness ε = 0.7 mean?",
+            question_type=QuestionType.MULTIPLE_CHOICE,
+            options=["70% of maximum possible heat is transferred", "70% efficiency", "70% of area is used", "UA = 0.7"],
+            correct_answer="70% of maximum possible heat is transferred",
+            explanation="ε = Q_actual/Q_max, so 70% of the thermodynamically maximum heat transfer is achieved.",
+            difficulty=Difficulty.BEGINNER,
+            points=10
+        )
+    ],
+    difficulty=Difficulty.INTERMEDIATE,
+    estimated_time_minutes=15,
+    prerequisites=["lmtd", "heat_duty"],
+    related_equations=["lmtd", "hx_area", "overall_u"]
+)
+
 class LMTD(BaseEquation):
     """Log Mean Temperature Difference calculation."""
     
@@ -318,6 +376,7 @@ class NTUEffectiveness(BaseEquation):
     category = "Heat Transfer"
     description = "Calculate heat exchanger effectiveness from NTU (counterflow)"
     reference = "Kays & London, Compact Heat Exchangers"
+    learning_content = NTU_EFF_LEARNING
     
     def get_parameters(self) -> List[EquationParameter]:
         return [
