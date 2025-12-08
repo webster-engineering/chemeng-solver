@@ -9,6 +9,183 @@ import pint
 
 from .base import BaseEquation, EquationParameter, ParameterType
 from core.units import ureg
+from core.learning import (
+    LearningContent, QuizQuestion, QuestionType, Difficulty,
+    WorkedExample, CalculationStep
+)
+
+
+# ===============================
+# LMTD LEARNING CONTENT
+# ===============================
+LMTD_LEARNING = LearningContent(
+    background_theory="""
+The **Log Mean Temperature Difference (LMTD)** is the true driving force for heat transfer 
+in heat exchangers. It accounts for the changing temperature difference along the exchanger.
+
+**The Equation:** LMTD = (ΔT₁ - ΔT₂) / ln(ΔT₁/ΔT₂)
+
+**For Counterflow:**
+- ΔT₁ = T_hot,in - T_cold,out (hot end)
+- ΔT₂ = T_hot,out - T_cold,in (cold end)
+
+**Why Log Mean?**
+Temperature difference varies exponentially along the exchanger length. The logarithmic 
+mean correctly averages this for heat transfer calculations.
+
+**The Design Equation:** Q = U × A × F × LMTD
+Where F is the correction factor for multi-pass arrangements (F=1 for true counterflow).
+""",
+    key_concepts=[
+        "LMTD is the effective average temperature difference",
+        "Always larger at one end (approach temperature matters!)",
+        "Counterflow gives highest LMTD for given terminal temperatures",
+        "If ΔT₁ ≈ ΔT₂, then LMTD ≈ ΔT (arithmetic mean works)"
+    ],
+    real_world_applications=[
+        "Shell and tube heat exchanger design",
+        "Plate heat exchanger sizing",
+        "Condenser and reboiler design",
+        "Process heater calculations"
+    ],
+    common_mistakes=[
+        "Using wrong flow arrangement (co-current vs counter-current)",
+        "Temperature crossover (physically impossible - need larger area)",
+        "Forgetting F factor for shell-side multi-pass",
+        "Using LMTD when outlet temperatures are unknown (use NTU instead)"
+    ],
+    pro_tips=[
+        "If designing, counterflow ALWAYS gives smaller area than co-current",
+        "Target minimum approach temp of 10-20°F for process exchangers",
+        "For close approach temps, check if NTU method is easier"
+    ],
+    quiz_questions=[
+        QuizQuestion(
+            id="lmtd_q1",
+            question="If ΔT₁ = 50°F and ΔT₂ = 50°F (parallel approaches), what is LMTD?",
+            question_type=QuestionType.MULTIPLE_CHOICE,
+            options=["50°F", "25°F", "0°F", "Undefined"],
+            correct_answer="50°F",
+            explanation="When ΔT₁ = ΔT₂, the limit of the LMTD formula equals the arithmetic mean, which is simply ΔT.",
+            difficulty=Difficulty.BEGINNER,
+            points=10
+        ),
+        QuizQuestion(
+            id="lmtd_q2",
+            question="Hot in=200°F, Hot out=120°F, Cold in=80°F, Cold out=160°F (counterflow). What is LMTD?",
+            question_type=QuestionType.NUMERIC,
+            options=[],
+            correct_answer="40",
+            explanation="ΔT₁=200-160=40°F, ΔT₂=120-80=40°F. Since equal, LMTD=40°F.",
+            difficulty=Difficulty.INTERMEDIATE,
+            hint="Calculate ΔT at each end first",
+            points=15
+        )
+    ],
+    worked_example=WorkedExample(
+        title="LMTD for Oil-Water Heat Exchanger",
+        scenario="Size a counterflow HX to cool oil from 180°F to 120°F using cooling water from 75°F to 95°F.",
+        given_values={
+            "T_hot_in": "180°F (oil inlet)",
+            "T_hot_out": "120°F (oil outlet)",
+            "T_cold_in": "75°F (CW inlet)",
+            "T_cold_out": "95°F (CW outlet)"
+        },
+        find=["LMTD for design"],
+        steps=[
+            CalculationStep(
+                step_number=1,
+                title="Calculate Temperature Approaches",
+                description="Find ΔT at each end (counterflow arrangement)",
+                formula="ΔT₁ = T_hot,in - T_cold,out, ΔT₂ = T_hot,out - T_cold,in",
+                substitution="ΔT₁ = 180 - 95 = 85°F, ΔT₂ = 120 - 75 = 45°F",
+                result="ΔT₁ = 85°F, ΔT₂ = 45°F"
+            ),
+            CalculationStep(
+                step_number=2,
+                title="Apply LMTD Formula",
+                description="Calculate log mean",
+                formula="LMTD = (ΔT₁ - ΔT₂) / ln(ΔT₁/ΔT₂)",
+                substitution="LMTD = (85 - 45) / ln(85/45)",
+                computation="LMTD = 40 / ln(1.889) = 40 / 0.636 = 62.9°F",
+                result="LMTD = 62.9°F"
+            )
+        ],
+        final_answer="LMTD = 62.9°F",
+        real_world_context="Use this in Q = U·A·LMTD to find required exchanger area."
+    ),
+    difficulty=Difficulty.BEGINNER,
+    estimated_time_minutes=12,
+    prerequisites=[],
+    related_equations=["hx_area", "heat_duty", "ntu_eff"],
+    diagram_type="heat_exchanger",
+    diagram_labels={
+        "shell": "Shell Side (Hot)",
+        "tubes": "Tube Side (Cold)",
+        "inlet_hot": "Hot Fluid In",
+        "outlet_cold": "Cold Fluid Out"
+    }
+)
+
+
+# ===============================
+# HEAT DUTY LEARNING CONTENT
+# ===============================
+HEAT_DUTY_LEARNING = LearningContent(
+    background_theory="""
+**Heat Duty (Q)** is theA rate of heat transfer in a process. It's the starting point for 
+all heat exchanger and heater/cooler designs.
+
+**The Equation:** Q = ṁ × Cp × ΔT
+
+Where:
+- **Q** = Heat duty (BTU/hr, kW)
+- **ṁ** = Mass flow rate (lb/hr, kg/s)
+- **Cp** = Specific heat capacity (BTU/lb·°F, kJ/kg·K)
+- **ΔT** = Temperature change (T_out - T_in)
+
+**Energy Balance:**
+For heat exchangers without heat loss:
+Q_hot = Q_cold (heat lost by hot fluid = heat gained by cold fluid)
+
+This is the fundamental energy balance that links both sides of the exchanger.
+""",
+    key_concepts=[
+        "Heat duty is the total rate of energy transferred",
+        "Q = ṁCpΔT is the sensible heat equation",
+        "For phase change, add latent heat: Q = ṁ × h_fg",
+        "Energy balance: Q_hot = Q_cold for adiabatic operation"
+    ],
+    real_world_applications=[
+        "Sizing heaters and coolers",
+        "Determining utility requirements (steam, cooling water)",
+        "Energy balance on distillation columns",
+        "Calculating condenser and reboiler duties"
+    ],
+    common_mistakes=[
+        "Using Cp at wrong temperature (it varies!)",
+        "Forgetting latent heat during phase change",
+        "Sign errors in ΔT (heating vs cooling)",
+        "Mixing unit systems (SI vs Imperial)"
+    ],
+    quiz_questions=[
+        QuizQuestion(
+            id="hd_q1",
+            question="10,000 lb/hr of water cools from 150°F to 100°F. What's Q?",
+            question_type=QuestionType.NUMERIC,
+            options=[],
+            correct_answer="500000",
+            explanation="Q = ṁCpΔT = 10000 × 1.0 × 50 = 500,000 BTU/hr",
+            difficulty=Difficulty.BEGINNER,
+            hint="Water Cp = 1.0 BTU/(lb·°F)",
+            points=10
+        )
+    ],
+    difficulty=Difficulty.BEGINNER,
+    estimated_time_minutes=10,
+    prerequisites=[],
+    related_equations=["lmtd", "hx_area"]
+)
 
 
 class LMTD(BaseEquation):
@@ -19,6 +196,7 @@ class LMTD(BaseEquation):
     category = "Heat Transfer"
     description = "Calculate LMTD for shell-and-tube or double-pipe heat exchanger design"
     reference = "Perry's Chemical Engineers' Handbook"
+    learning_content = LMTD_LEARNING
     
     def get_parameters(self) -> List[EquationParameter]:
         return [
@@ -104,6 +282,7 @@ class HeatDuty(BaseEquation):
     category = "Heat Transfer"
     description = "Calculate heat transfer rate Q = m·Cp·ΔT"
     reference = "Standard thermodynamics"
+    learning_content = HEAT_DUTY_LEARNING
     
     def get_parameters(self) -> List[EquationParameter]:
         return [
