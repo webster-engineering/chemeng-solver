@@ -2060,6 +2060,80 @@
         let comparisonMode = false;
         let equationCache = {};
 
+        // ===== Wikipedia URL Mapping =====
+        const wikipediaUrls = {
+            // Process Control
+            'ziegler_nichols_pid': 'Ziegler%E2%80%93Nichols_method',
+            'cohen_coon_pid': 'PID_controller#Loop_tuning',
+            'imc_pid': 'Internal_model_control',
+            'tyreus_luyben_pid': 'PID_controller#Tyreus%E2%80%93Luyben_tuning',
+            'cv_liquid': 'Control_valve#Valve_coefficient',
+            'cv_gas': 'Control_valve#Valve_coefficient',
+            'gain_margin': 'Gain_margin',
+            'phase_margin': 'Phase_margin',
+            'fopdt_model': 'PID_controller#FOPDT_model',
+            'cascade_control': 'Cascade_control',
+            'feedforward_control': 'Feed-forward_(control)',
+            // Fluid Dynamics
+            'reynolds_number': 'Reynolds_number',
+            'bernoulli': 'Bernoulli%27s_principle',
+            'orifice_flow': 'Orifice_plate',
+            'friction_factor': 'Darcy_friction_factor',
+            'darcy_weisbach': 'Darcy%E2%80%93Weisbach_equation',
+            'hazen_williams': 'Hazen%E2%80%93Williams_equation',
+            'pump_power': 'Pump#Pump_power',
+            'npsh': 'Net_positive_suction_head',
+            'cavitation': 'Cavitation',
+            // Heat Transfer
+            'lmtd': 'Log_mean_temperature_difference',
+            'hx_area': 'Heat_exchanger#Design',
+            'heat_duty': 'Heat_transfer',
+            'ntu_eff': 'NTU_method',
+            'overall_u': 'Thermal_contact_conductance',
+            'convection_coeff': 'Convective_heat_transfer#Dittus%E2%80%93Boelter_correlation',
+            // Thermodynamics
+            'antoine': 'Antoine_equation',
+            'clausius_clapeyron': 'Clausius%E2%80%93Clapeyron_relation',
+            'ideal_gas': 'Ideal_gas_law',
+            'compressibility': 'Compressibility_factor',
+            'raoults_law': 'Raoult%27s_law',
+            'henrys_law': 'Henry%27s_law',
+            // Mass Transfer
+            'ficks_law': 'Fick%27s_laws_of_diffusion',
+            'mass_transfer_coeff': 'Mass_transfer_coefficient',
+            'sherwood': 'Sherwood_number',
+            'schmidt': 'Schmidt_number',
+            // Reaction Kinetics
+            'arrhenius': 'Arrhenius_equation',
+            'first_order': 'First-order_reaction',
+            'second_order': 'Second-order_reaction',
+            'half_life': 'Half-life',
+            // Distillation
+            'mccabe_thiele': 'McCabe%E2%80%93Thiele_method',
+            'fenske_equation': 'Fenske_equation',
+            'underwood_equation': 'Underwood_equation',
+            'relative_volatility': 'Relative_volatility',
+            // Safety
+            'relief_valve': 'Relief_valve',
+            'fire_case': 'Process_safety#Fire_scenarios',
+            'tnteq': 'TNT_equivalent',
+            // Economics
+            'npv': 'Net_present_value',
+            'irr': 'Internal_rate_of_return',
+            'payback': 'Payback_period',
+            'cepci': 'Chemical_Engineering_Plant_Cost_Index',
+            // Default fallback
+            'default': null
+        };
+
+        function getWikipediaUrl(equationId, equationName) {
+            if (wikipediaUrls[equationId]) {
+                return `https://en.wikipedia.org/wiki/${wikipediaUrls[equationId]}`;
+            }
+            // Fallback to search if no mapping exists
+            return `https://en.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(equationName + ' chemical engineering')}`;
+        }
+
         // ===== Chemical Engineering Tips =====
         const chemEngTips = [
             { icon: "🧪", text: "The Haber process for ammonia synthesis operates at 400-500°C and 150-300 atm, producing 150 million tons annually worldwide." },
@@ -2268,7 +2342,7 @@
                     </svg>
                     Search Google
                 </a>
-                <a href="https://en.wikipedia.org/wiki/${eq.name.replace(/ /g, '_')}" target="_blank" class="reference-link">
+                <a href="${getWikipediaUrl(equationId, eq.name)}" target="_blank" class="reference-link">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/>
                     </svg>
