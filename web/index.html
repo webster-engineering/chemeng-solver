@@ -2308,49 +2308,51 @@
                     <p>Run a calculation to see results</p>
                 </div>
             </div>
+    </div>
 
-            <!-- Tips Carousel -->
-            <div class="tips-carousel" id="tipsCarousel">
-                <div class="tip-label">💡 ChemE Fact</div>
-                <div class="tip active">
-                    <div class="tip-text">The Haber process for ammonia synthesis operates at 400-500°C and 150-300 atm,
-                        producing 150 million tons annually.</div>
-                </div>
-                <div class="tip">
-                    <div class="tip-text">A typical oil refinery can process up to 600,000 barrels of crude oil per day
-                        into gasoline, diesel, and jet fuel.</div>
-                </div>
-                <div class="tip">
-                    <div class="tip-text">The Reynolds number (Re > 4000) determines turbulent flow - discovered by
-                        Osborne Reynolds in 1883.</div>
-                </div>
-                <div class="tip">
-                    <div class="tip-text">Water has an unusually high heat capacity (4.18 kJ/kg·K), making it excellent
-                        for industrial cooling.</div>
-                </div>
-                <div class="tip">
-                    <div class="tip-text">Distillation accounts for ~40% of all energy used in chemical processing. Heat
-                        integration can cut this in half.</div>
-                </div>
-                <div class="tip">
-                    <div class="tip-text">The Navier-Stokes equations governing fluid flow remain one of the Millennium
-                        Prize Problems in mathematics.</div>
-                </div>
-                <div class="tip">
-                    <div class="tip-text">Bioreactors can produce 200+ grams of monoclonal antibodies per liter - up
-                        from milligrams in the 1980s.</div>
-                </div>
-            </div>
-            <div id="chartSection" style="display:none; margin-top: 20px;">
-                <h4 style="font-size: 0.9rem; color: var(--accent); margin-bottom: 10px;">Sensitivity Analysis</h4>
-                <canvas id="sensitivityChart" style="max-height: 250px;"></canvas>
-            </div>
-            <div id="chartActions" style="display:none; margin-top: 15px;">
-                <button class="calculate-btn" style="padding: 10px; font-size: 0.85rem;" onclick="runSensitivity()">
-                    📊 Run Sensitivity Analysis
-                </button>
-            </div>
-        </aside>
+    <div id="chartSection" style="display:none; margin-top: 20px;">
+        <h4 style="font-size: 0.9rem; color: var(--accent); margin-bottom: 10px;">Sensitivity Analysis</h4>
+        <canvas id="sensitivityChart" style="max-height: 250px;"></canvas>
+    </div>
+    <div id="chartActions" style="display:none; margin-top: 15px;">
+        <button class="calculate-btn" style="padding: 10px; font-size: 0.85rem;" onclick="runSensitivity()">
+            📊 Run Sensitivity Analysis
+        </button>
+    </div>
+    </aside>
+    </div>
+
+    <!-- ChemE Fact - Fixed to viewport bottom right -->
+    <div class="tips-carousel" id="tipsCarousel">
+        <div class="tip-label">💡 ChemE Fact</div>
+        <div class="tip active">
+            <div class="tip-text">The Haber process for ammonia synthesis operates at 400-500°C and 150-300 atm,
+                producing 150 million tons annually.</div>
+        </div>
+        <div class="tip">
+            <div class="tip-text">A typical oil refinery can process up to 600,000 barrels of crude oil per day
+                into gasoline, diesel, and jet fuel.</div>
+        </div>
+        <div class="tip">
+            <div class="tip-text">The Reynolds number (Re > 4000) determines turbulent flow - discovered by
+                Osborne Reynolds in 1883.</div>
+        </div>
+        <div class="tip">
+            <div class="tip-text">Water has an unusually high heat capacity (4.18 kJ/kg·K), making it excellent
+                for industrial cooling.</div>
+        </div>
+        <div class="tip">
+            <div class="tip-text">Distillation accounts for ~40% of all energy used in chemical processing. Heat
+                integration can cut this in half.</div>
+        </div>
+        <div class="tip">
+            <div class="tip-text">The Navier-Stokes equations governing fluid flow remain one of the Millennium
+                Prize Problems in mathematics.</div>
+        </div>
+        <div class="tip">
+            <div class="tip-text">Bioreactors can produce 200+ grams of monoclonal antibodies per liter - up
+                from milligrams in the 1980s.</div>
+        </div>
     </div>
 
     <script>
