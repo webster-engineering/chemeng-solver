@@ -253,9 +253,29 @@
             margin-top: 4px;
         }
 
+        .category.expanded {
+            background: rgba(91, 110, 174, 0.08);
+            border-radius: 12px;
+            margin-bottom: 8px;
+        }
+
+        .category.expanded .category-header {
+            color: var(--accent-light);
+            background: rgba(91, 110, 174, 0.15);
+            border-left: 3px solid var(--accent);
+        }
+
+        .category.expanded .category-count {
+            background: var(--accent-light);
+            box-shadow: 0 0 8px var(--accent-glow);
+        }
+
         .category.expanded .equation-list {
             display: block;
             animation: slideDown 0.3s ease-out;
+            padding: 8px 0 8px 12px;
+            border-left: 1px solid rgba(91, 110, 174, 0.2);
+            margin-left: 14px;
         }
 
         @keyframes slideDown {
@@ -3846,9 +3866,12 @@
             currentCategory = category;
             currentEquation = equationId;
 
+            // Switch to equations tab if not already there
+            switchTab('equations');
+
             // Update active state
             document.querySelectorAll('.equation-item').forEach(el => el.classList.remove('active'));
-            event.target.classList.add('active');
+            if (event && event.target) event.target.classList.add('active');
 
             // Fetch equation details
             const response = await fetch(`${API_BASE}/api/equations/${category}/${equationId}`);
@@ -4713,35 +4736,29 @@
 
         // ===== Tab Switching =====
         function switchTab(tabName) {
-            // Update tab buttons
-            document.querySelectorAll('.main-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            // Find the button that matches by checking its onclick attribute or text
-            document.querySelectorAll('.main-tab').forEach(tab => {
-                if (tab.textContent.toLowerCase().includes(tabName.substring(0, 4))) {
-                    tab.classList.add('active');
-                }
-            });
-
             // Hide all tab contents
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.remove('active');
             });
 
-            // Show selected tab
+            // Map all tab names to their element IDs
             const tabIds = {
                 'equations': 'equationsTab',
                 'scientific': 'scientificTab',
                 'steam': 'steamTab',
-                'fluids': 'fluidsTab'
+                'fluids': 'fluidsTab',
+                'converter': 'converterTab',
+                'chemicals': 'chemicalsTab',
+                'graphing': 'graphingTab'
             };
+
             const tabEl = document.getElementById(tabIds[tabName]);
             if (tabEl) tabEl.classList.add('active');
 
             // Initialize tab content if needed
             if (tabName === 'steam') updateSteamTable();
             if (tabName === 'fluids') filterFluids();
+            if (tabName === 'chemicals') populateChemicalsTable();
         }
 
         // ===== Scientific Calculator =====
