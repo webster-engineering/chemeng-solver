@@ -9,6 +9,205 @@ import pint
 
 from .base import BaseEquation, EquationParameter, ParameterType
 from core.units import ureg
+from core.learning import (
+    LearningContent, QuizQuestion, QuestionType, Difficulty,
+    WorkedExample, CalculationStep
+)
+
+
+# ===============================
+# IDEAL GAS LEARNING CONTENT
+# ===============================
+IDEAL_GAS_LEARNING = LearningContent(
+    background_theory="""
+The Ideal Gas Law (PV = nRT) is one of the most fundamental equations in thermodynamics 
+and chemical engineering. It relates four key properties of a gas:
+
+**The Equation:** PV = nRT
+
+Where:
+- **P** = Absolute pressure (not gauge!)
+- **V** = Volume occupied by the gas
+- **n** = Amount of substance (moles)
+- **R** = Universal gas constant (8.314 J/mol·K)
+- **T** = Absolute temperature (must be Kelvin or Rankine!)
+
+**Key Assumptions:**
+1. Gas molecules have negligible volume compared to the container
+2. No intermolecular forces between molecules
+3. Collisions are perfectly elastic
+4. Random molecular motion
+
+The ideal gas law works best at **low pressures** and **high temperatures** where 
+real gases behave most ideally.
+""",
+    key_concepts=[
+        "Absolute vs gauge pressure",
+        "Absolute temperature scales (Kelvin, Rankine)",
+        "Molar quantities and molecular weight",
+        "The universal gas constant R has different values in different unit systems"
+    ],
+    real_world_applications=[
+        "Sizing gas storage tanks and vessels",
+        "Calculating gas flow rates in pipelines", 
+        "HVAC system design and air handling",
+        "Pneumatic system design",
+        "Chemical reactor sizing for gas-phase reactions",
+        "Estimating gas volumes at different conditions"
+    ],
+    industry_examples=[
+        "Compressed air systems in manufacturing plants",
+        "Natural gas processing and transmission",
+        "Pharmaceutical lyophilization (freeze-drying)",
+        "Semiconductor manufacturing clean rooms",
+        "Automotive airbag inflation calculations"
+    ],
+    common_mistakes=[
+        "Using gauge pressure instead of absolute pressure",
+        "Using Celsius or Fahrenheit instead of absolute temperature (K or °R)",
+        "Forgetting to convert mass to moles using molecular weight",
+        "Using inconsistent units for the gas constant R",
+        "Applying to high-pressure systems where real gas effects matter"
+    ],
+    pro_tips=[
+        "Always add atmospheric pressure to gauge readings: P_abs = P_gauge + P_atm",
+        "Convert °C to K by adding 273.15; convert °F to °R by adding 459.67",
+        "At conditions far from ideal (high P, low T), use Van der Waals or other real gas equations",
+        "R = 8.314 J/(mol·K) = 10.73 (psia·ft³)/(lbmol·°R) = 0.08206 (L·atm)/(mol·K)"
+    ],
+    variable_sources={
+        "n": "Calculate from mass and molecular weight: n = mass / MW. Look up MW in chemical tables or material data sheets.",
+        "T": "Measure with thermometer or thermocouple. Process control systems display this. Must convert to absolute scale!",
+        "P": "Read from pressure gauge and ADD atmospheric pressure (~14.7 psia or 101.3 kPa). Check if gauge or absolute.",
+        "V": "For unknowns: this is what you're solving for. For verification: measure tank dimensions or use vessel specs."
+    },
+    quiz_questions=[
+        QuizQuestion(
+            id="ig_q1",
+            question="What type of pressure must be used in the ideal gas law?",
+            question_type=QuestionType.MULTIPLE_CHOICE,
+            options=["Gauge pressure", "Absolute pressure", "Differential pressure", "Vacuum pressure"],
+            correct_answer="Absolute pressure",
+            explanation="The ideal gas law requires absolute pressure. Gauge pressure reads zero at atmospheric conditions, but there's still ~14.7 psi of absolute pressure present. Always use P_abs = P_gauge + P_atm.",
+            difficulty=Difficulty.BEGINNER,
+            hint="Think about what happens at 'zero' gauge pressure - is there really no pressure?",
+            points=10
+        ),
+        QuizQuestion(
+            id="ig_q2", 
+            question="A gas at 25°C needs to be used in the ideal gas law. What temperature should you use?",
+            question_type=QuestionType.NUMERIC,
+            options=[],
+            correct_answer="298.15",
+            explanation="Convert Celsius to Kelvin: K = °C + 273.15 = 25 + 273.15 = 298.15 K. The ideal gas law requires absolute temperature!",
+            difficulty=Difficulty.BEGINNER,
+            hint="Add 273.15 to convert from Celsius to Kelvin",
+            points=10
+        ),
+        QuizQuestion(
+            id="ig_q3",
+            question="If you double the absolute temperature of an ideal gas at constant pressure and moles, what happens to the volume?",
+            question_type=QuestionType.MULTIPLE_CHOICE,
+            options=["Volume doubles", "Volume halves", "Volume stays the same", "Volume quadruples"],
+            correct_answer="Volume doubles",
+            explanation="From PV = nRT, if P and n are constant: V ∝ T. Doubling T doubles V. This is Charles's Law.",
+            difficulty=Difficulty.INTERMEDIATE,
+            hint="Rearrange PV = nRT to solve for V in terms of T",
+            points=15
+        ),
+        QuizQuestion(
+            id="ig_q4",
+            question="The ideal gas law works best under which conditions?",
+            question_type=QuestionType.MULTIPLE_CHOICE,
+            options=["High pressure, low temperature", "Low pressure, high temperature", 
+                     "High pressure, high temperature", "Low pressure, low temperature"],
+            correct_answer="Low pressure, high temperature",
+            explanation="At low pressure, gas molecules are far apart (negligible volume). At high temperature, kinetic energy dominates over intermolecular forces. These conditions match the ideal gas assumptions.",
+            difficulty=Difficulty.INTERMEDIATE,
+            hint="Think about when gas molecules are most spread out and moving fastest",
+            points=15
+        ),
+        QuizQuestion(
+            id="ig_q5",
+            question="What is the value of R in SI units (J/mol·K)?",
+            question_type=QuestionType.NUMERIC,
+            options=[],
+            correct_answer="8.314",
+            explanation="R = 8.314 J/(mol·K) is the universal gas constant. Other common values: 0.08206 L·atm/(mol·K), 10.73 psia·ft³/(lbmol·°R).",
+            difficulty=Difficulty.BEGINNER,
+            hint="This is a fundamental constant worth memorizing",
+            points=10
+        )
+    ],
+    worked_example=WorkedExample(
+        title="Compressed Air Tank Sizing",
+        scenario="A chemical plant needs to store compressed air for pneumatic instruments. The tank will hold 5 kg of air at 25°C and 150 psig. What tank volume is required?",
+        given_values={
+            "mass": "5 kg",
+            "T": "25°C = 298.15 K",
+            "P_gauge": "150 psig",
+            "P_atm": "14.7 psia",
+            "MW_air": "28.97 g/mol"
+        },
+        find=["Tank volume V in cubic feet"],
+        steps=[
+            CalculationStep(
+                step_number=1,
+                title="Convert gauge to absolute pressure",
+                description="The pressure gauge reads 150 psig. We must add atmospheric pressure to get absolute pressure.",
+                formula="P_abs = P_gauge + P_atm",
+                substitution="P_abs = 150 + 14.7",
+                computation="P_abs = 164.7 psia",
+                result="P = 164.7 psia",
+                notes="Always check if pressure is gauge (psig) or absolute (psia)!"
+            ),
+            CalculationStep(
+                step_number=2,
+                title="Calculate moles of air",
+                description="Convert mass to moles using the molecular weight of air.",
+                formula="n = mass / MW",
+                substitution="n = 5000 g / 28.97 g/mol",
+                computation="n = 172.6 mol",
+                result="n = 172.6 mol",
+                notes="Air MW ≈ 29 g/mol (78% N₂ at 28 + 21% O₂ at 32)"
+            ),
+            CalculationStep(
+                step_number=3,
+                title="Verify temperature is absolute",
+                description="Convert Celsius to Kelvin for use in the ideal gas law.",
+                formula="T(K) = T(°C) + 273.15",
+                substitution="T = 25 + 273.15",
+                computation="T = 298.15 K",
+                result="T = 298.15 K",
+                notes="Never use °C or °F directly in gas law equations!"
+            ),
+            CalculationStep(
+                step_number=4,
+                title="Apply the ideal gas law",
+                description="Rearrange PV = nRT to solve for volume V.",
+                formula="V = nRT / P",
+                substitution="V = (172.6 mol)(8.314 J/mol·K)(298.15 K) / (164.7 psia)",
+                computation="Converting: 164.7 psia = 1,135,500 Pa. V = (172.6)(8.314)(298.15) / 1,135,500 = 0.377 m³",
+                result="V = 0.377 m³ = 13.3 ft³",
+                notes="1 m³ = 35.31 ft³"
+            )
+        ],
+        final_answer="V ≈ 13.3 ft³ (0.377 m³)",
+        real_world_context="In practice, you'd specify a standard tank size (e.g., 15 ft³) with some margin for safety and operational flexibility."
+    ),
+    difficulty=Difficulty.BEGINNER,
+    estimated_time_minutes=15,
+    prerequisites=[],
+    related_equations=["van_der_waals", "compressor_work"],
+    diagram_type="gas_tank",
+    diagram_labels={
+        "tank": "Gas Storage Vessel",
+        "pressure_gauge": "Pressure Gauge (P)",
+        "thermometer": "Temperature Sensor (T)",
+        "volume": "Internal Volume (V)",
+        "molecules": "Gas Molecules (n moles)"
+    }
+)
 
 
 class IdealGas(BaseEquation):
@@ -19,6 +218,7 @@ class IdealGas(BaseEquation):
     category = "Thermodynamics"
     description = "Calculate any one unknown from P, V, n, T using PV = nRT"
     reference = "Standard thermodynamics"
+    learning_content = IDEAL_GAS_LEARNING
     
     def get_parameters(self) -> List[EquationParameter]:
         return [
@@ -46,6 +246,8 @@ class IdealGas(BaseEquation):
         v_ft3 = v * 35.3147
         
         return {"V": ureg.Quantity(v_ft3, "ft**3")}
+
+
 
 
 class AntoineVaporPressure(BaseEquation):

@@ -4,9 +4,12 @@ Base equation class that all equations inherit from.
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, List, Any, Optional, Tuple, TYPE_CHECKING
 from enum import Enum
 import pint
+
+if TYPE_CHECKING:
+    from core.learning import LearningContent
 
 from core.units import ureg, get_converter
 from core.validation import Validator, ValidationResult
@@ -75,6 +78,7 @@ class BaseEquation(ABC):
     reference: str = ""
     derivation: str = ""  # Explains how the equation was derived
     examples: List[Dict[str, Any]] = []  # Worked examples with inputs and expected outputs
+    learning_content: Optional["LearningContent"] = None  # Learning mode content
     
     def __init__(self):
         self.converter = get_converter()

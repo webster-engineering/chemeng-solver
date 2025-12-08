@@ -7,6 +7,7 @@
     <title>Webster Engineering Equation Solver</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         :root {
             /* Midnight Blue High-Contrast Theme (WCAG AAA) */
@@ -2605,12 +2606,934 @@
                 display: none;
             }
         }
+
+        /* ================================
+           LEARNING MODE STYLES
+           ================================ */
+
+        /* Learning Mode Toggle */
+        .learning-toggle {
+            position: fixed;
+            top: 20px;
+            right: 70px;
+            z-index: 1000;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 25px;
+            padding: 8px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .learning-toggle:hover {
+            background: rgba(88, 166, 255, 0.1);
+            border-color: var(--accent);
+        }
+
+        .learning-toggle.active {
+            background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+            border-color: transparent;
+            color: white;
+        }
+
+        .learning-toggle .toggle-icon {
+            font-size: 1.1rem;
+        }
+
+        /* Learning Badge on Equation Items */
+        .equation-item .learning-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #10b981, #34d399);
+            color: white;
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+
+        /* Difficulty Badges */
+        .difficulty-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 12px;
+            margin-left: 8px;
+        }
+
+        .difficulty-badge.beginner {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+        }
+
+        .difficulty-badge.intermediate {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+        }
+
+        .difficulty-badge.advanced {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        /* Learning Panel - replaces input section when active */
+        .learning-panel {
+            display: none;
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+            animation: cardSlideIn 0.5s ease-out;
+        }
+
+        .learning-panel.active {
+            display: block;
+        }
+
+        /* Progress Stepper */
+        .learning-stepper {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .learning-stepper::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 40px;
+            right: 40px;
+            height: 2px;
+            background: var(--border);
+        }
+
+        .stepper-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stepper-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .stepper-step.active .stepper-circle {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .stepper-step.completed .stepper-circle {
+            background: #10b981;
+            border-color: #10b981;
+            color: white;
+        }
+
+        .stepper-label {
+            margin-top: 8px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 80px;
+        }
+
+        .stepper-step.active .stepper-label {
+            color: var(--accent-light);
+            font-weight: 600;
+        }
+
+        /* Learning Step Content */
+        .learning-step-content {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .learning-step-content.active {
+            display: block;
+        }
+
+        .step-header {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step-header .step-icon {
+            font-size: 1.5rem;
+        }
+
+        /* Theory Section */
+        .theory-content {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+
+        .theory-content strong {
+            color: var(--accent-light);
+        }
+
+        .key-concepts {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .concept-tag {
+            background: rgba(88, 166, 255, 0.1);
+            border: 1px solid rgba(88, 166, 255, 0.3);
+            color: var(--accent-light);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        /* Application Cards */
+        .applications-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .application-card {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+
+        .application-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        /* Variable Source Cards */
+        .variable-sources {
+            display: grid;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .variable-card {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 15px;
+            display: grid;
+            grid-template-columns: 60px 1fr;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .variable-symbol {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-light);
+            text-align: center;
+            background: rgba(88, 166, 255, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .variable-info h4 {
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            font-size: 0.95rem;
+        }
+
+        .variable-info p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        /* Quiz Section */
+        .quiz-container {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .quiz-question {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .quiz-options {
+            display: grid;
+            gap: 10px;
+        }
+
+        .quiz-option {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 18px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .quiz-option:hover {
+            border-color: var(--accent);
+            background: rgba(88, 166, 255, 0.05);
+        }
+
+        .quiz-option.selected {
+            border-color: var(--accent);
+            background: rgba(88, 166, 255, 0.15);
+        }
+
+        .quiz-option.correct {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.15);
+        }
+
+        .quiz-option.incorrect {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.15);
+        }
+
+        .quiz-feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .quiz-feedback.show {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .quiz-feedback.correct {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #10b981;
+        }
+
+        .quiz-feedback.incorrect {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+
+        .quiz-hint-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            margin-top: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .quiz-hint-btn:hover {
+            border-color: var(--warning);
+            color: var(--warning);
+        }
+
+        .quiz-hint {
+            margin-top: 12px;
+            padding: 12px;
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 8px;
+            color: var(--warning);
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .quiz-hint.show {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* Progress indicator */
+        .quiz-progress {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .quiz-progress-bar {
+            flex: 1;
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .quiz-progress-fill {
+            height: 100%;
+            background: var(--gradient-1);
+            transition: width 0.3s ease;
+        }
+
+        /* Navigation Buttons */
+        .learning-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .learning-nav-btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .learning-nav-btn.prev {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        .learning-nav-btn.prev:hover {
+            border-color: var(--text-primary);
+            color: var(--text-primary);
+        }
+
+        .learning-nav-btn.next {
+            background: var(--gradient-1);
+            border: none;
+            color: white;
+        }
+
+        .learning-nav-btn.next:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+
+        .learning-nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Explain Button */
+        .explain-btn {
+            background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+            border: none;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .explain-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+
+        /* Explanation Panel */
+        .explanation-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .explanation-panel.show {
+            display: block;
+            animation: cardSlideIn 0.4s ease-out;
+        }
+
+        .explanation-step {
+            padding: 15px;
+            border-left: 3px solid var(--accent);
+            margin-bottom: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .explanation-step h4 {
+            color: var(--accent-light);
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .explanation-step p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .explanation-step .formula {
+            font-family: 'Courier New', monospace;
+            background: rgba(88, 166, 255, 0.1);
+            padding: 8px 12px;
+            border-radius: 6px;
+            color: var(--accent-light);
+            display: inline-block;
+        }
+
+        /* Gamification Elements */
+        .xp-display {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 0.8rem;
+            color: var(--warning);
+            display: none;
+            z-index: 999;
+        }
+
+        .xp-display.show {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .streak-badge {
+            background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* XP Popup Animation */
+        .xp-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+            color: white;
+            padding: 20px 40px;
+            border-radius: 16px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            z-index: 10000;
+            display: none;
+            animation: xpPopup 1s ease-out forwards;
+        }
+
+        @keyframes xpPopup {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+
+            20% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+
+            40% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -70%) scale(1);
+            }
+        }
+
+        /* Common Mistakes Warning Box */
+        .mistakes-box {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .mistakes-box h4 {
+            color: #ef4444;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mistakes-box ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .mistakes-box li {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            padding: 6px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .mistakes-box li::before {
+            content: '⚠';
+            position: absolute;
+            left: 0;
+            color: #ef4444;
+        }
+
+        /* Pro Tips Box */
+        .tips-box {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .tips-box h4 {
+            color: #10b981;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tips-box li {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            padding: 6px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .tips-box li::before {
+            content: '💡';
+            position: absolute;
+            left: 0;
+        }
+
+        /* Interactive Diagram Container */
+        .diagram-container {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .diagram-container svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .diagram-label {
+            fill: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        .diagram-value {
+            fill: var(--accent-light);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Category Progress */
+        .category-progress {
+            margin-top: 6px;
+            height: 3px;
+            background: var(--border);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .category-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #34d399);
+            transition: width 0.3s ease;
+        }
+
+        /* Completed Equation Item */
+        .equation-item.completed {
+            position: relative;
+        }
+
+        .equation-item.completed::after {
+            content: '✓';
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #10b981;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        /* Interactive Gas Tank Diagram */
+        .diagram-svg {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .diagram-element {
+            transition: all 0.3s ease;
+        }
+
+        .diagram-element:hover {
+            filter: brightness(1.2);
+            cursor: pointer;
+        }
+
+        .diagram-tooltip {
+            position: absolute;
+            background: var(--bg-card);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            z-index: 1000;
+            max-width: 250px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            pointer-events: none;
+            display: none;
+        }
+
+        .diagram-tooltip.show {
+            display: block;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        /* Hint Button */
+        .hint-btn {
+            background: transparent;
+            border: 1px dashed var(--warning);
+            color: var(--warning);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .hint-btn:hover {
+            background: rgba(245, 158, 11, 0.1);
+            border-style: solid;
+        }
+
+        .hint-content {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-top: 10px;
+            color: var(--warning);
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .hint-content.show {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .hint-content.level-2 {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: rgba(139, 92, 246, 0.3);
+            color: #a78bfa;
+        }
+
+        .hint-content.level-3 {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+
+        /* Unit Practice Mode */
+        .practice-panel {
+            padding: 30px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .practice-problem {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .practice-question {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: 30px;
+        }
+
+        .practice-question .from-value {
+            color: var(--accent-light);
+            font-weight: 700;
+        }
+
+        .practice-question .to-unit {
+            color: var(--warning);
+            font-weight: 600;
+        }
+
+        .practice-input-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .practice-input {
+            width: 200px;
+            padding: 15px;
+            font-size: 1.3rem;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            text-align: center;
+        }
+
+        .practice-input:focus {
+            border-color: var(--accent);
+            outline: none;
+        }
+
+        .practice-result-unit {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+        }
+
+        .practice-stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .practice-stat {
+            text-align: center;
+        }
+
+        .practice-stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-light);
+        }
+
+        .practice-stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .practice-feedback {
+            margin-top: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            display: none;
+        }
+
+        .practice-feedback.show {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .practice-feedback.correct {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid #10b981;
+            color: #10b981;
+        }
+
+        .practice-feedback.incorrect {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+        }
     </style>
 </head>
 
 <body>
     <!-- Theme Toggle -->
     <button class="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode">🌙</button>
+
+    <!-- Learning Mode Toggle -->
+    <button class="learning-toggle" id="learningToggle" onclick="toggleLearningMode()" title="Toggle Learning Mode">
+        <span class="toggle-icon">🎓</span>
+        <span class="toggle-text">Learning Mode</span>
+    </button>
+
+    <!-- XP Display (shown when learning mode active) -->
+    <div class="xp-display" id="xpDisplay">
+        ⭐ <span id="totalXp">0</span> XP
+        <span class="streak-badge" id="streakBadge" style="display: none;">🔥 <span id="streakCount">0</span></span>
+    </div>
+
+    <!-- XP Popup (animated) -->
+    <div class="xp-popup" id="xpPopup">+50 XP</div>
 
     <!-- Copy Toast -->
     <div class="copy-toast" id="copyToast">✓ Copied to clipboard!</div>
@@ -2789,6 +3712,17 @@
                                 <circle cx="7" cy="8" r="1.5" />
                             </svg>
                             Chemical Database
+                        </button>
+                    </div>
+                    <div style="display: flex; gap: 15px; justify-content: center; margin-top: 15px;">
+                        <button onclick="switchTab('practice'); initPracticeMode();" class="tool-card"
+                            style="cursor: pointer; background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(52, 211, 153, 0.1)); border-color: #10b981;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10b981"
+                                stroke-width="2">
+                                <path d="M9 11l3 3L22 4" />
+                                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                            </svg>
+                            <span style="color: #10b981;">Unit Practice</span>
                         </button>
                     </div>
                 </div>
@@ -3424,6 +4358,25 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Unit Practice Tab -->
+            <div id="practiceTab" class="tab-content">
+                <div class="practice-panel">
+                    <h2
+                        style="color: var(--accent-light); margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                        <span>🎯</span> Unit Conversion Practice
+                    </h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 30px;">
+                        Test your unit conversion skills! Practice common engineering unit conversions with instant
+                        feedback.
+                    </p>
+                    <div id="practiceContent">
+                        <div class="empty-state">
+                            <p>Loading practice problems...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </main>
 
         <!-- Results Panel -->
@@ -3888,28 +4841,73 @@
 
 
         // Load categories on page load
+        let equationsWithLearning = new Set();
+        let learningDifficulties = {};
+
         async function loadCategories() {
+            // Fetch categories
             const response = await fetch(`${API_BASE}/api/categories`);
             const categories = await response.json();
 
+            // Fetch equations with learning content
+            try {
+                const learningResponse = await fetch(`${API_BASE}/api/learning/equations-with-content`);
+                const learningEquations = await learningResponse.json();
+                equationsWithLearning = new Set(learningEquations.map(e => e.id));
+                learningEquations.forEach(e => {
+                    learningDifficulties[e.id] = e.difficulty;
+                });
+            } catch (e) {
+                console.log('Learning content API not available');
+            }
+
+            // Get learning progress for category completion indicators
+            const progress = getLearningProgress ? getLearningProgress() : { completed: [] };
+            const completedSet = new Set(progress.completed || []);
+
             const container = document.getElementById('categoryList');
-            container.innerHTML = categories.map((cat, index) => `
-                <div class="category ${index === 0 ? 'expanded' : ''}" data-category="${cat.name.toLowerCase().replace(/ /g, '_')}">
+            container.innerHTML = categories.map((cat, index) => {
+                const catId = cat.name.toLowerCase().replace(/ /g, '_');
+
+                // Calculate category learning progress
+                const catEquations = cat.equations.map(eq => eq.id);
+                const completedInCat = catEquations.filter(id => completedSet.has(id)).length;
+                const withLearningInCat = catEquations.filter(id => equationsWithLearning.has(id)).length;
+                const progressPct = withLearningInCat > 0 ? (completedInCat / withLearningInCat) * 100 : 0;
+
+                return `
+                <div class="category ${index === 0 ? 'expanded' : ''}" data-category="${catId}">
                     <div class="category-header" onclick="toggleCategory(this)">
                         ${cat.name}
                         <span class="category-count">${cat.equation_count}</span>
                     </div>
+                    ${withLearningInCat > 0 ? `
+                        <div class="category-progress">
+                            <div class="category-progress-fill" style="width: ${progressPct}%"></div>
+                        </div>
+                    ` : ''}
                     <div class="equations">
-                        ${cat.equations.map(eq => `
-                            <div class="equation-item" 
-                                 onclick="selectEquation('${cat.name.toLowerCase().replace(/ /g, '_')}', '${eq.id}')"
-                                 onmouseenter="showEquationPreview(this, '${cat.name.toLowerCase().replace(/ /g, '_')}', '${eq.id}')">
+                        ${cat.equations.map(eq => {
+                    const hasLearning = equationsWithLearning.has(eq.id);
+                    const difficulty = learningDifficulties[eq.id];
+                    const difficultyBadge = hasLearning && difficulty ?
+                        `<span class="difficulty-badge ${difficulty}">${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}</span>` : '';
+                    const learningBadge = hasLearning ?
+                        '<span class="learning-badge">📚 Learn</span>' : '';
+
+                    return `
+                            <div class="equation-item ${completedSet.has(eq.id) ? 'completed' : ''}" 
+                                 data-equation-id="${eq.id}"
+                                 onclick="selectEquation('${catId}', '${eq.id}')"
+                                 onmouseenter="showEquationPreview(this, '${catId}', '${eq.id}')">
                                 ${eq.name}
+                                ${learningBadge}
+                                ${difficultyBadge}
                             </div>
-                        `).join('')}
+                        `}).join('')}
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
         }
 
         function toggleCategory(header) {
@@ -6434,6 +7432,1172 @@
                     if (input) {
                         input.value = value;
                     }
+                }
+            }
+        }
+
+        // ================================
+        // LEARNING MODE FUNCTIONALITY
+        // ================================
+
+        let learningModeActive = false;
+        let currentLearningContent = null;
+        let currentLearningStep = 0;
+        let quizAnswers = {};
+        let currentQuizIndex = 0;
+
+        // Learning stats stored in localStorage
+        const LEARNING_STORAGE_KEY = 'websterLearningProgress';
+
+        function getLearningProgress() {
+            try {
+                return JSON.parse(localStorage.getItem(LEARNING_STORAGE_KEY)) || {
+                    totalXp: 0,
+                    streak: 0,
+                    lastDate: null,
+                    completed: [],
+                    quizScores: {}
+                };
+            } catch (e) {
+                return { totalXp: 0, streak: 0, lastDate: null, completed: [], quizScores: {} };
+            }
+        }
+
+        function saveLearningProgress(progress) {
+            try {
+                localStorage.setItem(LEARNING_STORAGE_KEY, JSON.stringify(progress));
+            } catch (e) {
+                console.warn('Failed to save learning progress:', e);
+            }
+        }
+
+        function toggleLearningMode() {
+            learningModeActive = !learningModeActive;
+            const toggle = document.getElementById('learningToggle');
+            const xpDisplay = document.getElementById('xpDisplay');
+
+            if (learningModeActive) {
+                toggle.classList.add('active');
+                toggle.querySelector('.toggle-text').textContent = 'Learning ON';
+                xpDisplay.classList.add('show');
+                updateXpDisplay();
+            } else {
+                toggle.classList.remove('active');
+                toggle.querySelector('.toggle-text').textContent = 'Learning Mode';
+                xpDisplay.classList.remove('show');
+            }
+
+            // Refresh current equation view if one is selected
+            if (currentEquation) {
+                selectEquation(currentCategory, currentEquation);
+            }
+        }
+
+        function updateXpDisplay() {
+            const progress = getLearningProgress();
+            document.getElementById('totalXp').textContent = progress.totalXp;
+
+            const streakBadge = document.getElementById('streakBadge');
+            if (progress.streak > 0) {
+                streakBadge.style.display = 'inline-flex';
+                document.getElementById('streakCount').textContent = progress.streak;
+            } else {
+                streakBadge.style.display = 'none';
+            }
+        }
+
+        function showXpPopup(amount) {
+            const popup = document.getElementById('xpPopup');
+            popup.textContent = `+${amount} XP`;
+            popup.style.display = 'block';
+
+            // Update XP
+            const progress = getLearningProgress();
+            progress.totalXp += amount;
+            saveLearningProgress(progress);
+            updateXpDisplay();
+
+            // Hide popup after animation
+            setTimeout(() => {
+                popup.style.display = 'none';
+            }, 1000);
+        }
+
+        async function loadLearningContent(category, equationId) {
+            try {
+                const response = await fetch(`${API_BASE}/api/learning/${category}/${equationId}`);
+                const data = await response.json();
+
+                if (data.available) {
+                    currentLearningContent = data.content;
+                    currentLearningStep = 0;
+                    currentQuizIndex = 0;
+                    quizAnswers = {};
+                    return true;
+                }
+                return false;
+            } catch (e) {
+                console.error('Failed to load learning content:', e);
+                return false;
+            }
+        }
+
+        function renderLearningPanel() {
+            if (!currentLearningContent) return;
+
+            const lc = currentLearningContent;
+            const steps = ['Introduction', 'Variables', 'Input', 'Quiz', 'Solution'];
+
+            let html = `
+                <div class="learning-panel active" id="learningPanel">
+                    <!-- Progress Stepper -->
+                    <div class="learning-stepper">
+                        ${steps.map((step, idx) => `
+                            <div class="stepper-step ${idx === currentLearningStep ? 'active' : ''} ${idx < currentLearningStep ? 'completed' : ''}">
+                                <div class="stepper-circle">${idx < currentLearningStep ? '✓' : idx + 1}</div>
+                                <div class="stepper-label">${step}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <!-- Step 1: Introduction -->
+                    <div class="learning-step-content ${currentLearningStep === 0 ? 'active' : ''}" data-step="0">
+                        <div class="step-header">
+                            <span class="step-icon">📖</span>
+                            Background Theory
+                        </div>
+                        <div class="theory-content">
+                            ${lc.background_theory.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}
+                        </div>
+                        
+                        ${lc.key_concepts && lc.key_concepts.length > 0 ? `
+                            <div class="key-concepts">
+                                ${lc.key_concepts.map(c => `<span class="concept-tag">${c}</span>`).join('')}
+                            </div>
+                        ` : ''}
+                        
+                        ${lc.real_world_applications && lc.real_world_applications.length > 0 ? `
+                            <h4 style="margin-top: 20px; color: var(--text-primary);">Real-World Applications</h4>
+                            <div class="applications-grid">
+                                ${lc.real_world_applications.map(app => `
+                                    <div class="application-card">📍 ${app}</div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <!-- Step 2: Variables -->
+                    <div class="learning-step-content ${currentLearningStep === 1 ? 'active' : ''}" data-step="1">
+                        <div class="step-header">
+                            <span class="step-icon">📐</span>
+                            Understanding the Variables
+                        </div>
+                        
+                        <div class="variable-sources">
+                            ${Object.entries(lc.variable_sources || {}).map(([varName, source]) => `
+                                <div class="variable-card">
+                                    <div class="variable-symbol">${varName}</div>
+                                    <div class="variable-info">
+                                        <h4>${varName}</h4>
+                                        <p>${source}</p>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        
+                        ${lc.common_mistakes && lc.common_mistakes.length > 0 ? `
+                            <div class="mistakes-box">
+                                <h4>⚠️ Common Mistakes to Avoid</h4>
+                                <ul>
+                                    ${lc.common_mistakes.map(m => `<li>${m}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                        
+                        ${lc.pro_tips && lc.pro_tips.length > 0 ? `
+                            <div class="tips-box">
+                                <h4>💡 Pro Tips</h4>
+                                <ul>
+                                    ${lc.pro_tips.map(t => `<li>${t}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <!-- Step 3: Input (uses existing input form) -->
+                    <div class="learning-step-content ${currentLearningStep === 2 ? 'active' : ''}" data-step="2">
+                        <div class="step-header">
+                            <span class="step-icon">✏️</span>
+                            Enter Your Values
+                        </div>
+                        <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                            Apply what you've learned! Enter the values for your calculation.
+                        </p>
+                        <div id="learningInputGrid"></div>
+                    </div>
+                    
+                    <!-- Step 4: Quiz -->
+                    <div class="learning-step-content ${currentLearningStep === 3 ? 'active' : ''}" data-step="3">
+                        <div class="step-header">
+                            <span class="step-icon">❓</span>
+                            Knowledge Check
+                        </div>
+                        <div id="quizContainer"></div>
+                    </div>
+                    
+                    <!-- Step 5: Solution -->
+                    <div class="learning-step-content ${currentLearningStep === 4 ? 'active' : ''}" data-step="4">
+                        <div class="step-header">
+                            <span class="step-icon">🎉</span>
+                            Your Results
+                        </div>
+                        <div id="learningResultsContainer"></div>
+                    </div>
+                    
+                    <!-- Navigation -->
+                    <div class="learning-nav">
+                        <button class="learning-nav-btn prev" onclick="prevLearningStep()" ${currentLearningStep === 0 ? 'disabled' : ''}>
+                            ← Previous
+                        </button>
+                        <button class="learning-nav-btn next" onclick="nextLearningStep()">
+                            ${currentLearningStep === steps.length - 1 ? 'Complete ✓' : 'Next →'}
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            return html;
+        }
+
+        function renderQuiz() {
+            if (!currentLearningContent || !currentLearningContent.quiz_questions) return;
+
+            const questions = currentLearningContent.quiz_questions;
+            if (currentQuizIndex >= questions.length) {
+                // All questions answered, show summary
+                showQuizSummary();
+                return;
+            }
+
+            const q = questions[currentQuizIndex];
+            const container = document.getElementById('quizContainer');
+
+            let html = `
+                <div class="quiz-progress">
+                    Question ${currentQuizIndex + 1} of ${questions.length}
+                    <div class="quiz-progress-bar">
+                        <div class="quiz-progress-fill" style="width: ${((currentQuizIndex) / questions.length) * 100}%"></div>
+                    </div>
+                </div>
+                
+                <div class="quiz-container">
+                    <div class="quiz-question">${q.question}</div>
+                    
+                    <div class="quiz-options" id="quizOptions">
+                        ${q.question_type === 'multiple_choice' ?
+                    q.options.map((opt, idx) => `
+                                <div class="quiz-option" data-answer="${opt}" onclick="selectQuizOption(this, '${opt.replace(/'/g, "\\'")}')">
+                                    ${opt}
+                                </div>
+                            `).join('') : `
+                            <input type="text" class="input-field" id="quizNumericInput" style="max-width: 200px;" placeholder="Enter your answer...">
+                        `}
+                    </div>
+                    
+                    <button class="quiz-hint-btn" onclick="showQuizHint()">💡 Need a hint?</button>
+                    <div class="quiz-hint" id="quizHint">${q.hint || 'Think about the key concepts covered earlier.'}</div>
+                    
+                    <div class="quiz-feedback" id="quizFeedback"></div>
+                    
+                    <button class="calculate-btn" style="margin-top: 20px; max-width: 200px;" onclick="submitQuizAnswer()">
+                        Submit Answer
+                    </button>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function selectQuizOption(element, answer) {
+            document.querySelectorAll('.quiz-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            quizAnswers[currentQuizIndex] = answer;
+        }
+
+        function showQuizHint() {
+            document.getElementById('quizHint').classList.add('show');
+        }
+
+        function submitQuizAnswer() {
+            const questions = currentLearningContent.quiz_questions;
+            const q = questions[currentQuizIndex];
+
+            let userAnswer;
+            if (q.question_type === 'multiple_choice') {
+                userAnswer = quizAnswers[currentQuizIndex];
+            } else {
+                userAnswer = document.getElementById('quizNumericInput')?.value;
+            }
+
+            if (!userAnswer) {
+                alert('Please select or enter an answer');
+                return;
+            }
+
+            // Validate answer (simple client-side check)
+            let isCorrect = false;
+            if (q.question_type === 'numeric') {
+                const userVal = parseFloat(userAnswer);
+                const correctVal = parseFloat(q.correct_answer);
+                isCorrect = Math.abs(userVal - correctVal) / Math.max(Math.abs(correctVal), 0.0001) < 0.01;
+            } else {
+                isCorrect = userAnswer.toLowerCase().trim() === q.correct_answer.toLowerCase().trim();
+            }
+
+            // Show feedback
+            const feedback = document.getElementById('quizFeedback');
+            feedback.className = `quiz-feedback show ${isCorrect ? 'correct' : 'incorrect'}`;
+            feedback.innerHTML = `
+                <strong>${isCorrect ? '✓ Correct!' : '✗ Not quite...'}</strong><br>
+                ${q.explanation}
+            `;
+
+            // Mark options
+            if (q.question_type === 'multiple_choice') {
+                document.querySelectorAll('.quiz-option').forEach(el => {
+                    if (el.dataset.answer === q.correct_answer) {
+                        el.classList.add('correct');
+                    } else if (el.classList.contains('selected') && !isCorrect) {
+                        el.classList.add('incorrect');
+                    }
+                });
+            }
+
+            // Award XP if correct
+            if (isCorrect) {
+                showXpPopup(q.points || 10);
+            }
+
+            // Move to next question after delay
+            setTimeout(() => {
+                currentQuizIndex++;
+                renderQuiz();
+            }, 2000);
+        }
+
+        function showQuizSummary() {
+            const container = document.getElementById('quizContainer');
+            const questions = currentLearningContent.quiz_questions;
+            const totalPoints = questions.reduce((sum, q) => sum + (q.points || 10), 0);
+
+            container.innerHTML = `
+                <div style="text-align: center; padding: 40px;">
+                    <div style="font-size: 4rem; margin-bottom: 20px;">🎓</div>
+                    <h3 style="color: var(--success); margin-bottom: 10px;">Quiz Complete!</h3>
+                    <p style="color: var(--text-secondary);">
+                        You've completed the knowledge check. Click Next to see your calculation results!
+                    </p>
+                </div>
+            `;
+        }
+
+        function nextLearningStep() {
+            const steps = 5;
+
+            if (currentLearningStep === 2) {
+                // Step 3: Copy inputs to learning input grid
+                // Values should already be captured
+            }
+
+            if (currentLearningStep === 3) {
+                // Moving from quiz to results - perform calculation
+                calculateLearningMode();
+            }
+
+            if (currentLearningStep < steps - 1) {
+                currentLearningStep++;
+                updateLearningStepUI();
+
+                if (currentLearningStep === 3) {
+                    renderQuiz();
+                }
+            } else {
+                // Complete!
+                showXpPopup(100);
+                const progress = getLearningProgress();
+                if (!progress.completed.includes(currentEquation)) {
+                    progress.completed.push(currentEquation);
+                }
+                saveLearningProgress(progress);
+            }
+        }
+
+        function prevLearningStep() {
+            if (currentLearningStep > 0) {
+                currentLearningStep--;
+                updateLearningStepUI();
+            }
+        }
+
+        function updateLearningStepUI() {
+            // Update stepper
+            document.querySelectorAll('.stepper-step').forEach((step, idx) => {
+                step.classList.remove('active', 'completed');
+                if (idx === currentLearningStep) step.classList.add('active');
+                if (idx < currentLearningStep) step.classList.add('completed');
+            });
+
+            // Update content visibility
+            document.querySelectorAll('.learning-step-content').forEach((content, idx) => {
+                content.classList.toggle('active', idx === currentLearningStep);
+            });
+
+            // Update nav buttons
+            document.querySelector('.learning-nav-btn.prev').disabled = currentLearningStep === 0;
+            document.querySelector('.learning-nav-btn.next').textContent =
+                currentLearningStep === 4 ? 'Complete ✓' : 'Next →';
+        }
+
+        async function calculateLearningMode() {
+            // Gather inputs from the regular input form
+            const inputs = {};
+            for (const param of equationParams) {
+                const valueEl = document.getElementById(`input_${param.name}`);
+                const unitEl = document.getElementById(`unit_${param.name}`);
+                const value = parseFloat(valueEl?.value);
+
+                if (!isNaN(value)) {
+                    inputs[param.name] = {
+                        value: value,
+                        unit: unitEl?.value || ''
+                    };
+                }
+            }
+
+            try {
+                // Get both calculation and explanation
+                const calcResponse = await fetch(`${API_BASE}/api/calculate/${currentCategory}/${currentEquation}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ inputs })
+                });
+                const calcResult = await calcResponse.json();
+
+                const explainResponse = await fetch(`${API_BASE}/api/learning/${currentCategory}/${currentEquation}/explain`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ inputs })
+                });
+                const explainResult = await explainResponse.json();
+
+                renderLearningResults(calcResult, explainResult);
+            } catch (e) {
+                console.error('Learning mode calculation failed:', e);
+                document.getElementById('learningResultsContainer').innerHTML = `
+                    <div class="validation-badge fail">❌ Error</div>
+                    <p>Calculation failed. Please check your inputs.</p>
+                `;
+            }
+        }
+
+        function renderLearningResults(calcResult, explainResult) {
+            const container = document.getElementById('learningResultsContainer');
+
+            if (!calcResult.success) {
+                container.innerHTML = `
+                    <div class="validation-badge fail">❌ Error</div>
+                    <p>${calcResult.error || 'Calculation failed'}</p>
+                `;
+                return;
+            }
+
+            let html = `
+                <div class="validation-badge pass">✓ Calculation Complete</div>
+                
+                <h4 style="color: var(--text-primary); margin: 20px 0 10px;">Results:</h4>
+            `;
+
+            // Output values
+            for (const [name, data] of Object.entries(calcResult.outputs)) {
+                const value = typeof data.value === 'number' ?
+                    data.value.toFixed(4) : data.value;
+                html += `
+                    <div class="result-card">
+                        <div class="result-name">${name}</div>
+                        <div class="result-value">
+                            ${value}
+                            <span class="result-unit">${data.unit || ''}</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Explanation steps
+            if (explainResult.success && explainResult.steps) {
+                html += `
+                    <h4 style="color: var(--text-primary); margin: 30px 0 10px;">Step-by-Step Explanation:</h4>
+                    <div class="explanation-panel show">
+                        ${explainResult.steps.map(step => `
+                            <div class="explanation-step">
+                                <h4>Step ${step.step_number}: ${step.title}</h4>
+                                <p>${step.description}</p>
+                                ${step.content && step.content.length > 0 ? `
+                                    <ul style="margin-top: 10px; padding-left: 20px;">
+                                        ${step.content.map(c => `<li style="color: var(--text-secondary); font-size: 0.9rem;">${c}</li>`).join('')}
+                                    </ul>
+                                ` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        // Modify selectEquation to handle learning mode
+        const originalSelectEquation = selectEquation;
+        selectEquation = async function (category, equationId) {
+            await originalSelectEquation(category, equationId);
+
+            if (learningModeActive) {
+                const hasContent = await loadLearningContent(category, equationId);
+
+                if (hasContent) {
+                    // Hide regular input section, show learning panel
+                    const inputSection = document.querySelector('.input-section');
+                    if (inputSection) {
+                        inputSection.insertAdjacentHTML('beforebegin', renderLearningPanel());
+                        inputSection.style.display = 'none';
+                    }
+
+                    // Copy input form to learning step 3
+                    const learningInputGrid = document.getElementById('learningInputGrid');
+                    if (learningInputGrid) {
+                        learningInputGrid.innerHTML = document.getElementById('inputGrid').outerHTML;
+                    }
+                } else {
+                    // No learning content - show message
+                    const inputSection = document.querySelector('.input-section');
+                    if (inputSection) {
+                        inputSection.insertAdjacentHTML('beforebegin', `
+                            <div class="learning-panel active" style="text-align: center; padding: 40px;">
+                                <div style="font-size: 3rem; margin-bottom: 15px;">🚧</div>
+                                <h3 style="color: var(--text-secondary);">Learning content coming soon!</h3>
+                                <p style="color: var(--text-muted);">This equation doesn't have learning content yet. Use the regular calculator below.</p>
+                            </div>
+                        `);
+                    }
+                }
+            }
+        };
+
+        // Explain button for non-learning mode
+        async function explainResult() {
+            if (!currentEquation || !lastCalculationResult) {
+                alert('Please perform a calculation first.');
+                return;
+            }
+
+            // Gather inputs
+            const inputs = {};
+            for (const param of equationParams) {
+                const valueEl = document.getElementById(`input_${param.name}`);
+                const unitEl = document.getElementById(`unit_${param.name}`);
+                const value = parseFloat(valueEl?.value);
+                if (!isNaN(value)) {
+                    inputs[param.name] = { value, unit: unitEl?.value || '' };
+                }
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/learning/${currentCategory}/${currentEquation}/explain`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ inputs })
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    let panelEl = document.getElementById('explanationPanel');
+                    if (!panelEl) {
+                        const container = document.getElementById('resultsContent');
+                        container.insertAdjacentHTML('beforeend', '<div class="explanation-panel" id="explanationPanel"></div>');
+                        panelEl = document.getElementById('explanationPanel');
+                    }
+
+                    panelEl.innerHTML = result.steps.map(step => `
+                        <div class="explanation-step">
+                            <h4>Step ${step.step_number}: ${step.title}</h4>
+                            <p>${step.description}</p>
+                            ${step.content && step.content.length > 0 ? `
+                                <ul style="margin-top: 10px; padding-left: 20px;">
+                                    ${step.content.map(c => `<li style="color: var(--text-secondary); font-size: 0.9rem;">${c}</li>`).join('')}
+                                </ul>
+                            ` : ''}
+                        </div>
+                    `).join('');
+
+                    panelEl.classList.add('show');
+                }
+            } catch (e) {
+                console.error('Failed to get explanation:', e);
+            }
+        }
+
+        // Initialize learning mode on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateXpDisplay();
+        });
+
+        // ================================
+        // INTERACTIVE DIAGRAM GENERATOR
+        // ================================
+
+        const DIAGRAM_GENERATORS = {
+            gas_tank: generateGasTankDiagram,
+            heat_exchanger: generateHeatExchangerDiagram
+        };
+
+        function generateGasTankDiagram(values = {}) {
+            const P = values.P || '?';
+            const V = values.V || '?';
+            const T = values.T || '?';
+            const n = values.n || '?';
+
+            return `
+                <svg class="diagram-svg" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="tankGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#1e3a5f"/>
+                            <stop offset="50%" style="stop-color:#2d5a87"/>
+                            <stop offset="100%" style="stop-color:#1e3a5f"/>
+                        </linearGradient>
+                        <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:#3b82f6"/>
+                            <stop offset="100%" style="stop-color:#1d4ed8"/>
+                        </linearGradient>
+                    </defs>
+                    
+                    <!-- Tank Body -->
+                    <g class="diagram-element" data-tooltip="Gas Storage Vessel - Volume V">
+                        <rect x="80" y="60" width="180" height="180" rx="20" fill="url(#tankGrad)" stroke="#58a6ff" stroke-width="2"/>
+                        <ellipse cx="170" cy="60" rx="90" ry="20" fill="#2d5a87" stroke="#58a6ff" stroke-width="2"/>
+                        <ellipse cx="170" cy="240" rx="90" ry="20" fill="#1e3a5f" stroke="#58a6ff" stroke-width="2"/>
+                    </g>
+                    
+                    <!-- Gas Molecules -->
+                    <g fill="#79c0ff" opacity="0.6">
+                        <circle cx="120" cy="100" r="4"><animate attributeName="cy" values="100;110;100" dur="2s" repeatCount="indefinite"/></circle>
+                        <circle cx="180" cy="130" r="5"><animate attributeName="cx" values="180;190;180" dur="1.5s" repeatCount="indefinite"/></circle>
+                        <circle cx="150" cy="170" r="4"><animate attributeName="cy" values="170;160;170" dur="1.8s" repeatCount="indefinite"/></circle>
+                        <circle cx="200" cy="150" r="3"><animate attributeName="cx" values="200;195;200" dur="2.2s" repeatCount="indefinite"/></circle>
+                        <circle cx="130" cy="200" r="5"><animate attributeName="cy" values="200;195;200" dur="1.6s" repeatCount="indefinite"/></circle>
+                    </g>
+                    
+                    <!-- Pressure Gauge -->
+                    <g class="diagram-element" data-tooltip="Pressure Gauge - Absolute pressure P" transform="translate(280, 80)">
+                        <circle cx="30" cy="30" r="28" fill="url(#gaugeGrad)" stroke="#58a6ff" stroke-width="2"/>
+                        <circle cx="30" cy="30" r="20" fill="#0d1117"/>
+                        <text x="30" y="35" text-anchor="middle" fill="#58a6ff" font-size="12" font-weight="bold">P</text>
+                        <line x1="30" y1="30" x2="30" y2="15" stroke="#ef4444" stroke-width="2"/>
+                    </g>
+                    
+                    <!-- Thermometer -->
+                    <g class="diagram-element" data-tooltip="Temperature Sensor - Absolute temperature T" transform="translate(320, 160)">
+                        <rect x="15" y="0" width="10" height="60" rx="5" fill="#1e3a5f" stroke="#58a6ff"/>
+                        <circle cx="20" cy="70" r="12" fill="#ef4444"/>
+                        <rect x="17" y="30" width="6" height="35" fill="#ef4444"/>
+                        <text x="20" y="95" text-anchor="middle" fill="#8b949e" font-size="10">T</text>
+                    </g>
+                    
+                    <!-- Labels -->
+                    <g fill="#f0f6fc" font-size="14" font-weight="500">
+                        <text x="170" y="155" text-anchor="middle">n = ${n}</text>
+                        <text x="310" y="75" text-anchor="start">P = ${P}</text>
+                        <text x="355" y="185" text-anchor="start">T = ${T}</text>
+                        <text x="170" y="275" text-anchor="middle" fill="#8b949e">V = ${V}</text>
+                    </g>
+                    
+                    <!-- Equation -->
+                    <text x="200" y="25" text-anchor="middle" fill="#58a6ff" font-size="16" font-weight="600">PV = nRT</text>
+                </svg>
+                <div class="diagram-tooltip" id="diagramTooltip"></div>
+            `;
+        }
+
+        function generateHeatExchangerDiagram(values = {}) {
+            return `
+                <svg class="diagram-svg" viewBox="0 0 400 250" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="hotFlow" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#ef4444"/>
+                            <stop offset="100%" style="stop-color:#f97316"/>
+                        </linearGradient>
+                        <linearGradient id="coldFlow" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#3b82f6"/>
+                            <stop offset="100%" style="stop-color:#06b6d4"/>
+                        </linearGradient>
+                    </defs>
+                    
+                    <!-- Shell -->
+                    <rect x="50" y="50" width="300" height="100" rx="10" fill="#1e3a5f" stroke="#58a6ff" stroke-width="2"/>
+                    
+                    <!-- Tubes -->
+                    <g stroke="#8b949e" stroke-width="1" fill="none">
+                        <path d="M60 70 H340"/>
+                        <path d="M60 90 H340"/>
+                        <path d="M60 110 H340"/>
+                        <path d="M60 130 H340"/>
+                    </g>
+                    
+                    <!-- Hot Fluid Arrows -->
+                    <g fill="url(#hotFlow)">
+                        <polygon points="30,100 50,85 50,115" />
+                        <polygon points="370,100 350,85 350,115" />
+                    </g>
+                    
+                    <!-- Cold Fluid -->
+                    <rect x="50" y="160" width="300" height="30" rx="5" fill="url(#coldFlow)" opacity="0.5"/>
+                    <text x="200" y="180" text-anchor="middle" fill="#f0f6fc" font-size="12">Shell Side (Cold)</text>
+                    
+                    <!-- Labels -->
+                    <text x="15" y="105" fill="#ef4444" font-size="11">Hot In</text>
+                    <text x="355" y="105" fill="#f97316" font-size="11">Hot Out</text>
+                    <text x="200" y="40" text-anchor="middle" fill="#58a6ff" font-size="14" font-weight="600">Shell & Tube Heat Exchanger</text>
+                </svg>
+            `;
+        }
+
+        function renderDiagram(diagramType, values) {
+            const generator = DIAGRAM_GENERATORS[diagramType];
+            if (!generator) return '';
+
+            const container = document.createElement('div');
+            container.className = 'diagram-container';
+            container.innerHTML = `
+                <h4 style="color: var(--text-primary); margin-bottom: 15px;">Interactive Diagram</h4>
+                ${generator(values)}
+            `;
+
+            return container.outerHTML;
+        }
+
+        // Add diagram to learning mode step 1
+        function addDiagramToLearning() {
+            if (!currentLearningContent || !currentLearningContent.diagram_type) return;
+
+            const step1 = document.querySelector('[data-step="0"]');
+            if (step1 && !step1.querySelector('.diagram-container')) {
+                const values = {};
+                equationParams.forEach(p => {
+                    const input = document.getElementById(`input_${p.name}`);
+                    if (input && input.value) {
+                        values[p.name] = input.value;
+                    }
+                });
+
+                step1.insertAdjacentHTML('beforeend', renderDiagram(currentLearningContent.diagram_type, values));
+
+                // Setup tooltips
+                setupDiagramTooltips();
+            }
+        }
+
+        function setupDiagramTooltips() {
+            document.querySelectorAll('.diagram-element').forEach(el => {
+                el.addEventListener('mouseenter', (e) => {
+                    const tooltip = document.getElementById('diagramTooltip');
+                    if (tooltip && el.dataset.tooltip) {
+                        tooltip.textContent = el.dataset.tooltip;
+                        tooltip.style.left = `${e.pageX + 10}px`;
+                        tooltip.style.top = `${e.pageY - 30}px`;
+                        tooltip.classList.add('show');
+                    }
+                });
+                el.addEventListener('mouseleave', () => {
+                    const tooltip = document.getElementById('diagramTooltip');
+                    if (tooltip) tooltip.classList.remove('show');
+                });
+            });
+        }
+
+        // ================================
+        // UNIT CONVERSION PRACTICE MODE
+        // ================================
+
+        const PRACTICE_UNITS = {
+            pressure: [
+                { unit: 'psia', factor: 1 },
+                { unit: 'bar', factor: 0.0689476 },
+                { unit: 'kPa', factor: 6.89476 },
+                { unit: 'atm', factor: 0.068046 }
+            ],
+            temperature: [
+                { unit: '°C', toC: v => v },
+                { unit: '°F', toC: v => (v - 32) * 5 / 9 },
+                { unit: 'K', toC: v => v - 273.15 },
+                { unit: '°R', toC: v => (v - 491.67) * 5 / 9 }
+            ],
+            flow: [
+                { unit: 'gpm', factor: 1 },
+                { unit: 'L/min', factor: 3.78541 },
+                { unit: 'm³/h', factor: 0.227125 },
+                { unit: 'ft³/min', factor: 0.133681 }
+            ],
+            length: [
+                { unit: 'ft', factor: 1 },
+                { unit: 'm', factor: 0.3048 },
+                { unit: 'in', factor: 12 },
+                { unit: 'cm', factor: 30.48 }
+            ]
+        };
+
+        let practiceStats = { correct: 0, total: 0, streak: 0 };
+        let currentPracticeProblem = null;
+
+        function generatePracticeProblem() {
+            const categories = Object.keys(PRACTICE_UNITS);
+            const category = categories[Math.floor(Math.random() * categories.length)];
+            const units = PRACTICE_UNITS[category];
+
+            const fromIdx = Math.floor(Math.random() * units.length);
+            let toIdx = Math.floor(Math.random() * units.length);
+            while (toIdx === fromIdx) {
+                toIdx = Math.floor(Math.random() * units.length);
+            }
+
+            const fromUnit = units[fromIdx];
+            const toUnit = units[toIdx];
+
+            // Generate reasonable values
+            let value;
+            switch (category) {
+                case 'pressure': value = Math.round((Math.random() * 200 + 10) * 10) / 10; break;
+                case 'temperature':
+                    if (fromUnit.unit === '°C') value = Math.round((Math.random() * 200 - 50) * 10) / 10;
+                    else if (fromUnit.unit === '°F') value = Math.round((Math.random() * 400 - 100) * 10) / 10;
+                    else if (fromUnit.unit === 'K') value = Math.round((Math.random() * 300 + 200) * 10) / 10;
+                    else value = Math.round((Math.random() * 500 + 400) * 10) / 10;
+                    break;
+                case 'flow': value = Math.round((Math.random() * 500 + 10) * 10) / 10; break;
+                case 'length': value = Math.round((Math.random() * 100 + 1) * 10) / 10; break;
+                default: value = Math.round(Math.random() * 100 + 1);
+            }
+
+            // Calculate answer
+            let answer;
+            if (category === 'temperature') {
+                const celsius = fromUnit.toC(value);
+                if (toUnit.unit === '°C') answer = celsius;
+                else if (toUnit.unit === '°F') answer = celsius * 9 / 5 + 32;
+                else if (toUnit.unit === 'K') answer = celsius + 273.15;
+                else answer = (celsius + 273.15) * 9 / 5;
+            } else {
+                answer = (value / fromUnit.factor) * toUnit.factor;
+            }
+
+            currentPracticeProblem = {
+                category,
+                value,
+                fromUnit: fromUnit.unit,
+                toUnit: toUnit.unit,
+                answer: Math.round(answer * 1000) / 1000
+            };
+
+            renderPracticeProblem();
+        }
+
+        function renderPracticeProblem() {
+            const p = currentPracticeProblem;
+            if (!p) return;
+
+            const container = document.getElementById('practiceContent');
+            if (!container) return;
+
+            container.innerHTML = `
+                <div class="practice-problem">
+                    <div class="practice-question">
+                        Convert <span class="from-value">${p.value} ${p.fromUnit}</span> 
+                        to <span class="to-unit">${p.toUnit}</span>
+                    </div>
+                    
+                    <div class="practice-input-row">
+                        <input type="number" class="practice-input" id="practiceAnswer" 
+                               placeholder="Your answer" step="any" onkeypress="if(event.key==='Enter')checkPracticeAnswer()">
+                        <span class="practice-result-unit">${p.toUnit}</span>
+                    </div>
+                    
+                    <button class="calculate-btn" onclick="checkPracticeAnswer()">Check Answer</button>
+                    <button class="learning-nav-btn prev" onclick="generatePracticeProblem()" style="margin-left: 10px;">Skip →</button>
+                    
+                    <div class="practice-feedback" id="practiceFeedback"></div>
+                    
+                    <div class="practice-stats">
+                        <div class="practice-stat">
+                            <div class="practice-stat-value">${practiceStats.correct}</div>
+                            <div class="practice-stat-label">Correct</div>
+                        </div>
+                        <div class="practice-stat">
+                            <div class="practice-stat-value">${practiceStats.total}</div>
+                            <div class="practice-stat-label">Attempted</div>
+                        </div>
+                        <div class="practice-stat">
+                            <div class="practice-stat-value">${practiceStats.streak}🔥</div>
+                            <div class="practice-stat-label">Streak</div>
+                        </div>
+                        <div class="practice-stat">
+                            <div class="practice-stat-value">${practiceStats.total > 0 ? Math.round(practiceStats.correct / practiceStats.total * 100) : 0}%</div>
+                            <div class="practice-stat-label">Accuracy</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('practiceAnswer').focus();
+        }
+
+        function checkPracticeAnswer() {
+            const input = document.getElementById('practiceAnswer');
+            const userAnswer = parseFloat(input.value);
+
+            if (isNaN(userAnswer)) {
+                alert('Please enter a number');
+                return;
+            }
+
+            const correctAnswer = currentPracticeProblem.answer;
+            const tolerance = Math.abs(correctAnswer) * 0.02; // 2% tolerance
+            const isCorrect = Math.abs(userAnswer - correctAnswer) <= tolerance;
+
+            practiceStats.total++;
+
+            const feedback = document.getElementById('practiceFeedback');
+            if (isCorrect) {
+                practiceStats.correct++;
+                practiceStats.streak++;
+                feedback.className = 'practice-feedback show correct';
+                feedback.innerHTML = `✓ Correct! ${currentPracticeProblem.value} ${currentPracticeProblem.fromUnit} = ${correctAnswer.toFixed(3)} ${currentPracticeProblem.toUnit}`;
+
+                if (learningModeActive) {
+                    showXpPopup(15);
+                }
+            } else {
+                practiceStats.streak = 0;
+                feedback.className = 'practice-feedback show incorrect';
+                feedback.innerHTML = `✗ Not quite. The answer is ${correctAnswer.toFixed(3)} ${currentPracticeProblem.toUnit}`;
+            }
+
+            // Generate next problem after delay
+            setTimeout(() => {
+                generatePracticeProblem();
+            }, 2000);
+        }
+
+        // Initialize practice mode when tab is clicked
+        function initPracticeMode() {
+            const container = document.getElementById('practiceContent');
+            if (container && !currentPracticeProblem) {
+                generatePracticeProblem();
+            }
+        }
+
+        // ================================
+        // EXPORT STUDY NOTES (PDF)
+        // ================================
+
+        async function exportStudyNotes() {
+            if (!currentLearningContent && !currentEquation) {
+                alert('Please select an equation with learning content first.');
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            if (!jsPDF) {
+                alert('PDF library not loaded. Please refresh the page.');
+                return;
+            }
+
+            const doc = new jsPDF();
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const margin = 15;
+            let y = 20;
+
+            // Helper functions
+            const addTitle = (text, size = 16) => {
+                doc.setFontSize(size);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(58, 100, 180);
+                doc.text(text, margin, y);
+                y += size * 0.5 + 3;
+            };
+
+            const addSubtitle = (text, size = 12) => {
+                doc.setFontSize(size);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(60, 60, 60);
+                doc.text(text, margin, y);
+                y += size * 0.4 + 3;
+            };
+
+            const addText = (text, size = 10) => {
+                doc.setFontSize(size);
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(40, 40, 40);
+                const lines = doc.splitTextToSize(text, pageWidth - 2 * margin);
+                doc.text(lines, margin, y);
+                y += lines.length * (size * 0.35) + 4;
+            };
+
+            const addBullet = (text, indent = 5) => {
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(40, 40, 40);
+                const lines = doc.splitTextToSize(text, pageWidth - 2 * margin - indent);
+                doc.text('•', margin + indent, y);
+                doc.text(lines, margin + indent + 5, y);
+                y += lines.length * 4 + 2;
+            };
+
+            const checkPage = (needed = 20) => {
+                if (y + needed > doc.internal.pageSize.getHeight() - 20) {
+                    doc.addPage();
+                    y = 20;
+                }
+            };
+
+            // Header
+            doc.setFillColor(58, 100, 180);
+            doc.rect(0, 0, pageWidth, 35, 'F');
+            doc.setFontSize(18);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(255, 255, 255);
+            doc.text('Webster Engineering Study Notes', margin, 22);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Generated: ${new Date().toLocaleString()}`, pageWidth - margin - 60, 22);
+
+            y = 50;
+
+            // Equation Title
+            const eqTitle = document.getElementById('eqTitle')?.textContent || currentEquation;
+            addTitle(eqTitle, 16);
+
+            // Description
+            const eqDesc = document.getElementById('eqDescription')?.textContent || '';
+            if (eqDesc) {
+                addText(eqDesc);
+            }
+
+            y += 8;
+
+            // Learning Content
+            if (currentLearningContent) {
+                const lc = currentLearningContent;
+
+                // Background Theory
+                if (lc.background_theory) {
+                    checkPage(30);
+                    addSubtitle('📖 Background Theory');
+                    addText(lc.background_theory.replace(/\*\*/g, ''));
+                    y += 5;
+                }
+
+                // Key Concepts
+                if (lc.key_concepts && lc.key_concepts.length > 0) {
+                    checkPage(20);
+                    addSubtitle('🔑 Key Concepts');
+                    lc.key_concepts.forEach(c => addBullet(c));
+                    y += 5;
+                }
+
+                // Real-World Applications
+                if (lc.real_world_applications && lc.real_world_applications.length > 0) {
+                    checkPage(20);
+                    addSubtitle('🌍 Real-World Applications');
+                    lc.real_world_applications.forEach(app => addBullet(app));
+                    y += 5;
+                }
+
+                // Common Mistakes
+                if (lc.common_mistakes && lc.common_mistakes.length > 0) {
+                    checkPage(20);
+                    addSubtitle('⚠️ Common Mistakes');
+                    lc.common_mistakes.forEach(m => addBullet(m));
+                    y += 5;
+                }
+
+                // Pro Tips
+                if (lc.pro_tips && lc.pro_tips.length > 0) {
+                    checkPage(20);
+                    addSubtitle('💡 Pro Tips');
+                    lc.pro_tips.forEach(t => addBullet(t));
+                    y += 5;
+                }
+
+                // Worked Example
+                if (lc.worked_example) {
+                    const ex = lc.worked_example;
+                    checkPage(40);
+                    addSubtitle('📝 Worked Example: ' + (ex.title || ''));
+                    if (ex.scenario) addText('Scenario: ' + ex.scenario);
+                    if (ex.given && ex.given.length > 0) {
+                        addText('Given: ' + ex.given.join(', '));
+                    }
+                    if (ex.find) addText('Find: ' + ex.find);
+
+                    if (ex.steps && ex.steps.length > 0) {
+                        checkPage(30);
+                        addText('Solution Steps:');
+                        ex.steps.forEach((step, i) => {
+                            checkPage(15);
+                            addBullet(`Step ${i + 1}: ${step.title || ''} - ${step.description || ''}`, 3);
+                        });
+                    }
+
+                    if (ex.final_answer) {
+                        addText('Final Answer: ' + ex.final_answer, 11);
+                    }
+                }
+            }
+
+            // Learning Progress
+            checkPage(25);
+            y += 10;
+            addSubtitle('📊 Your Progress');
+            const progress = getLearningProgress();
+            addText(`Total XP Earned: ${progress.totalXp}`);
+            addText(`Current Streak: ${progress.streak} days`);
+            addText(`Equations Completed: ${progress.completed?.length || 0}`);
+
+            // Footer
+            const pageCount = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setFontSize(8);
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(150, 150, 150);
+                doc.text(`Page ${i} of ${pageCount}`, pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
+                doc.text('Webster Engineering Equation Solver', margin, doc.internal.pageSize.getHeight() - 10);
+            }
+
+            // Save
+            const filename = `study_notes_${currentEquation || 'general'}_${Date.now()}.pdf`;
+            doc.save(filename);
+        }
+
+        // Add export button to learning panel
+        function addExportButton() {
+            const learnPanel = document.getElementById('learningPanel');
+            if (learnPanel && !learnPanel.querySelector('.export-btn')) {
+                const nav = learnPanel.querySelector('.learning-nav');
+                if (nav) {
+                    const btn = document.createElement('button');
+                    btn.className = 'learning-nav-btn prev export-btn';
+                    btn.innerHTML = '📄 Export Notes';
+                    btn.onclick = exportStudyNotes;
+                    btn.style.marginLeft = 'auto';
+                    nav.appendChild(btn);
                 }
             }
         }

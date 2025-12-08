@@ -310,9 +310,206 @@ async def search_equations(q: str):
     return results
 
 
+# ================================
+# LEARNING MODE API ENDPOINTS
+# ================================
+
+class QuizAnswerRequest(BaseModel):
+    question_id: str
+    answer: str
+
+
+class QuizValidationResult(BaseModel):
+    correct: bool
+    explanation: str
+    points_earned: int
+
+
+class LearningProgressRequest(BaseModel):
+    equation_id: str
+    completed_steps: List[int] = []
+    quiz_scores: Dict[str, bool] = {}
+    completed: bool = False
+
+
+@app.get("/api/learning/{category}/{equation_id}")
+async def get_learning_content(category: str, equation_id: str):
+    """Get learning mode content for an equation."""
+    if category not in EQUATION_REGISTRY:
+        raise HTTPException(status_code=404, detail=f"Category '{category}' not found")
+    
+    if equation_id not in EQUATION_REGISTRY[category]:
+        raise HTTPException(status_code=404, detail=f"Equation '{equation_id}' not found")
+    
+    eq_class = EQUATION_REGISTRY[category][equation_id]
+    eq = eq_class()
+    
+    # Check if learning content exists
+    if not hasattr(eq, 'learning_content') or eq.learning_content is None:
+        return {
+            "available": False,
+            "message": "Learning content not yet available for this equation"
+        }
+    
+    lc = eq.learning_content
+    return {
+        "available": True,
+        "equation_id": eq.equation_id,
+        "equation_name": eq.name,
+        "content": lc.to_dict()
+    }
+
+
+@app.post("/api/learning/{category}/{equation_id}/explain")
+async def explain_calculation(category: str, equation_id: str, request: CalculationRequest):
+    """Generate step-by-step explanation for a calculation."""
+    if category not in EQUATION_REGISTRY:
+        raise HTTPException(status_code=404, detail=f"Category '{category}' not found")
+    
+    if equation_id not in EQUATION_REGISTRY[category]:
+        raise HTTPException(status_code=404, detail=f"Equation '{equation_id}' not found")
+    
+    eq_class = EQUATION_REGISTRY[category][equation_id]
+    eq = eq_class()
+    
+    # Parse inputs
+    parsed_inputs = {}
+    for key, value in request.inputs.items():
+        if isinstance(value, dict) and "value" in value:
+            parsed_inputs[key] = (value["value"], value.get("unit", ""))
+        else:
+            parsed_inputs[key] = value
+    
+    try:
+        # Perform calculation
+        result = eq.calculate(parsed_inputs, validate=True)
+        
+        if not result.success:
+            return {"success": False, "error": result.error_message}
+        
+        # Generate explanation steps
+        steps = []
+        
+        # Step 1: List given values
+        given_values = []
+        for key, value in request.inputs.items():
+            if isinstance(value, dict):
+                given_values.append(f"{key} = {value['value']} {value.get('unit', '')}")
+            else:
+                given_values.append(f"{key} = {value}")
+        
+        steps.append({
+            "step_number": 1,
+            "title": "Given Values",
+            "description": "The following values were provided:",
+            "content": given_values
+        })
+        
+        # Step 2: Equation being used
+        steps.append({
+            "step_number": 2,
+            "title": "Equation",
+            "description": f"Using: {eq.name}",
+            "content": [eq.description]
+        })
+        
+        # Step 3: Results
+        output_values = []
+        for name, qty in result.outputs.items():
+            if hasattr(qty, 'magnitude'):
+                output_values.append(f"{name} = {qty.magnitude:.4f} {qty.units}")
+            else:
+                output_values.append(f"{name} = {qty}")
+        
+        steps.append({
+            "step_number": 3,
+            "title": "Calculation Result",
+            "description": "The calculated values are:",
+            "content": output_values
+        })
+        
+        # Add worked example if available
+        if hasattr(eq, 'learning_content') and eq.learning_content and eq.learning_content.worked_example:
+            we = eq.learning_content.worked_example
+            steps.append({
+                "step_number": 4,
+                "title": "Reference: Worked Example",
+                "description": we.scenario,
+                "content": [f"Step {s.step_number}: {s.title} - {s.result}" for s in we.steps]
+            })
+        
+        return {
+            "success": True,
+            "steps": steps,
+            "validation_status": result.validation.overall_status.value if result.validation else None
+        }
+    
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+@app.post("/api/learning/quiz/validate")
+async def validate_quiz_answer(category: str, equation_id: str, request: QuizAnswerRequest):
+    """Validate a quiz answer."""
+    if category not in EQUATION_REGISTRY:
+        raise HTTPException(status_code=404, detail=f"Category '{category}' not found")
+    
+    if equation_id not in EQUATION_REGISTRY[category]:
+        raise HTTPException(status_code=404, detail=f"Equation '{equation_id}' not found")
+    
+    eq_class = EQUATION_REGISTRY[category][equation_id]
+    eq = eq_class()
+    
+    if not hasattr(eq, 'learning_content') or eq.learning_content is None:
+        raise HTTPException(status_code=404, detail="Learning content not available")
+    
+    # Find the question
+    question = None
+    for q in eq.learning_content.quiz_questions:
+        if q.id == request.question_id:
+            question = q
+            break
+    
+    if not question:
+        raise HTTPException(status_code=404, detail=f"Question '{request.question_id}' not found")
+    
+    # Validate answer
+    correct = question.validate_answer(request.answer)
+    
+    return QuizValidationResult(
+        correct=correct,
+        explanation=question.explanation,
+        points_earned=question.points if correct else 0
+    )
+
+
+@app.get("/api/learning/equations-with-content")
+async def get_equations_with_learning_content():
+    """Get list of all equations that have learning content."""
+    equations_with_content = []
+    
+    for cat_id, equations in EQUATION_REGISTRY.items():
+        for eq_id, eq_class in equations.items():
+            eq = eq_class()
+            if hasattr(eq, 'learning_content') and eq.learning_content is not None:
+                lc = eq.learning_content
+                equations_with_content.append({
+                    "category": cat_id,
+                    "id": eq_id,
+                    "name": eq.name,
+                    "difficulty": lc.difficulty.value if hasattr(lc.difficulty, 'value') else str(lc.difficulty),
+                    "estimated_time_minutes": lc.estimated_time_minutes,
+                    "has_quiz": len(lc.quiz_questions) > 0,
+                    "has_diagram": lc.diagram_type is not None
+                })
+    
+    return equations_with_content
+
+
 # Run server
 if __name__ == "__main__":
     print("Starting Webster Engineering Solver API...")
     print("API Documentation: http://localhost:8000/docs")
     print("Web Interface: http://localhost:8000")
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
