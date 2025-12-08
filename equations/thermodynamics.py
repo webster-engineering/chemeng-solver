@@ -780,6 +780,159 @@ Van der Waals laid the foundation for modern cubic equations of state (Peng-Robi
 )
 
 
+# ===============================
+# ACTIVITY COEFFICIENT LEARNING CONTENT
+# ===============================
+ACTIVITY_COEFF_LEARNING = LearningContent(
+    background_theory="""
+**Activity coefficients (γ)** correct for non-ideal behavior in liquid mixtures.
+For ideal solutions, γ = 1. For non-ideal mixtures, γ ≠ 1.
+
+**Modified Raoult's Law:** P = x₁γ₁P₁* + x₂γ₂P₂*
+
+**Margules Equations:**
+ln(γ₁) = x₂² × [A₁₂ + 2(A₂₁ - A₁₂)x₁]
+ln(γ₂) = x₁² × [A₂₁ + 2(A₁₂ - A₂₁)x₂]
+
+Where A₁₂ and A₂₁ are empirical parameters from experimental data.
+
+**Physical Meaning:**
+- γ > 1: Positive deviation (molecules repel) 
+- γ < 1: Negative deviation (molecules attract)
+""",
+    key_concepts=[
+        "γ = 1 for ideal solution",
+        "γ > 1 indicates repulsive interactions",
+        "γ < 1 indicates attractive interactions",
+        "Required for accurate VLE calculations"
+    ],
+    common_mistakes=[
+        "Using γ = 1 for non-ideal mixtures",
+        "Wrong Margules parameters",
+        "Confusing γ with fugacity coefficient"
+    ],
+    quiz_questions=[
+        QuizQuestion(
+            id="ac_q1",
+            question="If γ = 1 for all components, what type of solution is this?",
+            question_type=QuestionType.MULTIPLE_CHOICE,
+            options=["Ideal solution", "Azeotrope", "Immiscible", "Supersaturated"],
+            correct_answer="Ideal solution",
+            explanation="γ = 1 means the mixture behaves ideally (Raoult's Law applies exactly).",
+            difficulty=Difficulty.BEGINNER,
+            points=10
+        )
+    ],
+    difficulty=Difficulty.INTERMEDIATE,
+    estimated_time_minutes=12,
+    prerequisites=["raoults_law"],
+    related_equations=["raoults_law", "flash"]
+)
+
+
+# ===============================
+# JOULE-THOMSON LEARNING CONTENT
+# ===============================
+JOULE_THOMSON_LEARNING = LearningContent(
+    background_theory="""
+The **Joule-Thomson effect** is the temperature change when a gas expands 
+through a valve (isenthalpic process). This is the basis for refrigeration.
+
+**The Joule-Thomson Coefficient:** μ_JT = (∂T/∂P)_H
+
+**Physical Meaning:**
+- μ_JT > 0: Gas cools on expansion (most gases at room temp)
+- μ_JT < 0: Gas heats on expansion (H₂, He at room temp)
+- μ_JT = 0: Inversion temperature
+
+**For Ideal Gas:** μ_JT = 0 (no temperature change)
+
+**Practical Applications:**
+- Refrigeration cycles
+- LNG production 
+- Cryogenic processes
+""",
+    key_concepts=[
+        "Isenthalpic process (constant enthalpy)",
+        "Most gases cool when expanded",
+        "Inversion temperature: μ changes sign",
+        "Ideal gas: no Joule-Thomson effect"
+    ],
+    common_mistakes=[
+        "Assuming all gases cool on expansion",
+        "Forgetting H₂ and He are exceptions at room temp",
+        "Confusing with isentropic expansion"
+    ],
+    quiz_questions=[
+        QuizQuestion(
+            id="jt_q1",
+            question="For an ideal gas, what is the Joule-Thomson coefficient?",
+            question_type=QuestionType.MULTIPLE_CHOICE,
+            options=["Zero", "Positive", "Negative", "Infinite"],
+            correct_answer="Zero",
+            explanation="Ideal gases have no intermolecular forces, so no temperature change occurs on throttling.",
+            difficulty=Difficulty.BEGINNER,
+            points=10
+        )
+    ],
+    difficulty=Difficulty.INTERMEDIATE,
+    estimated_time_minutes=12,
+    prerequisites=["ideal_gas"],
+    related_equations=["ideal_gas", "van_der_waals"]
+)
+
+
+# ===============================
+# HEAT CAPACITY MIXTURE LEARNING
+# ===============================
+HEAT_CAPACITY_MIXTURE_LEARNING = LearningContent(
+    background_theory="""
+**Mixture heat capacity** is calculated by averaging component heat capacities 
+weighted by their mass or mole fractions.
+
+**Mass Basis:** Cp_mix = Σ(wᵢ × Cp,ᵢ)
+**Mole Basis:** Cp_mix = Σ(xᵢ × Cp,ᵢ)
+
+Where:
+- wᵢ = Mass fraction of component i
+- xᵢ = Mole fraction of component i
+- Cp,ᵢ = Heat capacity of component i
+
+**For Gases vs Liquids:**
+- Gases: Use Cp for constant pressure processes
+- Liquids: Cp ≈ Cv (incompressible)
+""",
+    key_concepts=[
+        "Linear mixing rule for Cp",
+        "Use mass fractions for mass-based Cp",
+        "Use mole fractions for molar Cp",
+        "Temperature dependence of individual Cp values"
+    ],
+    common_mistakes=[
+        "Using mass fractions with molar Cp",
+        "Not accounting for Cp temperature dependence",
+        "Ignoring excess heat capacity for non-ideal mixtures"
+    ],
+    quiz_questions=[
+        QuizQuestion(
+            id="hcm_q1",
+            question="50% water (Cp=1.0) and 50% oil (Cp=0.5) by mass. What is Cp_mix?",
+            question_type=QuestionType.NUMERIC,
+            options=[],
+            correct_answer="0.75",
+            explanation="Cp_mix = 0.5×1.0 + 0.5×0.5 = 0.5 + 0.25 = 0.75 BTU/(lb·°F)",
+            difficulty=Difficulty.BEGINNER,
+            hint="Cp_mix = Σ(wᵢ × Cp,ᵢ)",
+            points=10
+        )
+    ],
+    difficulty=Difficulty.BEGINNER,
+    estimated_time_minutes=10,
+    prerequisites=[],
+    related_equations=["heat_duty"]
+)
+
+
 class AntoineVaporPressure(BaseEquation):
     """Antoine equation for vapor pressure."""
     
@@ -1112,6 +1265,7 @@ class ActivityCoefficient(BaseEquation):
     category = "Thermodynamics"
     description = "Calculate activity coefficients for non-ideal liquid mixtures"
     reference = "Smith, Van Ness & Abbott"
+    learning_content = ACTIVITY_COEFF_LEARNING
     
     def get_parameters(self) -> List[EquationParameter]:
         return [
@@ -1151,6 +1305,7 @@ class JouleThomson(BaseEquation):
     category = "Thermodynamics"
     description = "Temperature change during isenthalpic throttling"
     reference = "Perry's Chemical Engineers' Handbook"
+    learning_content = JOULE_THOMSON_LEARNING
     
     def get_parameters(self) -> List[EquationParameter]:
         return [
@@ -1192,6 +1347,7 @@ class HeatCapacityMixture(BaseEquation):
     category = "Thermodynamics"
     description = "Calculate Cp of ideal gas mixture from pure component values"
     reference = "Standard thermodynamics"
+    learning_content = HEAT_CAPACITY_MIXTURE_LEARNING
     
     def get_parameters(self) -> List[EquationParameter]:
         return [

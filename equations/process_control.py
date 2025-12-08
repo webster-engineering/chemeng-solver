@@ -219,6 +219,262 @@ Where:
     related_equations=["cv_gas", "cv_travel"]
 )
 
+
+# ===============================
+# COHEN-COON LEARNING CONTENT
+# ===============================
+COHEN_COON_LEARNING = LearningContent(
+    background_theory="""
+**Cohen-Coon tuning** uses the process reaction curve (step test) to identify 
+a First-Order Plus Dead Time (FOPDT) model, then applies tuning rules.
+
+**The FOPDT Model:** G(s) = K × e^(-θs) / (τs + 1)
+
+From step test, identify:
+- **K** = Process gain (final value / step size)
+- **τ** = Time constant (63.2% of final value)
+- **θ** = Dead time (delay before response starts)
+
+**Cohen-Coon PID Formulas:**
+- Kp = (τ/Kθ) × (4/3 + θ/4τ)
+- Ti = θ × (32 + 6θ/τ) / (13 + 8θ/τ)
+- Td = 4θ / (11 + 2θ/τ)
+
+Works well for processes with θ/τ < 1 (moderate dead time).
+""",
+    key_concepts=[
+        "Uses process reaction curve (step test) data",
+        "Requires FOPDT model: K, τ, θ",
+        "Works well for θ/τ < 1",
+        "More conservative than Z-N for many processes"
+    ],
+    common_mistakes=[
+        "Poor model identification from noisy step test",
+        "Applying when θ/τ > 1 (high dead time ratio)",
+        "Confusing effective dead time with transportation lag"
+    ],
+    quiz_questions=[
+        QuizQuestion(
+            id="cc_q1",
+            question="What does K represent in FOPDT model?",
+            question_type=QuestionType.MULTIPLE_CHOICE,
+            options=["Process gain", "Controller gain", "Time constant", "Dead time"],
+            correct_answer="Process gain",
+            explanation="K = process gain = (final output change)/(input step size) at steady state.",
+            difficulty=Difficulty.BEGINNER,
+            points=10
+        )
+    ],
+    difficulty=Difficulty.INTERMEDIATE,
+    estimated_time_minutes=15,
+    prerequisites=[],
+    related_equations=["ziegler_nichols_pid", "lambda_tuning"]
+)
+
+
+# ===============================
+# IMC PID LEARNING CONTENT
+# ===============================
+IMC_LEARNING = LearningContent(
+    background_theory="""
+**Internal Model Control (IMC)** PID tuning is similar to Lambda tuning.
+It uses a process model and a single tuning parameter for desired closed-loop response.
+
+**IMC for FOPDT Process:**
+- Kc = τ / [K × (λ + θ)]
+- Ti = τ
+- Td = θ/2 (for PID) or 0 (for PI)
+
+**Choosing λ (filter time constant):**
+- λ = θ → Aggressive
+- λ = τ → Moderate
+- λ = max(0.1τ, 0.8θ) → Skogestad rule
+
+IMC provides guaranteed stability if model is accurate.
+""",
+    key_concepts=[
+        "Model-based tuning approach",
+        "λ controls aggressiveness vs robustness",
+        "Requires good FOPDT model",
+        "Essentially same as Lambda tuning"
+    ],
+    common_mistakes=[
+        "Using too small λ (aggressive, oscillatory)",
+        "Model mismatch causing poor performance"
+    ],
+    quiz_questions=[
+        QuizQuestion(
+            id="imc_q1",
+            question="In IMC tuning, what does larger λ give?",
+            question_type=QuestionType.MULTIPLE_CHOICE,
+            options=["Slower, more robust response", "Faster, more aggressive response", "Higher overshoot", "Lower integral time"],
+            correct_answer="Slower, more robust response",
+            explanation="Larger λ = larger closed-loop time constant = slower but more robust response.",
+            difficulty=Difficulty.BEGINNER,
+            points=10
+        )
+    ],
+    difficulty=Difficulty.INTERMEDIATE,
+    estimated_time_minutes=12,
+    prerequisites=[],
+    related_equations=["lambda_tuning", "ziegler_nichols_pid"]
+)
+
+
+# ===============================
+# TYREUS-LUYBEN LEARNING CONTENT
+# ===============================
+TYREUS_LUYBEN_LEARNING = LearningContent(
+    background_theory="""
+**Tyreus-Luyben tuning** is a more conservative alternative to Ziegler-Nichols.
+It uses the same Ku and Pu but gives less aggressive settings.
+
+**Tyreus-Luyben Formulas:**
+- Kp = Ku / 3.2
+- Ti = 2.2 × Pu
+- Td = Pu / 6.3
+
+**Comparison to Z-N:**
+| Parameter | Z-N | T-L |
+|-----------|-----|-----|
+| Kp | 0.6 Ku | 0.31 Ku |
+| Ti | 0.5 Pu | 2.2 Pu |
+
+T-L gives less overshoot and is preferred for chemical process control.
+""",
+    key_concepts=[
+        "Uses same Ku, Pu as Ziegler-Nichols",
+        "Kp ≈ half of Z-N (less aggressive)",
+        "Higher integral time = slower reset",
+        "Better for process control (less overshoot)"
+    ],
+    common_mistakes=[
+        "Expecting same fast response as Z-N",
+        "Confusing with Z-N formulas"
+    ],
+    quiz_questions=[
+        QuizQuestion(
+            id="tl_q1",
+            question="If Ku = 5, what is Kp using Tyreus-Luyben?",
+            question_type=QuestionType.NUMERIC,
+            options=[],
+            correct_answer="1.56",
+            explanation="Kp = Ku/3.2 = 5/3.2 = 1.5625 ≈ 1.56",
+            difficulty=Difficulty.BEGINNER,
+            hint="Kp = Ku / 3.2",
+            points=10
+        )
+    ],
+    difficulty=Difficulty.INTERMEDIATE,
+    estimated_time_minutes=10,
+    prerequisites=[],
+    related_equations=["ziegler_nichols_pid"]
+)
+
+
+# ===============================
+# CV GAS LEARNING CONTENT
+# ===============================
+CV_GAS_LEARNING = LearningContent(
+    background_theory="""
+**Control valve sizing for gas/vapor** is more complex than liquids because
+gas expands as pressure drops (compressible flow).
+
+**Key Equation:**
+Cv = Q / [963 × P1 × (1 - x/3) × √(x / (SG × T))]
+
+Where:
+- Q = Standard volumetric flow (scfm at 14.7 psia, 60°F)
+- P1 = Upstream absolute pressure (psia)
+- x = ΔP/P1 = Pressure drop ratio
+- SG = Specific gravity (vs air = 1.0)
+- T = Temperature (°R)
+
+**Choked Flow:**
+When x > 0.5, flow is choked (sonic velocity at vena contracta).
+Flow cannot increase even with more ΔP.
+""",
+    key_concepts=[
+        "Gas flow is compressible - different from liquid",
+        "Choked flow when ΔP/P1 > 0.5",
+        "Use absolute pressure and temperature",
+        "SG relative to air = 1.0"
+    ],
+    common_mistakes=[
+        "Using liquid Cv equation for gas",
+        "Using gauge instead of absolute pressure",
+        "Not checking for choked flow conditions"
+    ],
+    quiz_questions=[
+        QuizQuestion(
+            id="cvg_q1",
+            question="At what pressure ratio is gas flow typically choked?",
+            question_type=QuestionType.MULTIPLE_CHOICE,
+            options=["ΔP/P1 > 0.5", "ΔP/P1 > 0.1", "ΔP/P1 > 0.9", "Never chokes"],
+            correct_answer="ΔP/P1 > 0.5",
+            explanation="When pressure ratio exceeds ~0.5, critical flow occurs and velocity reaches sonic.",
+            difficulty=Difficulty.INTERMEDIATE,
+            points=15
+        )
+    ],
+    difficulty=Difficulty.INTERMEDIATE,
+    estimated_time_minutes=15,
+    prerequisites=["cv_liquid"],
+    related_equations=["cv_liquid"]
+)
+
+
+# ===============================
+# GAIN MARGIN LEARNING CONTENT
+# ===============================
+GAIN_MARGIN_LEARNING = LearningContent(
+    background_theory="""
+**Gain Margin (GM)** tells you how much the loop gain can increase before
+the system becomes unstable.
+
+**The Equation:** GM = Ku / Kc
+
+Where:
+- Ku = Ultimate gain (controller gain at sustained oscillation)
+- Kc = Current controller gain
+
+**Guidelines:**
+- GM > 2 (linear) or > 6 dB is recommended
+- GM = 1 means at stability boundary (oscillating)
+- GM < 1 means unstable!
+
+**In Decibels:** GM(dB) = 20 × log₁₀(GM)
+""",
+    key_concepts=[
+        "GM = Ku/Kc = safety margin to instability",
+        "GM > 2 (or > 6 dB) recommended",
+        "GM = 1 means at stability boundary",
+        "Related to robustness against model uncertainty"
+    ],
+    common_mistakes=[
+        "Confusing gain margin with phase margin",
+        "Operating with GM < 1.5 (too close to instability)",
+        "Not accounting for process gain changes"
+    ],
+    quiz_questions=[
+        QuizQuestion(
+            id="gm_q1",
+            question="If Ku = 10 and Kc = 2, what is the gain margin?",
+            question_type=QuestionType.NUMERIC,
+            options=[],
+            correct_answer="5",
+            explanation="GM = Ku/Kc = 10/2 = 5",
+            difficulty=Difficulty.BEGINNER,
+            hint="GM = Ku / Kc",
+            points=10
+        )
+    ],
+    difficulty=Difficulty.INTERMEDIATE,
+    estimated_time_minutes=10,
+    prerequisites=["ziegler_nichols_pid"],
+    related_equations=["ziegler_nichols_pid", "tyreus_luyben_pid"]
+)
+
 class ZieglerNicholsPID(BaseEquation):
     """Ziegler-Nichols ultimate gain method for PID tuning."""
     
@@ -284,6 +540,7 @@ class CohenCoonPID(BaseEquation):
     category = "Process Control"
     description = "PID tuning from first-order plus dead time (FOPDT) model parameters"
     reference = "Cohen & Coon, 1953"
+    learning_content = COHEN_COON_LEARNING
     
     def get_parameters(self) -> List[EquationParameter]:
         return [
@@ -336,6 +593,7 @@ class IMCPID(BaseEquation):
     category = "Process Control"
     description = "PID tuning with adjustable aggressiveness via λ (lambda) parameter"
     reference = "Rivera, Morari & Skogestad, 1986"
+    learning_content = IMC_LEARNING
     
     def get_parameters(self) -> List[EquationParameter]:
         return [
@@ -382,6 +640,7 @@ class TyreusLuybenPID(BaseEquation):
     category = "Process Control"
     description = "Conservative PID tuning from ultimate gain/period - less aggressive than Z-N"
     reference = "Tyreus & Luyben, 1992"
+    learning_content = TYREUS_LUYBEN_LEARNING
     
     def get_parameters(self) -> List[EquationParameter]:
         return [
@@ -464,6 +723,7 @@ class ControlValveCvGas(BaseEquation):
     category = "Process Control"
     description = "Calculate valve Cv for compressible (gas/vapor) flow"
     reference = "ISA-75.01.01"
+    learning_content = CV_GAS_LEARNING
     
     def get_parameters(self) -> List[EquationParameter]:
         return [
@@ -520,6 +780,7 @@ class ControlLoopGainMargin(BaseEquation):
     category = "Process Control"
     description = "Calculate how much loop gain can increase before instability"
     reference = "Standard Control Theory"
+    learning_content = GAIN_MARGIN_LEARNING
     
     def get_parameters(self) -> List[EquationParameter]:
         return [
