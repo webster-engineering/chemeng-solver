@@ -241,6 +241,17 @@ Where Cr = C_min / C_max (heat capacity ratio)
         )
     ],
     difficulty=Difficulty.INTERMEDIATE,
+    estimated_time_minutes=15,
+    prerequisites=["lmtd", "heat_duty"],
+    related_equations=["lmtd", "hx_area", "overall_u"]
+)
+
+
+class LMTD(BaseEquation):
+    """Log Mean Temperature Difference calculation."""
+    
+    equation_id = "lmtd"
+    name = "Log Mean Temperature Difference"
     category = "Heat Transfer"
     description = "Calculate LMTD for shell-and-tube or double-pipe heat exchanger design"
     reference = "Perry's Chemical Engineers' Handbook"
