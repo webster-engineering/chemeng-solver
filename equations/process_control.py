@@ -10,7 +10,214 @@ import pint
 
 from .base import BaseEquation, EquationParameter, ParameterType
 from core.units import ureg
+from core.learning import (
+    LearningContent, QuizQuestion, QuestionType, Difficulty,
+    WorkedExample, CalculationStep
+)
 
+
+# ===============================
+# ZIEGLER-NICHOLS LEARNING CONTENT
+# ===============================
+ZIEGLER_NICHOLS_LEARNING = LearningContent(
+    background_theory="""
+The **Ziegler-Nichols method** (1942) is the classic PID tuning technique. It uses the 
+**ultimate gain (Ku)** and **ultimate period (Pu)** found by pushing the system to oscillation.
+
+**Procedure:**
+1. Set Ti = ∞, Td = 0 (P-only control)
+2. Increase Kp until sustained oscillation occurs
+3. Record: Ku = that Kp value, Pu = oscillation period
+
+**Tuning Rules:**
+| Controller | Kp | Ti | Td |
+|---|---|---|---|
+| P | 0.5·Ku | ∞ | 0 |
+| PI | 0.45·Ku | Pu/1.2 | 0 |
+| PID | 0.6·Ku | Pu/2 | Pu/8 |
+
+**Characteristics:**
+- Aggressive tuning - fast response but ~25% overshoot
+- Good for set point changes, poor for disturbance rejection
+- Quarter-decay ratio target
+""",
+    key_concepts=[
+        "Ultimate gain Ku = controller gain at sustained oscillation",
+        "Ultimate period Pu = time between peaks at Ku",
+        "Produces aggressive tuning with ~25% overshoot",
+        "Tyreus-Luyben is more conservative alternative"
+    ],
+    real_world_applications=[
+        "Initial tuning starting point",
+        "Flow and pressure loops (fast dynamics)",
+        "Educational demonstration of feedback control",
+        "Loops where speed matters more than overshoot"
+    ],
+    common_mistakes=[
+        "Using this on integrating processes (level control)",
+        "Expecting slug response - Z-N gives oscillatory response",
+        "Not recognizing when process won't oscillate (overdamped)",
+        "Applying to loops with significant noise"
+    ],
+    pro_tips=[
+        "For less aggressive tuning, use Tyreus-Luyben (Kp=Ku/3.2)",
+        "If you can't find Ku, use Cohen-Coon or Lambda tuning",
+        "Many DCS systems have auto-tune that does this automatically"
+    ],
+    quiz_questions=[
+        QuizQuestion(
+            id="zn_q1",
+            question="If Ku = 4 and Pu = 2 min, what is Kp for Z-N PID tuning?",
+            question_type=QuestionType.NUMERIC,
+            options=[],
+            correct_answer="2.4",
+            explanation="Kp = 0.6 × Ku = 0.6 × 4 = 2.4",
+            difficulty=Difficulty.BEGINNER,
+            hint="Kp = 0.6 × Ku for PID",
+            points=10
+        ),
+        QuizQuestion(
+            id="zn_q2",
+            question="Ziegler-Nichols tuning typically produces what approximate overshoot?",
+            question_type=QuestionType.MULTIPLE_CHOICE,
+            options=["0%", "10%", "25%", "50%"],
+            correct_answer="25%",
+            explanation="Z-N targets quarter-decay ratio, which corresponds to ~25% overshoot.",
+            difficulty=Difficulty.BEGINNER,
+            points=10
+        )
+    ],
+    difficulty=Difficulty.INTERMEDIATE,
+    estimated_time_minutes=15,
+    prerequisites=[],
+    related_equations=["tyreus_luyben_pid", "lambda_tuning"],
+    diagram_type="control_loop"
+)
+
+
+# ===============================
+# LAMBDA TUNING LEARNING CONTENT
+# ===============================
+LAMBDA_TUNING_LEARNING = LearningContent(
+    background_theory="""
+**Lambda (λ) Tuning** is the most popular industrial PID tuning method. It gives you direct 
+control over the closed-loop speed via the λ parameter.
+
+**The Idea:** Choose your desired closed-loop time constant λ, then calculate controller gains.
+
+**For First-Order Plus Dead Time (FOPDT) Process:**
+- **Kc = τ / [K × (λ + θ)]**
+- **Ti = τ** (integral time = process time constant)
+- **Td = 0** (usually PI, or θ/2 for PID)
+
+**Choosing λ:**
+| λ Value | Response |
+|---------|----------|
+| λ = θ | Fast but aggressive |
+| λ = τ | Moderate (good starting point) |
+| λ = 3θ | Conservative, robust |
+
+**Why It's Popular:**
+- Single tuning parameter (λ)
+- Directly controls speed vs robustness trade-off
+- Works with process identification
+""",
+    key_concepts=[
+        "λ = desired closed-loop time constant",
+        "Larger λ = slower but more robust response",
+        "Requires FOPDT model: K, τ, θ from step test",
+        "Industry-standard method for most loops"
+    ],
+    real_world_applications=[
+        "Temperature loop tuning (slow processes)",
+        "Composition/analyzer loops",
+        "Any loop where you have step test data",
+        "Model predictive control initialization"
+    ],
+    common_mistakes=[
+        "Using λ < θ (aggressive, can cause instability)",
+        "Poor FOPDT model identification",
+        "Forgetting to account for dead time θ"
+    ],
+    quiz_questions=[
+        QuizQuestion(
+            id="lam_q1",
+            question="For a process with K=2, τ=10 min, θ=2 min, and λ=4 min, what is Kc?",
+            question_type=QuestionType.NUMERIC,
+            options=[],
+            correct_answer="0.833",
+            explanation="Kc = τ / [K(λ+θ)] = 10 / [2×(4+2)] = 10/12 = 0.833",
+            difficulty=Difficulty.INTERMEDIATE,
+            hint="Kc = τ / [K(λ+θ)]",
+            points=15
+        )
+    ],
+    difficulty=Difficulty.INTERMEDIATE,
+    estimated_time_minutes=15,
+    prerequisites=[],
+    related_equations=["ziegler_nichols_pid", "simc_tuning"]
+)
+
+
+# ===============================
+# CONTROL VALVE CV LEARNING CONTENT
+# ===============================
+CV_LIQUID_LEARNING = LearningContent(
+    background_theory="""
+**Cv (Valve Coefficient)** is THE valve sizing parameter. It defines how much 
+flow a valve passes for a given pressure drop.
+
+**Definition:** Cv = flow rate (gpm) that passes through the valve with 1 psi 
+pressure drop and specific gravity = 1.0
+
+**The Equation (Liquid):** Cv = Q × √(SG/ΔP)
+
+Where:
+- **Q** = Flow rate (gpm)
+- **SG** = Specific gravity (water = 1.0)
+- **ΔP** = Pressure drop across valve (psi)
+
+**Valve Selection:**
+1. Calculate required Cv at design conditions
+2. Add margin (typically select valve where design Cv is ~70-80% of valve max Cv)
+3. Verify valve can handle turndown
+""",
+    key_concepts=[
+        "Cv = gpm at SG=1 and ΔP=1 psi",
+        "Higher Cv = larger valve capacity",
+        "Always add margin - don't size at 100% Cv",
+        "Rangeability = Cv_max / Cv_min (typically 50:1)"
+    ],
+    real_world_applications=[
+        "Control valve sizing for new installations",
+        "Checking existing valve adequacy",
+        "Troubleshooting valve capacity issues",
+        "System hydraulic analysis"
+    ],
+    common_mistakes=[
+        "Using gauge pressure instead of differential ΔP",
+        "Forgetting specific gravity correction",
+        "Not checking for choked flow conditions",
+        "Sizing at 100% Cv (no margin for upset)"
+    ],
+    quiz_questions=[
+        QuizQuestion(
+            id="cv_q1",
+            question="100 gpm water flow with 25 psi pressure drop. What Cv is needed?",
+            question_type=QuestionType.NUMERIC,
+            options=[],
+            correct_answer="20",
+            explanation="Cv = Q × √(SG/ΔP) = 100 × √(1/25) = 100 × 0.2 = 20",
+            difficulty=Difficulty.BEGINNER,
+            hint="Cv = Q × √(SG/ΔP)",
+            points=10
+        )
+    ],
+    difficulty=Difficulty.BEGINNER,
+    estimated_time_minutes=12,
+    prerequisites=[],
+    related_equations=["cv_gas", "cv_travel"]
+)
 
 class ZieglerNicholsPID(BaseEquation):
     """Ziegler-Nichols ultimate gain method for PID tuning."""
@@ -20,6 +227,7 @@ class ZieglerNicholsPID(BaseEquation):
     category = "Process Control"
     description = "Calculate PID parameters using ultimate gain (Ku) and ultimate period (Pu)"
     reference = "Ziegler & Nichols, 1942"
+    learning_content = ZIEGLER_NICHOLS_LEARNING
     
     def get_parameters(self) -> List[EquationParameter]:
         return [
@@ -213,6 +421,7 @@ class ControlValveCvLiquid(BaseEquation):
     category = "Process Control"
     description = "Calculate valve coefficient Cv for incompressible (liquid) flow"
     reference = "ISA-75.01.01"
+    learning_content = CV_LIQUID_LEARNING
     
     def get_parameters(self) -> List[EquationParameter]:
         return [
@@ -549,6 +758,7 @@ class LambdaTuning(BaseEquation):
     category = "Process Control"
     description = "Industry-standard tuning with adjustable closed-loop time constant λ"
     reference = "Dahlin, 1968 / Lambda Tuning Method"
+    learning_content = LAMBDA_TUNING_LEARNING
     
     def get_parameters(self) -> List[EquationParameter]:
         return [
