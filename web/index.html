@@ -3804,22 +3804,42 @@
 
         // ===== Tab Switching =====
         function switchTab(tabName) {
-            // Update tab buttons
+            // Update tab buttons - match by checking if button text contains tab name
             document.querySelectorAll('.main-tab').forEach(tab => {
                 tab.classList.remove('active');
-                if (tab.textContent.toLowerCase().includes(tabName.substring(0, 4))) {
-                    tab.classList.add('active');
-                }
+                const btnText = tab.textContent.toLowerCase();
+                if (tabName === 'equations' && btnText.includes('equation')) tab.classList.add('active');
+                else if (tabName === 'graphing' && btnText.includes('graph')) tab.classList.add('active');
+                else if (tabName === 'scientific' && btnText.includes('calc')) tab.classList.add('active');
+                else if (tabName === 'steam' && btnText.includes('steam')) tab.classList.add('active');
+                else if (tabName === 'fluids' && btnText.includes('fluid')) tab.classList.add('active');
+                else if (tabName === 'pipes' && btnText.includes('pipe')) tab.classList.add('active');
+                else if (tabName === 'materials' && btnText.includes('material')) tab.classList.add('active');
             });
 
-            // Update tab content
-            document.getElementById('equationsTab').classList.toggle('active', tabName === 'equations');
-            document.getElementById('graphingTab').classList.toggle('active', tabName === 'graphing');
+            // Hide all tabs
+            ['equations', 'graphing', 'scientific', 'steam', 'fluids', 'pipes', 'materials'].forEach(t => {
+                const el = document.getElementById(t + 'Tab');
+                if (el) el.classList.remove('active');
+            });
 
-            // Initialize graph canvas when switching to graphing tab
+            // Show selected tab
+            const tabEl = document.getElementById(tabName + 'Tab');
+            if (tabEl) tabEl.classList.add('active');
+
+            // Initialize specific tabs
             if (tabName === 'graphing') {
                 initGraphCanvas();
+                if (typeof setupPanning === 'function') setupPanning();
                 plotGraph();
+            } else if (tabName === 'steam' && typeof updateSteamTable === 'function') {
+                updateSteamTable();
+            } else if (tabName === 'fluids' && typeof filterFluids === 'function') {
+                filterFluids();
+            } else if (tabName === 'pipes' && typeof updatePipeTable === 'function') {
+                updatePipeTable();
+            } else if (tabName === 'materials' && typeof filterMaterials === 'function') {
+                filterMaterials();
             }
         }
 
@@ -4455,26 +4475,7 @@
                 `Trace: x = ${x.toFixed(4)}, y = ${y.toFixed(4)}`;
         }
 
-        // Initialize panning when graphing tab is shown
-        const originalSwitchTab = switchTab;
-        switchTab = function (tabName) {
-            document.querySelectorAll('.main-tab').forEach(tab => {
-                tab.classList.remove('active');
-                if (tab.textContent.toLowerCase().includes(tabName.substring(0, 4))) {
-                    tab.classList.add('active');
-                }
-            });
-
-            document.getElementById('equationsTab').classList.toggle('active', tabName === 'equations');
-            document.getElementById('graphingTab').classList.toggle('active', tabName === 'graphing');
-            document.getElementById('scientificTab').classList.toggle('active', tabName === 'scientific');
-
-            if (tabName === 'graphing') {
-                initGraphCanvas();
-                setupPanning();
-                plotGraph();
-            }
-        };
+        // Note: switchTab is defined later with full tab support
 
         // ===== Scientific Calculator =====
         let calcExpression = '';
@@ -4842,10 +4843,18 @@
         // Update switchTab to include new tabs
         const masterSwitchTab = switchTab;
         switchTab = function (tabName) {
+            // Update tab buttons - find by matching tab name in button text
             document.querySelectorAll('.main-tab').forEach(tab => {
                 tab.classList.remove('active');
+                const btnText = tab.textContent.toLowerCase();
+                if (tabName === 'equations' && btnText.includes('equation')) tab.classList.add('active');
+                else if (tabName === 'graphing' && btnText.includes('graph')) tab.classList.add('active');
+                else if (tabName === 'scientific' && btnText.includes('calc')) tab.classList.add('active');
+                else if (tabName === 'steam' && btnText.includes('steam')) tab.classList.add('active');
+                else if (tabName === 'fluids' && btnText.includes('fluid')) tab.classList.add('active');
+                else if (tabName === 'pipes' && btnText.includes('pipe')) tab.classList.add('active');
+                else if (tabName === 'materials' && btnText.includes('material')) tab.classList.add('active');
             });
-            event.target.classList.add('active');
 
             // Hide all tabs
             ['equations', 'graphing', 'scientific', 'steam', 'fluids', 'pipes', 'materials'].forEach(t => {
