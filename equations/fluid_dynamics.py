@@ -9,6 +9,276 @@ import pint
 
 from .base import BaseEquation, EquationParameter, ParameterType
 from core.units import ureg
+from core.learning import (
+    LearningContent, QuizQuestion, QuestionType, Difficulty,
+    WorkedExample, CalculationStep
+)
+
+
+# ===============================
+# REYNOLDS NUMBER LEARNING CONTENT
+# ===============================
+REYNOLDS_LEARNING = LearningContent(
+    background_theory="""
+The **Reynolds Number (Re)** is the most important dimensionless number in fluid dynamics.
+It predicts whether flow will be **laminar** (smooth) or **turbulent** (chaotic).
+
+**The Equation:** Re = ρVD/μ = VD/ν
+
+Where:
+- **ρ** = Fluid density
+- **V** = Average flow velocity
+- **D** = Pipe inside diameter
+- **μ** = Dynamic viscosity
+- **ν** = Kinematic viscosity (μ/ρ)
+
+**Flow Regime Classification:**
+| Re | Flow Type | Characteristics |
+|---|---|---|
+| < 2100 | **Laminar** | Smooth parallel layers, predictable |
+| 2100-4000 | **Transition** | Unstable, intermittent turbulence |
+| > 4000 | **Turbulent** | Chaotic eddies, enhanced mixing |
+
+Named after Osborne Reynolds (1883) who visualized flow regimes using dye injection.
+""",
+    key_concepts=[
+        "Ratio of inertial forces to viscous forces",
+        "Critical Re ≈ 2100 for pipe flow transition",
+        "Turbulent flow has higher pressure drop but better heat/mass transfer",
+        "Re must be > 4000 to use Moody chart for friction factor"
+    ],
+    real_world_applications=[
+        "Determining pressure drop calculation method",
+        "Heat exchanger design (Re affects heat transfer coefficient)",
+        "Process piping design and pump sizing",
+        "Mixing and reactor design"
+    ],
+    industry_examples=[
+        "Crude oil pipelines: Often laminar due to high viscosity",
+        "Water distribution: Always turbulent",
+        "Blood flow in arteries: Typically laminar, turbulence indicates problems"
+    ],
+    common_mistakes=[
+        "Using kinematic viscosity when equation needs dynamic (or vice versa)",
+        "Forgetting that water viscosity changes significantly with temperature",
+        "Not using inside diameter (using nominal instead of actual)",
+        "Mixing unit systems (SI and Imperial)"
+    ],
+    pro_tips=[
+        "Water at 68°F has μ ≈ 1 cP - a useful reference point",
+        "For non-circular ducts, use hydraulic diameter: Dh = 4A/P",
+        "In transition regime (2100-4000), assume worst case (turbulent)"
+    ],
+    quiz_questions=[
+        QuizQuestion(
+            id="re_q1",
+            question="What flow regime does Re = 500 indicate?",
+            question_type=QuestionType.MULTIPLE_CHOICE,
+            options=["Laminar", "Transition", "Turbulent", "Supersonic"],
+            correct_answer="Laminar",
+            explanation="Re < 2100 indicates laminar (smooth) flow with parallel streamlines.",
+            difficulty=Difficulty.BEGINNER,
+            points=10
+        ),
+        QuizQuestion(
+            id="re_q2", 
+            question="If velocity doubles and all else stays constant, what happens to Re?",
+            question_type=QuestionType.MULTIPLE_CHOICE,
+            options=["Doubles", "Quadruples", "Halves", "Stays the same"],
+            correct_answer="Doubles",
+            explanation="Re = ρVD/μ - velocity appears linearly, so 2V gives 2×Re.",
+            difficulty=Difficulty.BEGINNER,
+            points=10
+        ),
+        QuizQuestion(
+            id="re_q3",
+            question="Water (ρ=1000 kg/m³, μ=0.001 Pa·s) flows at 1 m/s through a 0.1 m pipe. Calculate Re.",
+            question_type=QuestionType.NUMERIC,
+            options=[],
+            correct_answer="100000",
+            explanation="Re = ρVD/μ = (1000)(1)(0.1)/(0.001) = 100,000 - highly turbulent!",
+            difficulty=Difficulty.INTERMEDIATE,
+            hint="Re = ρVD/μ with consistent SI units",
+            points=15
+        )
+    ],
+    worked_example=WorkedExample(
+        title="Flow Regime in a Water Pipe",
+        scenario="Determine flow regime for 3 ft/s water flow through a 4-inch Schedule 40 steel pipe at 68°F.",
+        given_values={
+            "V": "3 ft/s",
+            "D": "4.026 in (ID from pipe tables)",
+            "ρ": "62.4 lb/ft³",
+            "μ": "1.0 cP = 6.72×10⁻⁴ lbm/(ft·s)"
+        },
+        find=["Reynolds number and flow regime"],
+        steps=[
+            CalculationStep(
+                step_number=1,
+                title="Convert units to consistent system",
+                description="Express all variables in ft-lbm-s units",
+                substitution="D = 4.026/12 = 0.3355 ft",
+                result="D = 0.3355 ft"
+            ),
+            CalculationStep(
+                step_number=2,
+                title="Calculate Reynolds Number",
+                description="Apply Re = ρVD/μ",
+                formula="Re = ρVD/μ",
+                substitution="Re = (62.4)(3)(0.3355)/(6.72×10⁻⁴)",
+                computation="Re = 62.8 / 0.000672 = 93,400",
+                result="Re = 93,400"
+            ),
+            CalculationStep(
+                step_number=3,
+                title="Determine Flow Regime",
+                description="Compare to critical values",
+                computation="93,400 >> 4000",
+                result="Flow is fully turbulent",
+                notes="Use Moody chart or Colebrook for friction factor"
+            )
+        ],
+        final_answer="Re = 93,400 → Fully turbulent flow",
+        real_world_context="This is typical for water systems - turbulent flow ensures good mixing and heat transfer."
+    ),
+    difficulty=Difficulty.BEGINNER,
+    estimated_time_minutes=10,
+    prerequisites=[],
+    related_equations=["friction_factor", "darcy_weisbach"],
+    diagram_type="pipe_flow",
+    diagram_labels={
+        "pipe": "Pipe Section",
+        "flow_arrows": "Flow Direction",
+        "boundary_layer": "Boundary Layer",
+        "velocity_profile": "Velocity Profile"
+    }
+)
+
+
+# ===============================
+# DARCY-WEISBACH LEARNING CONTENT
+# ===============================
+DARCY_WEISBACH_LEARNING = LearningContent(
+    background_theory="""
+The **Darcy-Weisbach equation** is the fundamental equation for calculating pressure drop 
+due to friction in pipes. It works for ANY Newtonian fluid.
+
+**The Equation:** ΔP = f × (L/D) × (ρV²/2)
+
+Or as head loss: hf = f × (L/D) × (V²/2g)
+
+Where:
+- **f** = Darcy friction factor (from Moody chart)
+- **L** = Pipe length
+- **D** = Pipe inside diameter
+- **V** = Average flow velocity
+- **ρ** = Fluid density
+
+**Getting the Friction Factor:**
+- Laminar flow (Re < 2100): f = 64/Re (exact!)
+- Turbulent flow: Use Colebrook equation or Swamee-Jain approximation
+- Depends on Re and relative roughness ε/D
+""",
+    key_concepts=[
+        "Works for ANY fluid (unlike Hazen-Williams which is water-only)",
+        "Friction factor f is the key variable that captures all complexity",
+        "Pressure drop increases with velocity squared",
+        "Double the velocity = 4× the pressure drop"
+    ],
+    real_world_applications=[
+        "Process piping pressure drop calculations",
+        "Pump head requirements",
+        "Natural gas pipeline design",
+        "HVAC duct sizing"
+    ],
+    common_mistakes=[
+        "Using Fanning friction factor when Darcy is needed (Darcy = 4 × Fanning)",
+        "Forgetting the L/D ratio amplification effect",
+        "Not including fitting losses (equivalent lengths)",
+        "Using nominal diameter instead of actual inside diameter"
+    ],
+    pro_tips=[
+        "For a quick check: pressure drop ∝ V² ∝ Q² (at constant diameter)",
+        "Typical f values: 0.01-0.05 for clean commercial pipe",
+        "Reducing pipe diameter by half increases ΔP by 32× at same flow!"
+    ],
+    quiz_questions=[
+        QuizQuestion(
+            id="dw_q1",
+            question="If you halve the pipe diameter (keeping flow rate constant), pressure drop increases by factor of:",
+            question_type=QuestionType.MULTIPLE_CHOICE,
+            options=["2", "4", "16", "32"],
+            correct_answer="32",
+            explanation="V increases 4× (area ↓ 4×), V² ↑ 16×, D↓2× gives (L/D) ↑ 2×. Total: 16×2=32×",
+            difficulty=Difficulty.INTERMEDIATE,
+            points=15
+        )
+    ],
+    difficulty=Difficulty.INTERMEDIATE,
+    estimated_time_minutes=15,
+    prerequisites=["reynolds_number", "friction_factor"],
+    related_equations=["reynolds_number", "friction_factor", "hazen_williams"]
+)
+
+
+# ===============================
+# PUMP POWER LEARNING CONTENT
+# ===============================
+PUMP_POWER_LEARNING = LearningContent(
+    background_theory="""
+Pump power calculations determine motor sizing and operating costs. Understanding the 
+efficiency chain is critical for proper equipment selection.
+
+**Key Power Terms:**
+- **Hydraulic (Water) Horsepower (WHP)**: Ideal power delivered to fluid
+- **Brake Horsepower (BHP)**: Power required at pump shaft
+- **Motor Horsepower**: Electrical power consumed
+
+**The Equations:**
+- WHP = Q × H × SG / 3960 (gpm, ft, dimensionless → hp)
+- BHP = WHP / η_pump
+- Motor HP = BHP / η_motor
+
+**Efficiency Chain:**
+Electrical Power → Motor (92-96%) → Pump (60-85%) → Fluid
+Typically only 55-80% of electrical power reaches the fluid!
+""",
+    key_concepts=[
+        "WHP is theoretical minimum - real systems need more",
+        "Pump efficiency varies with operating point on curve",
+        "VFD-controlled pumps can dramatically reduce energy use",
+        "Motor selection should include service factor (~1.15)"
+    ],
+    real_world_applications=[
+        "Pump selection and motor sizing",
+        "Operating cost estimation",
+        "Energy efficiency studies",
+        "VFD payback calculations"
+    ],
+    common_mistakes=[
+        "Forgetting specific gravity for non-water fluids",
+        "Using head instead of differential head",
+        "Selecting pump at wrong point on curve (poor efficiency)",
+        "Not accounting for both pump AND motor efficiency"
+    ],
+    quiz_questions=[
+        QuizQuestion(
+            id="pp_q1",
+            question="100 gpm of water at 200 ft head. What's the WHP?",
+            question_type=QuestionType.NUMERIC,
+            options=[],
+            correct_answer="5.05",
+            explanation="WHP = Q×H×SG/3960 = 100×200×1/3960 = 5.05 hp",
+            difficulty=Difficulty.BEGINNER,
+            hint="WHP = Q × H × SG / 3960",
+            points=10
+        )
+    ],
+    difficulty=Difficulty.BEGINNER,
+    estimated_time_minutes=12,
+    prerequisites=[],
+    related_equations=["pump_head", "npsh"]
+)
 
 
 class ReynoldsNumber(BaseEquation):
@@ -19,6 +289,7 @@ class ReynoldsNumber(BaseEquation):
     category = "Fluid Dynamics"
     description = "Dimensionless number indicating laminar (<2100) or turbulent (>4000) flow"
     reference = "Fundamentals of Fluid Mechanics"
+    learning_content = REYNOLDS_LEARNING
     
     derivation = """
 **Reynolds Number Derivation**
@@ -218,6 +489,7 @@ class DarcyWeisbach(BaseEquation):
     category = "Fluid Dynamics"
     description = "Calculate pressure drop in pipes using friction factor"
     reference = "Perry's Chemical Engineers' Handbook, 8th Ed"
+    learning_content = DARCY_WEISBACH_LEARNING
     
     derivation = """
 **Darcy-Weisbach Equation Derivation**
@@ -338,6 +610,7 @@ class PumpPower(BaseEquation):
     category = "Fluid Dynamics"
     description = "Calculate hydraulic power and motor power required for pumping"
     reference = "Hydraulic Institute Standards"
+    learning_content = PUMP_POWER_LEARNING
     
     def get_parameters(self) -> List[EquationParameter]:
         return [

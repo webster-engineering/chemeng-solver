@@ -248,6 +248,416 @@ class IdealGas(BaseEquation):
         return {"V": ureg.Quantity(v_ft3, "ft**3")}
 
 
+# ===============================
+# ANTOINE EQUATION LEARNING CONTENT  
+# ===============================
+ANTOINE_LEARNING = LearningContent(
+    background_theory="""
+The Antoine Equation is an empirical correlation for calculating the **saturation vapor pressure** 
+of pure substances as a function of temperature. It's essential for VLE calculations.
+
+**The Equation:** log₁₀(P) = A - B/(C + T)
+
+Where:
+- **P** = Vapor pressure (typically mmHg or bar)
+- **T** = Temperature (typically °C)
+- **A, B, C** = Compound-specific constants from tables
+
+**Why It Matters:**
+- Used to calculate bubble point and dew point temperatures
+- Essential for distillation column design
+- Foundation of all VLE calculations
+
+The Antoine equation is more accurate than Clausius-Clapeyron for moderate temperature ranges 
+(typically within 30-40°C of the normal boiling point).
+""",
+    key_concepts=[
+        "Vapor-liquid equilibrium (VLE)",
+        "Saturation (vapor) pressure increases exponentially with temperature",
+        "Antoine constants are specific to each compound",
+        "Units must match the tabulated constants"
+    ],
+    real_world_applications=[
+        "Distillation column design and operation",
+        "Flash drum calculations",
+        "Evaporator sizing",
+        "Environmental emission calculations",
+        "Refrigeration system design"
+    ],
+    industry_examples=[
+        "Determining overhead condenser duty in crude distillation",
+        "Sizing vacuum systems for low-pressure distillation",
+        "Calculating VOC emissions from storage tanks"
+    ],
+    common_mistakes=[
+        "Using wrong temperature units (most constants are for °C)",
+        "Mixing Antoine coefficients from different sources with different pressure units",
+        "Applying outside the valid temperature range of the constants",
+        "Confusing log₁₀ with natural log (ln)"
+    ],
+    pro_tips=[
+        "NIST Chemistry WebBook is the most reliable source for Antoine constants",
+        "Check the validity range - constants are only accurate within a specific temperature range",
+        "Convert pressure units after calculation, not coefficients",
+        "For extended ranges, consider Wagner or Riedel equations"
+    ],
+    variable_sources={
+        "A": "Look up in NIST, Perry's, or CRC Handbook for your compound",
+        "B": "Same source as A - always use A,B,C from the same source",
+        "C": "Same source as A,B - these three are fitted together",
+        "T": "Your operating temperature - check it's within valid range"
+    },
+    quiz_questions=[
+        QuizQuestion(
+            id="ant_q1",
+            question="What type of pressure does the Antoine equation calculate?",
+            question_type=QuestionType.MULTIPLE_CHOICE,
+            options=["Saturation (vapor) pressure", "Total system pressure", "Partial pressure", "Critical pressure"],
+            correct_answer="Saturation (vapor) pressure",
+            explanation="Antoine calculates the pressure at which a pure liquid boils at a given temperature.",
+            difficulty=Difficulty.BEGINNER,
+            hint="Think about what happens at the boiling point",
+            points=10
+        ),
+        QuizQuestion(
+            id="ant_q2",
+            question="Why can't you mix Antoine constants from different sources?",
+            question_type=QuestionType.MULTIPLE_CHOICE,
+            options=["Different sources use different units", "The constants are fitted together to minimize error", 
+                     "Some sources have typos", "It's actually fine to mix them"],
+            correct_answer="The constants are fitted together to minimize error",
+            explanation="A, B, and C are regressed together. Using A from one source and B from another will give wrong results.",
+            difficulty=Difficulty.INTERMEDIATE,
+            points=15
+        ),
+        QuizQuestion(
+            id="ant_q3",
+            question="Water has A=8.07, B=1730.6, C=233.4 (T in °C, P in mmHg). What's the vapor pressure at 100°C?",
+            question_type=QuestionType.NUMERIC,
+            options=[],
+            correct_answer="760",
+            explanation="log₁₀(P) = 8.07 - 1730.6/(233.4+100) = 2.88, so P = 10^2.88 ≈ 760 mmHg (1 atm at boiling!)",
+            difficulty=Difficulty.INTERMEDIATE,
+            hint="100°C is water's normal boiling point...",
+            points=20
+        )
+    ],
+    worked_example=WorkedExample(
+        title="Vapor Pressure of Benzene",
+        scenario="Calculate the vapor pressure of benzene at 50°C for storage tank vent design.",
+        given_values={
+            "A": "6.90565",
+            "B": "1211.033",
+            "C": "220.79",
+            "T": "50°C",
+            "Units": "P in mmHg, T in °C"
+        },
+        find=["Vapor pressure in mmHg and psia"],
+        steps=[
+            CalculationStep(
+                step_number=1,
+                title="Apply Antoine Equation",
+                description="Substitute values into Antoine equation",
+                formula="log₁₀(P) = A - B/(C + T)",
+                substitution="log₁₀(P) = 6.90565 - 1211.033/(220.79 + 50)",
+                computation="log₁₀(P) = 6.90565 - 1211.033/270.79 = 6.90565 - 4.472 = 2.433",
+                result="log₁₀(P) = 2.433"
+            ),
+            CalculationStep(
+                step_number=2,
+                title="Convert to Pressure",
+                description="Take antilog to get pressure in mmHg",
+                formula="P = 10^(log₁₀P)",
+                substitution="P = 10^2.433",
+                computation="P = 271 mmHg",
+                result="P = 271 mmHg"
+            ),
+            CalculationStep(
+                step_number=3,
+                title="Convert Units",
+                description="Convert to psia for US engineering use",
+                formula="P(psia) = P(mmHg) × 14.696/760",
+                substitution="P = 271 × 0.01934",
+                computation="P = 5.24 psia",
+                result="P = 5.24 psia",
+                notes="This is above atmospheric, so benzene will readily evaporate at 50°C"
+            )
+        ],
+        final_answer="P_vap = 271 mmHg = 5.24 psia",
+        real_world_context="At 50°C, benzene has significant vapor pressure - tanks need proper venting!"
+    ),
+    difficulty=Difficulty.BEGINNER,
+    estimated_time_minutes=12,
+    prerequisites=[],
+    related_equations=["raoults_law", "clausius_clapeyron", "flash"],
+    diagram_type="phase_diagram",
+    diagram_labels={
+        "curve": "Vapor Pressure Curve",
+        "liquid_region": "Liquid Phase",
+        "vapor_region": "Vapor Phase",
+        "boiling_point": "Normal Boiling Point"
+    }
+)
+
+
+# ===============================
+# RAOULT'S LAW LEARNING CONTENT
+# ===============================
+RAOULTS_LAW_LEARNING = LearningContent(
+    background_theory="""
+Raoult's Law describes the vapor-liquid equilibrium (VLE) for **ideal solutions**. It states that 
+the partial pressure of a component equals its vapor pressure times its mole fraction in the liquid.
+
+**The Equation:** yᵢ·P = xᵢ·Pᵢˢᵃᵗ  →  yᵢ = xᵢ·Pᵢˢᵃᵗ/P
+
+Where:
+- **yᵢ** = Vapor mole fraction of component i
+- **xᵢ** = Liquid mole fraction of component i  
+- **P** = Total system pressure
+- **Pᵢˢᵃᵗ** = Pure component vapor pressure at T (from Antoine)
+
+**The K-value:**  K = y/x = Pˢᵃᵗ/P
+- K > 1: Component concentrates in vapor (more volatile)
+- K < 1: Component concentrates in liquid (less volatile)
+- K = 1: Equal distribution (at component's boiling point at P)
+
+Raoult's Law works for **ideal mixtures** - similar molecules like alkane mixtures.
+""",
+    key_concepts=[
+        "Ideal solution behavior - similar molecules",
+        "K-values (equilibrium ratios) for separation design",
+        "Relative volatility (α = K₁/K₂) drives distillation",
+        "Non-ideal systems require activity coefficients"
+    ],
+    real_world_applications=[
+        "Binary distillation column design",
+        "Flash drum vapor-liquid split",
+        "Bubble point and dew point calculations",
+        "Gasoline blending (hydrocarbon mixtures)"
+    ],
+    common_mistakes=[
+        "Applying to highly non-ideal mixtures (alcohols + water)",
+        "Forgetting that Pˢᵃᵗ depends on temperature",
+        "Not verifying x and y sum to 1.0",
+        "Using gauge instead of absolute pressure"
+    ],
+    pro_tips=[
+        "Calculate relative volatility α = K₁/K₂ - this determines separation difficulty",
+        "For non-ideal systems, multiply by activity coefficient: y·P = γ·x·Pˢᵃᵗ",
+        "If K·x > 1, the calculation is inconsistent - check your inputs"
+    ],
+    quiz_questions=[
+        QuizQuestion(
+            id="raoult_q1",
+            question="If K > 1 for a component, where does it concentrate?",
+            question_type=QuestionType.MULTIPLE_CHOICE,
+            options=["In the vapor phase", "In the liquid phase", "Equally distributed", "Cannot determine"],
+            correct_answer="In the vapor phase",
+            explanation="K = y/x, so K > 1 means y > x, the component is richer in vapor.",
+            difficulty=Difficulty.BEGINNER,
+            points=10
+        ),
+        QuizQuestion(
+            id="raoult_q2",
+            question="Component A has Pˢᵃᵗ = 2 atm and x = 0.3 at a total pressure of 1 atm. What is y?",
+            question_type=QuestionType.NUMERIC,
+            options=[],
+            correct_answer="0.6",
+            explanation="K = Pˢᵃᵗ/P = 2/1 = 2. y = K·x = 2 × 0.3 = 0.6",
+            difficulty=Difficulty.INTERMEDIATE,
+            hint="First calculate K, then multiply by x",
+            points=15
+        )
+    ],
+    worked_example=WorkedExample(
+        title="Benzene-Toluene Flash Separation",
+        scenario="A 50/50 benzene-toluene mixture is flashed at 1 atm and 95°C. Calculate vapor composition.",
+        given_values={
+            "x_benzene": "0.5",
+            "Pˢᵃᵗ_benzene": "1180 mmHg (at 95°C)",
+            "Pˢᵃᵗ_toluene": "480 mmHg (at 95°C)",
+            "P_total": "760 mmHg (1 atm)"
+        },
+        find=["Vapor composition (y_benzene)"],
+        steps=[
+            CalculationStep(
+                step_number=1,
+                title="Calculate K-values",
+                description="K = Pˢᵃᵗ/P for each component",
+                formula="K = Pˢᵃᵗ / P",
+                substitution="K_benzene = 1180/760, K_toluene = 480/760",
+                computation="K_benzene = 1.55, K_toluene = 0.63",
+                result="K_B = 1.55, K_T = 0.63"
+            ),
+            CalculationStep(
+                step_number=2,
+                title="Apply Raoult's Law",
+                description="Calculate vapor mole fractions",
+                formula="y = K · x",
+                substitution="y_benzene = 1.55 × 0.5 = 0.78",
+                computation="y_toluene = 0.63 × 0.5 = 0.32",
+                result="y_B = 0.78, y_T = 0.22 (normalized)",
+                notes="Note: benzene (K>1) enriches in vapor"
+            )
+        ],
+        final_answer="y_benzene = 0.78 (78% benzene in vapor)",
+        real_world_context="This is why benzene comes off the top of a BTX splitter!"
+    ),
+    difficulty=Difficulty.BEGINNER,
+    estimated_time_minutes=10,
+    prerequisites=["antoine"],
+    related_equations=["antoine", "flash", "activity_coefficient"]
+)
+
+
+# ===============================
+# CLAUSIUS-CLAPEYRON LEARNING CONTENT
+# ===============================
+CLAUSIUS_CLAPEYRON_LEARNING = LearningContent(
+    background_theory="""
+The Clausius-Clapeyron equation relates vapor pressure to temperature using the **heat of vaporization**.
+It's derived from thermodynamic first principles and is useful when Antoine constants aren't available.
+
+**The Equation:** ln(P₂/P₁) = (ΔHᵥₐₚ/R) × (1/T₁ - 1/T₂)
+
+Where:
+- **P₁, P₂** = Vapor pressures at T₁ and T₂
+- **ΔHᵥₐₚ** = Heat (enthalpy) of vaporization
+- **R** = Gas constant (8.314 J/mol·K)
+- **T₁, T₂** = Absolute temperatures (Kelvin!)
+
+**Key Insight:** A plot of ln(P) vs 1/T gives a straight line with slope = -ΔHᵥₐₚ/R
+
+This is the theoretical basis for the Antoine equation (which adds the C parameter for better fit).
+""",
+    key_concepts=[
+        "Heat of vaporization (latent heat) drives the P-T relationship",
+        "Must use absolute temperature (K or R)",
+        "Assumes ΔHᵥₐₚ is constant (valid for small T ranges)",
+        "Natural log (ln), not log₁₀"
+    ],
+    real_world_applications=[
+        "Estimating vapor pressure without Antoine data",
+        "Calculating boiling point at different pressures",
+        "Vacuum distillation design",
+        "Understanding altitude effects on boiling"
+    ],
+    common_mistakes=[
+        "Using °C or °F instead of absolute temperature",
+        "Confusing units of ΔHᵥₐₚ (J/mol vs kJ/kg)",
+        "Applying over too wide a temperature range",
+        "Using log₁₀ instead of natural log"
+    ],
+    quiz_questions=[
+        QuizQuestion(
+            id="cc_q1",
+            question="What happens to boiling point when you reduce pressure?",
+            question_type=QuestionType.MULTIPLE_CHOICE,
+            options=["Boiling point decreases", "Boiling point increases", "No change", "Depends on the substance"],
+            correct_answer="Boiling point decreases",
+            explanation="Lower pressure = lower vapor pressure needed to boil = lower temperature.",
+            difficulty=Difficulty.BEGINNER,
+            points=10
+        )
+    ],
+    worked_example=WorkedExample(
+        title="Water Boiling Point at Altitude",
+        scenario="Calculate the boiling point of water at 0.8 atm (approximately Denver, CO altitude).",
+        given_values={
+            "P₁": "1 atm = 101.3 kPa",
+            "T₁": "100°C = 373.15 K",
+            "P₂": "0.8 atm = 81.1 kPa",
+            "ΔHᵥₐₚ": "40,650 J/mol"
+        },
+        find=["Boiling point T₂"],
+        steps=[
+            CalculationStep(
+                step_number=1,
+                title="Rearrange for T₂",
+                description="Solve Clausius-Clapeyron for the unknown temperature",
+                formula="1/T₂ = 1/T₁ - (R/ΔHᵥₐₚ)·ln(P₂/P₁)",
+                substitution="1/T₂ = 1/373.15 - (8.314/40650)·ln(0.8)",
+                computation="1/T₂ = 0.002680 - (-4.56×10⁻⁵) = 0.002726",
+                result="1/T₂ = 0.002726"
+            ),
+            CalculationStep(
+                step_number=2,
+                title="Calculate T₂",
+                description="Take reciprocal and convert to Celsius",
+                formula="T₂ = 1/0.002726 K",
+                computation="T₂ = 366.9 K = 93.7°C",
+                result="T₂ = 93.7°C",
+                notes="Water boils about 6°C lower in Denver!"
+            )
+        ],
+        final_answer="T₂ = 93.7°C (water boils at lower temperature at altitude)",
+        real_world_context="This is why cooking times increase at high altitude - water boils at lower temperature!"
+    ),
+    difficulty=Difficulty.INTERMEDIATE,
+    estimated_time_minutes=15,
+    prerequisites=["ideal_gas"],
+    related_equations=["antoine", "heat_capacity_mixture"]
+)
+
+
+# ===============================
+# FLASH CALCULATION LEARNING CONTENT
+# ===============================
+FLASH_LEARNING = LearningContent(
+    background_theory="""
+A **flash calculation** determines how a feed stream splits into vapor and liquid phases at 
+equilibrium conditions. It's fundamental to understanding separators, flash drums, and distillation.
+
+**The Rachford-Rice Equation:**  
+Σ zᵢ(Kᵢ-1) / [1 + (V/F)(Kᵢ-1)] = 0
+
+Where:
+- **zᵢ** = Feed composition (mole fraction)
+- **Kᵢ** = K-value for component i (= y/x from VLE)
+- **V/F** = Vapor fraction (moles vapor per mole feed)
+
+**Key Outputs:**
+- V/F: Vapor fraction (0 = all liquid, 1 = all vapor)
+- xᵢ: Liquid compositions
+- yᵢ: Vapor compositions
+
+Flash drums are used everywhere: crude oil processing, refrigeration, chemical plants.
+""",
+    key_concepts=[
+        "Material balance + VLE = flash calculation",
+        "V/F determines how much feed vaporizes",
+        "K-values determine where components go",
+        "If all Kᵢ < 1: subcooled liquid (no vapor)"
+    ],
+    real_world_applications=[
+        "Flash separator design in oil/gas production",
+        "Distillation feed tray conditions",
+        "Refrigeration expansion valves",
+        "LNG regasification"
+    ],
+    common_mistakes=[
+        "Using K-values at wrong T/P conditions",
+        "Not checking if flash is possible (bubble/dew point limits)",
+        "Forgetting that K-values change with T and P",
+        "Not normalizing compositions to sum = 1"
+    ],
+    quiz_questions=[
+        QuizQuestion(
+            id="flash_q1",
+            question="If V/F = 0.5, what does this mean?",
+            question_type=QuestionType.MULTIPLE_CHOICE,
+            options=["Half the feed vaporizes", "All becomes vapor", "All remains liquid", "System is at critical point"],
+            correct_answer="Half the feed vaporizes",
+            explanation="V/F = 0.5 means 50% of feed moles go to vapor phase.",
+            difficulty=Difficulty.BEGINNER,
+            points=10
+        )
+    ],
+    difficulty=Difficulty.INTERMEDIATE,
+    estimated_time_minutes=20,
+    prerequisites=["raoults_law", "antoine"],
+    related_equations=["raoults_law", "antoine"]
+)
 
 
 class AntoineVaporPressure(BaseEquation):
@@ -258,6 +668,7 @@ class AntoineVaporPressure(BaseEquation):
     category = "Thermodynamics"
     description = "Calculate saturation pressure using Antoine equation: log₁₀(P) = A - B/(C+T)"
     reference = "NIST Chemistry WebBook"
+    learning_content = ANTOINE_LEARNING
     
     def get_parameters(self) -> List[EquationParameter]:
         return [
@@ -297,6 +708,7 @@ class RaoultsLaw(BaseEquation):
     category = "Thermodynamics"
     description = "Calculate vapor composition for ideal solution: yᵢ·P = xᵢ·Pᵢˢᵃᵗ"
     reference = "Smith, Van Ness & Abbott"
+    learning_content = RAOULTS_LAW_LEARNING
     
     def get_parameters(self) -> List[EquationParameter]:
         return [
@@ -340,6 +752,7 @@ class ClausiusClapeyron(BaseEquation):
     category = "Thermodynamics"
     description = "Estimate vapor pressure at T2 given vapor pressure at T1 and heat of vaporization"
     reference = "Standard thermodynamics"
+    learning_content = CLAUSIUS_CLAPEYRON_LEARNING
     
     def get_parameters(self) -> List[EquationParameter]:
         return [
@@ -384,6 +797,7 @@ class FlashCalculation(BaseEquation):
     category = "Thermodynamics"
     description = "Calculate vapor fraction in a flash drum using Rachford-Rice"
     reference = "Seader & Henley, Separation Process Principles"
+    learning_content = FLASH_LEARNING
     
     def get_parameters(self) -> List[EquationParameter]:
         return [
