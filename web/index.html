@@ -5244,15 +5244,41 @@
         }
 
         // ===== T-xy Diagram (VLE) =====
+        // Antoine coefficients for log10(P_mmHg) = A - B/(T+C), T in °C
+        // We convert to kPa by multiplying result by 0.133322
         const vleData = {
-            'benzene-toluene': { Tb1: 80.1, Tb2: 110.6, A1: 6.90565, B1: 1211.033, C1: 220.79, A2: 6.95464, B2: 1344.8, C2: 219.48, name1: 'Benzene', name2: 'Toluene' },
-            'methanol-water': { Tb1: 64.7, Tb2: 100, A1: 7.89750, B1: 1474.08, C1: 229.13, A2: 7.96681, B2: 1668.21, C2: 228.0, name1: 'Methanol', name2: 'Water' },
-            'ethanol-water': { Tb1: 78.4, Tb2: 100, A1: 8.11220, B1: 1592.864, C1: 226.184, A2: 7.96681, B2: 1668.21, C2: 228.0, name1: 'Ethanol', name2: 'Water' }
+            'benzene-toluene': {
+                Tb1: 80.1, Tb2: 110.6,
+                A1: 6.90565, B1: 1211.033, C1: 220.79,
+                A2: 6.95464, B2: 1344.8, C2: 219.48,
+                name1: 'Benzene', name2: 'Toluene'
+            },
+            'methanol-water': {
+                Tb1: 64.7, Tb2: 100,
+                A1: 7.89750, B1: 1474.08, C1: 229.13,
+                A2: 7.96681, B2: 1668.21, C2: 228.0,
+                name1: 'Methanol', name2: 'Water'
+            },
+            'ethanol-water': {
+                Tb1: 78.4, Tb2: 100,
+                A1: 8.11220, B1: 1592.864, C1: 226.184,
+                A2: 7.96681, B2: 1668.21, C2: 228.0,
+                name1: 'Ethanol', name2: 'Water'
+            }
         };
+
+        // Called when system dropdown changes
+        function updateTxyParams() {
+            // Automatically re-plot when system changes
+            plotTxy();
+        }
 
         function plotTxy() {
             const system = document.getElementById('txySystem')?.value || 'benzene-toluene';
-            const P = parseFloat(document.getElementById('txyP')?.value || 101.325);
+            const P_kPa = parseFloat(document.getElementById('txyP')?.value || 101.325);
+
+            // Convert kPa to mmHg for Antoine equation (1 kPa = 7.50062 mmHg)
+            const P = P_kPa * 7.50062;
 
             const ctx = document.getElementById('txyChart');
             if (!ctx) return;
@@ -5327,7 +5353,7 @@
                 options: {
                     responsive: true,
                     plugins: {
-                        title: { display: true, text: `${data.name1}-${data.name2} T-xy Diagram at ${P} kPa`, color: '#e0e0e6' },
+                        title: { display: true, text: `${data.name1}-${data.name2} T-xy Diagram at ${P_kPa} kPa`, color: '#f0f6fc' },
                         legend: { labels: { color: '#8a8a9a' } }
                     },
                     scales: {
