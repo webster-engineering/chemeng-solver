@@ -527,6 +527,7 @@
             margin-bottom: 24px;
             background: var(--gradient-1);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
@@ -625,14 +626,72 @@
             font-weight: 700;
             background: var(--gradient-1);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .result-number {
+            -webkit-background-clip: text;
+            background-clip: text;
         }
 
         .result-unit {
             font-size: 0.9rem;
             color: var(--text-secondary);
-            margin-left: 8px;
             -webkit-text-fill-color: var(--text-secondary);
+        }
+
+        .result-unit-select {
+            font-size: 0.85rem;
+            padding: 4px 8px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            cursor: pointer;
+            -webkit-text-fill-color: var(--text-primary);
+            transition: border-color 0.2s;
+        }
+
+        .result-unit-select:hover {
+            border-color: var(--accent);
+        }
+
+        .result-unit-select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .result-card.stored {
+            opacity: 0.8;
+            border-style: dashed;
+        }
+
+        .stored-results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            margin-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .stored-time {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .stored-equation {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: 10px;
         }
 
         .empty-state {
@@ -3916,6 +3975,10 @@
             btn.textContent = 'Calculate';
         }
 
+        // Store current calculation results for unit conversion
+        let lastCalculationResult = null;
+        let lastCalculationOutputs = {};
+
         function displayResults(result) {
             const container = document.getElementById('resultsContent');
 
@@ -3927,6 +3990,9 @@
                 return;
             }
 
+            lastCalculationResult = result;
+            lastCalculationOutputs = JSON.parse(JSON.stringify(result.outputs));
+
             let html = '';
 
             // Validation badge
@@ -3936,24 +4002,179 @@
                 html += `<div class="validation-badge ${status}">${icon} ${result.validation_status}</div>`;
             }
 
-            // Output cards
+            // Output cards with unit conversion dropdown
             for (const [name, data] of Object.entries(result.outputs)) {
-                const value = typeof data.value === 'number' ?
-                    (Math.abs(data.value) < 0.001 || Math.abs(data.value) > 10000 ?
-                        data.value.toExponential(4) : data.value.toFixed(4)) : data.value;
+                const value = formatResultValue(data.value);
+                const unitOptions = getUnitOptionsForUnit(data.unit);
+
                 html += `
-                    <div class="result-card">
+                    <div class="result-card" data-output-name="${name}" data-base-value="${data.value}" data-base-unit="${data.unit || ''}">
                         <div class="result-name">${name}</div>
                         <div class="result-value">
-                            ${value}
-                            <span class="result-unit">${data.unit || ''}</span>
+                            <span class="result-number" id="val_${name}">${value}</span>
+                            ${unitOptions.length > 1 ? `
+                                <select class="result-unit-select" onchange="convertResultUnit('${name}', this.value)">
+                                    ${unitOptions.map(u => `<option value="${u}" ${u === data.unit ? 'selected' : ''}>${u || '—'}</option>`).join('')}
+                                </select>
+                            ` : `<span class="result-unit">${data.unit || ''}</span>`}
                         </div>
                     </div>
                 `;
             }
 
             container.innerHTML = html;
+
+            // Save to localStorage for persistence
+            saveResultsToStorage(result);
         }
+
+        function formatResultValue(value) {
+            if (typeof value === 'number') {
+                if (Math.abs(value) < 0.001 && value !== 0) return value.toExponential(4);
+                if (Math.abs(value) > 10000) return value.toExponential(4);
+                return value.toFixed(4);
+            }
+            return value;
+        }
+
+        // Unit conversion mapping for result outputs
+        const resultUnitConversions = {
+            // Pressure
+            'psi': { group: 'pressure', toBase: 6.89476 },
+            'kPa': { group: 'pressure', toBase: 1 },
+            'bar': { group: 'pressure', toBase: 100 },
+            'atm': { group: 'pressure', toBase: 101.325 },
+            'Pa': { group: 'pressure', toBase: 0.001 },
+            'MPa': { group: 'pressure', toBase: 1000 },
+            // Length/Distance
+            'ft': { group: 'length', toBase: 0.3048 },
+            'm': { group: 'length', toBase: 1 },
+            'in': { group: 'length', toBase: 0.0254 },
+            'cm': { group: 'length', toBase: 0.01 },
+            'mm': { group: 'length', toBase: 0.001 },
+            // Velocity
+            'ft/s': { group: 'velocity', toBase: 0.3048 },
+            'm/s': { group: 'velocity', toBase: 1 },
+            'm/min': { group: 'velocity', toBase: 0.01667 },
+            // Flow
+            'gpm': { group: 'flow', toBase: 0.227125 },
+            'm3/h': { group: 'flow', toBase: 1 },
+            'm³/h': { group: 'flow', toBase: 1 },
+            'L/s': { group: 'flow', toBase: 3.6 },
+            'L/min': { group: 'flow', toBase: 0.06 },
+            // Power
+            'hp': { group: 'power', toBase: 0.7457 },
+            'kW': { group: 'power', toBase: 1 },
+            'W': { group: 'power', toBase: 0.001 },
+            'BTU/hr': { group: 'power', toBase: 0.000293071 },
+            // Dimensionless
+            '': { group: 'dimensionless', toBase: 1 },
+        };
+
+        function getUnitOptionsForUnit(unit) {
+            if (!unit || unit === '') return [''];
+            const conv = resultUnitConversions[unit];
+            if (!conv) return [unit];
+            const group = conv.group;
+            return Object.entries(resultUnitConversions)
+                .filter(([u, c]) => c.group === group && u !== '')
+                .map(([u]) => u);
+        }
+
+        function convertResultUnit(outputName, newUnit) {
+            const card = document.querySelector(`[data-output-name="${outputName}"]`);
+            if (!card) return;
+
+            const baseValue = parseFloat(card.dataset.baseValue);
+            const baseUnit = card.dataset.baseUnit;
+
+            if (isNaN(baseValue) || !baseUnit || !newUnit) return;
+
+            const fromConv = resultUnitConversions[baseUnit];
+            const toConv = resultUnitConversions[newUnit];
+
+            if (!fromConv || !toConv || fromConv.group !== toConv.group) {
+                console.warn('Unit conversion not possible:', baseUnit, newUnit);
+                return;
+            }
+
+            // Convert: value_in_base_SI = original * fromConv.toBase
+            // Then: new_value = value_in_base_SI / toConv.toBase
+            const valueInBase = baseValue * fromConv.toBase;
+            const newValue = valueInBase / toConv.toBase;
+
+            const valueEl = document.getElementById(`val_${outputName}`);
+            if (valueEl) {
+                valueEl.textContent = formatResultValue(newValue);
+            }
+        }
+
+        // ===== Persistent Results Storage =====
+        const RESULTS_STORAGE_KEY = 'websterSolverLastResults';
+        const HISTORY_STORAGE_KEY = 'websterSolverHistory';
+
+        function saveResultsToStorage(result) {
+            try {
+                const data = {
+                    timestamp: new Date().toISOString(),
+                    equation: currentEquation,
+                    category: currentCategory,
+                    outputs: result.outputs,
+                    validation: result.validation_status
+                };
+                localStorage.setItem(RESULTS_STORAGE_KEY, JSON.stringify(data));
+
+                // Also add to history
+                let history = JSON.parse(localStorage.getItem(HISTORY_STORAGE_KEY) || '[]');
+                history.unshift(data);
+                if (history.length > 10) history = history.slice(0, 10);
+                localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(history));
+            } catch (e) {
+                console.warn('Failed to save results to localStorage:', e);
+            }
+        }
+
+        function loadResultsFromStorage() {
+            try {
+                const data = JSON.parse(localStorage.getItem(RESULTS_STORAGE_KEY));
+                if (data && data.outputs) {
+                    displayStoredResults(data);
+                }
+            } catch (e) {
+                console.warn('Failed to load results from localStorage:', e);
+            }
+        }
+
+        function displayStoredResults(data) {
+            const container = document.getElementById('resultsContent');
+            if (!container) return;
+
+            let html = `<div class="stored-results-header">
+                <span>📋 Last Calculation</span>
+                <span class="stored-time">${new Date(data.timestamp).toLocaleTimeString()}</span>
+            </div>`;
+
+            for (const [name, outputData] of Object.entries(data.outputs)) {
+                const value = formatResultValue(outputData.value);
+                html += `
+                    <div class="result-card stored">
+                        <div class="result-name">${name}</div>
+                        <div class="result-value">
+                            ${value}
+                            <span class="result-unit">${outputData.unit || ''}</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            html += `<p class="stored-equation">From: ${data.equation}</p>`;
+            container.innerHTML = html;
+        }
+
+        // Load stored results on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadResultsFromStorage();
+        });
 
         // Search functionality
         document.getElementById('searchBox').addEventListener('input', async (e) => {
