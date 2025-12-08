@@ -2353,6 +2353,140 @@
             font-size: 1rem;
         }
 
+        /* Collapsible Sections (Derivation/Examples) */
+        .collapsible-section {
+            margin: 15px 0;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .section-toggle {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-secondary);
+            border: none;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .section-toggle:hover {
+            background: rgba(91, 110, 174, 0.2);
+        }
+
+        .toggle-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-icon.rotated {
+            transform: rotate(180deg);
+        }
+
+        .section-content {
+            padding: 20px;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border);
+            line-height: 1.7;
+        }
+
+        .section-content h4 {
+            color: var(--accent-light);
+            margin: 15px 0 8px 0;
+        }
+
+        .section-content p,
+        .section-content li {
+            color: var(--text-secondary);
+        }
+
+        .section-content strong {
+            color: var(--text-primary);
+        }
+
+        .section-content code {
+            background: rgba(91, 110, 174, 0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        .example-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 12px 0;
+        }
+
+        .example-card h5 {
+            color: var(--accent-light);
+            margin: 0 0 8px 0;
+            font-size: 1rem;
+        }
+
+        .example-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .example-input {
+            background: var(--bg-card);
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        .example-input span {
+            color: var(--text-secondary);
+        }
+
+        .example-input strong {
+            color: var(--text-primary);
+        }
+
+        .example-steps {
+            margin-top: 12px;
+            padding-left: 20px;
+        }
+
+        .example-steps li {
+            margin: 6px 0;
+            color: var(--text-secondary);
+        }
+
+        .example-conclusion {
+            margin-top: 12px;
+            padding: 10px;
+            background: rgba(34, 197, 94, 0.1);
+            border-left: 3px solid var(--success);
+            border-radius: 0 4px 4px 0;
+            color: var(--success);
+        }
+
+        .load-example-btn {
+            margin-top: 10px;
+            padding: 8px 16px;
+            background: var(--accent);
+            border: none;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background 0.2s;
+        }
+
+        .load-example-btn:hover {
+            background: var(--accent-light);
+        }
+
         @media (max-width: 1200px) {
             .container {
                 grid-template-columns: 1fr;
@@ -2558,6 +2692,25 @@
                         <div id="externalLinks" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px;">
                         </div>
                     </div>
+
+                    <!-- Derivation Section (Collapsible) -->
+                    <div class="collapsible-section" id="derivationSection" style="display: none;">
+                        <button class="section-toggle" onclick="toggleSection('derivation')">
+                            <span>📐 Equation Derivation</span>
+                            <span class="toggle-icon" id="derivationIcon">▼</span>
+                        </button>
+                        <div class="section-content" id="derivationContent" style="display: none;"></div>
+                    </div>
+
+                    <!-- Worked Examples Section (Collapsible) -->
+                    <div class="collapsible-section" id="examplesSection" style="display: none;">
+                        <button class="section-toggle" onclick="toggleSection('examples')">
+                            <span>📝 Worked Examples</span>
+                            <span class="toggle-icon" id="examplesIcon">▼</span>
+                        </button>
+                        <div class="section-content" id="examplesContent" style="display: none;"></div>
+                    </div>
+
                     <div class="input-section">
                         <h3 class="section-title">Inputs</h3>
                         <div class="input-grid" id="inputGrid"></div>
@@ -3709,6 +3862,22 @@
 
             // Setup input validation
             setupInputValidation();
+
+            // Render derivation and examples if available
+            document.getElementById('derivationSection').style.display = 'none';
+            document.getElementById('examplesSection').style.display = 'none';
+            document.getElementById('derivationContent').style.display = 'none';
+            document.getElementById('examplesContent').style.display = 'none';
+            document.getElementById('derivationIcon').classList.remove('rotated');
+            document.getElementById('examplesIcon').classList.remove('rotated');
+
+            if (eq.derivation) {
+                renderDerivation(eq.derivation);
+            }
+            if (eq.examples && eq.examples.length > 0) {
+                currentExamples = eq.examples;
+                renderExamples(eq.examples);
+            }
         }
 
         async function calculate() {
@@ -5634,6 +5803,109 @@
         document.addEventListener('DOMContentLoaded', () => {
             populateChemicalsTable();
         });
+
+        // ===== Derivation & Examples Toggle =====
+        function toggleSection(section) {
+            const content = document.getElementById(section + 'Content');
+            const icon = document.getElementById(section + 'Icon');
+
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                icon.classList.add('rotated');
+            } else {
+                content.style.display = 'none';
+                icon.classList.remove('rotated');
+            }
+        }
+
+        function renderDerivation(derivation) {
+            if (!derivation) return;
+
+            const section = document.getElementById('derivationSection');
+            const content = document.getElementById('derivationContent');
+
+            // Simple markdown-like rendering
+            let html = derivation
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\$\$(.*?)\$\$/g, '<code class="equation">$1</code>')
+                .replace(/^- (.*)/gm, '<li>$1</li>')
+                .replace(/\n\n/g, '</p><p>')
+                .replace(/\n/g, '<br>');
+
+            html = '<p>' + html + '</p>';
+            html = html.replace(/<p><li>/g, '<ul><li>').replace(/<\/li><\/p>/g, '</li></ul>');
+
+            content.innerHTML = html;
+            section.style.display = 'block';
+        }
+
+        function renderExamples(examples) {
+            if (!examples || examples.length === 0) return;
+
+            const section = document.getElementById('examplesSection');
+            const content = document.getElementById('examplesContent');
+
+            let html = examples.map((ex, idx) => `
+                <div class="example-card">
+                    <h5>${ex.title}</h5>
+                    <p style="color: var(--text-secondary); margin-bottom: 10px;">${ex.description}</p>
+                    
+                    <strong style="font-size: 0.85rem;">Inputs:</strong>
+                    <div class="example-inputs">
+                        ${Object.entries(ex.inputs).map(([k, v]) => `
+                            <div class="example-input">
+                                <span>${k}:</span> <strong>${v}</strong>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    ${ex.steps ? `
+                        <strong style="font-size: 0.85rem;">Step-by-Step Solution:</strong>
+                        <ol class="example-steps">
+                            ${ex.steps.map(s => `<li>${s}</li>`).join('')}
+                        </ol>
+                    ` : ''}
+                    
+                    ${ex.expected ? `
+                        <strong style="font-size: 0.85rem;">Expected Result:</strong>
+                        <div class="example-inputs">
+                            ${Object.entries(ex.expected).map(([k, v]) => `
+                                <div class="example-input">
+                                    <span>${k}:</span> <strong>${v}</strong>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                    
+                    ${ex.conclusion ? `
+                        <div class="example-conclusion">
+                            <strong>Conclusion:</strong> ${ex.conclusion}
+                        </div>
+                    ` : ''}
+                    
+                    <button class="load-example-btn" onclick="loadExample(${idx})">
+                        Load This Example
+                    </button>
+                </div>
+            `).join('');
+
+            content.innerHTML = html;
+            section.style.display = 'block';
+        }
+
+        let currentExamples = [];
+
+        function loadExample(idx) {
+            if (currentExamples[idx]) {
+                const ex = currentExamples[idx];
+                for (const [key, value] of Object.entries(ex.inputs)) {
+                    const input = document.querySelector(`input[data-param="${key}"]`);
+                    if (input) {
+                        input.value = value;
+                    }
+                }
+            }
+        }
 
     </script>
 

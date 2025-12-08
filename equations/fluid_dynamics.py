@@ -20,6 +20,42 @@ class ReynoldsNumber(BaseEquation):
     description = "Dimensionless number indicating laminar (<2100) or turbulent (>4000) flow"
     reference = "Fundamentals of Fluid Mechanics"
     
+    derivation = """
+**Reynolds Number Derivation**
+
+The Reynolds number is a dimensionless quantity that predicts flow patterns. It represents the ratio of inertial forces to viscous forces:
+
+$$Re = \\frac{\\text{Inertial Forces}}{\\text{Viscous Forces}} = \\frac{\\rho V D}{\\mu}$$
+
+**Physical Meaning:**
+- **Inertial forces** (ρV²) - tendency of fluid to keep moving
+- **Viscous forces** (μV/D) - fluid's resistance to deformation
+
+**Flow Regime Classification:**
+- Re < 2100: **Laminar flow** - smooth, orderly layers
+- 2100 < Re < 4000: **Transition** - unstable, intermittent
+- Re > 4000: **Turbulent flow** - chaotic, mixing eddies
+
+Named after Osborne Reynolds who demonstrated the transition in 1883 using dye injection experiments.
+"""
+
+    examples = [
+        {
+            "title": "Water in 4-inch Pipe",
+            "description": "Water at 68°F flowing at 5 ft/s through a 4-inch schedule 40 pipe",
+            "inputs": {"rho": 62.4, "V": 5, "D": 4.026, "mu": 1.0},
+            "expected": {"Re": 173420},
+            "conclusion": "Re >> 4000, so flow is fully turbulent"
+        },
+        {
+            "title": "Oil in Small Tube",
+            "description": "Heavy oil (viscosity 500 cP) at 2 ft/s in 1-inch tube",
+            "inputs": {"rho": 54, "V": 2, "D": 1, "mu": 500},
+            "expected": {"Re": 56},
+            "conclusion": "Re << 2100, so flow is laminar"
+        }
+    ]
+    
     def get_parameters(self) -> List[EquationParameter]:
         return [
             EquationParameter("rho", "Fluid density - mass per unit volume of the fluid", 
@@ -182,6 +218,45 @@ class DarcyWeisbach(BaseEquation):
     category = "Fluid Dynamics"
     description = "Calculate pressure drop in pipes using friction factor"
     reference = "Perry's Chemical Engineers' Handbook, 8th Ed"
+    
+    derivation = """
+**Darcy-Weisbach Equation Derivation**
+
+The Darcy-Weisbach equation is derived from dimensional analysis and energy balance principles:
+
+$$\\Delta P = f \\cdot \\frac{L}{D} \\cdot \\frac{\\rho V^2}{2}$$
+
+Or expressed as head loss:
+$$h_f = f \\cdot \\frac{L}{D} \\cdot \\frac{V^2}{2g}$$
+
+**Origin:**
+1. **Force Balance**: Shear stress at pipe wall balanced against pressure difference
+2. **Dimensional Analysis**: π-theorem reveals dimensionless groups
+3. **The friction factor (f)** encapsulates all Reynolds and roughness effects
+
+**Key Points:**
+- Works for ANY Newtonian fluid (unlike Hazen-Williams)
+- Requires friction factor from Moody Chart, Colebrook, or Swamee-Jain equation
+- For laminar flow: f = 64/Re (exact solution)
+- For turbulent flow: f depends on Re and relative roughness ε/D
+"""
+
+    examples = [
+        {
+            "title": "Water through 100 ft of 4-inch Steel Pipe",
+            "description": "Water at 5 ft/s through 4\" Sch 40 steel pipe (f = 0.018)",
+            "inputs": {"f": 0.018, "L": 100, "D": 4.026, "V": 5, "rho": 62.4},
+            "expected": {"dP": 0.46},
+            "steps": [
+                "Step 1: Convert D to ft: 4.026 in ÷ 12 = 0.3355 ft",
+                "Step 2: Calculate L/D = 100 / 0.3355 = 298.1",
+                "Step 3: Calculate velocity head: ρV²/2g = 62.4 × 25 / 64.35 = 24.23 lbf/ft²",
+                "Step 4: ΔP = f × (L/D) × (ρV²/2g) = 0.018 × 298.1 × 24.23 = 130 lbf/ft²",
+                "Step 5: Convert to psi: 130 ÷ 144 = 0.90 psi"
+            ],
+            "conclusion": "Pressure drop of ~0.9 psi per 100 ft is reasonable for water"
+        }
+    ]
     
     def get_parameters(self) -> List[EquationParameter]:
         return [

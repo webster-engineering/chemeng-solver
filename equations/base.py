@@ -73,6 +73,8 @@ class BaseEquation(ABC):
     category: str = ""
     description: str = ""
     reference: str = ""
+    derivation: str = ""  # Explains how the equation was derived
+    examples: List[Dict[str, Any]] = []  # Worked examples with inputs and expected outputs
     
     def __init__(self):
         self.converter = get_converter()
@@ -167,6 +169,7 @@ class BaseEquation(ABC):
         return {
             'id': self.equation_id, 'name': self.name, 'category': self.category,
             'description': self.description, 'reference': self.reference,
+            'derivation': self.derivation, 'examples': self.examples,
             'inputs': [{'name': p.name, 'description': p.description, 'unit': p.default_unit}
                        for p in self.inputs],
             'outputs': [{'name': p.name, 'description': p.description, 'unit': p.default_unit}
