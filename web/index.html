@@ -716,6 +716,33 @@
             margin-top: 10px;
         }
 
+        .pid-metrics {
+            margin: 15px 0;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .metric {
+            background: var(--bg-card);
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-size: 0.85rem;
+        }
+
+        .metric-label {
+            color: var(--text-secondary);
+            margin-right: 6px;
+        }
+
+        .metric strong {
+            color: var(--accent-light);
+        }
+
         .empty-state {
             text-align: center;
             padding: 80px 20px;
@@ -3120,26 +3147,47 @@
 
                     <!-- PID Step Response -->
                     <div id="pidGraph" class="graph-container active">
-                        <h3>PID Step Response</h3>
+                        <h3>Controller Step Response</h3>
                         <div class="graph-controls">
                             <div class="input-group">
-                                <label>Process Gain (K):</label>
+                                <label>Controller Type:</label>
+                                <select id="pidType">
+                                    <option value="P">P-Only</option>
+                                    <option value="PI">PI Controller</option>
+                                    <option value="PID" selected>PID Controller</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label>Process Gain (Kp):</label>
                                 <input type="number" id="pidK" value="1" step="0.1">
                             </div>
                             <div class="input-group">
-                                <label>Time Constant (τ, s):</label>
+                                <label>Process Time Constant (τp, s):</label>
                                 <input type="number" id="pidTau" value="5" step="0.5">
                             </div>
                             <div class="input-group">
-                                <label>Damping Ratio (ζ):</label>
-                                <input type="number" id="pidZeta" value="0.5" step="0.1" min="0" max="2">
+                                <label>Controller Gain (Kc):</label>
+                                <input type="number" id="pidKc" value="2" step="0.1">
                             </div>
                             <div class="input-group">
-                                <label>Step Size:</label>
+                                <label>Integral Time (τI, s):</label>
+                                <input type="number" id="pidTauI" value="10" step="1">
+                            </div>
+                            <div class="input-group">
+                                <label>Derivative Time (τD, s):</label>
+                                <input type="number" id="pidTauD" value="1" step="0.1">
+                            </div>
+                            <div class="input-group">
+                                <label>Time Scale (s):</label>
+                                <input type="number" id="pidTmax" value="50" step="10" min="10">
+                            </div>
+                            <div class="input-group">
+                                <label>Setpoint Change:</label>
                                 <input type="number" id="pidStep" value="1" step="0.1">
                             </div>
                             <button class="calculate-btn" onclick="plotPIDResponse()">Plot Response</button>
                         </div>
+                        <div class="pid-metrics" id="pidMetrics"></div>
                         <div class="chart-wrapper">
                             <canvas id="pidChart"></canvas>
                         </div>
@@ -5096,47 +5144,100 @@
         let moodyChartInstance = null;
 
         // ===== PID Step Response =====
+        // Simulates closed-loop step response for P, PI, or PID controller with FOPTD process
         function plotPIDResponse() {
-            const K = parseFloat(document.getElementById('pidK')?.value || 1);
-            const tau = parseFloat(document.getElementById('pidTau')?.value || 5);
-            const zeta = parseFloat(document.getElementById('pidZeta')?.value || 0.5);
+            const controllerType = document.getElementById('pidType')?.value || 'PID';
+            const Kp = parseFloat(document.getElementById('pidK')?.value || 1);         // Process gain
+            const taup = parseFloat(document.getElementById('pidTau')?.value || 5);     // Process time constant
+            const Kc = parseFloat(document.getElementById('pidKc')?.value || 2);        // Controller gain
+            const tauI = parseFloat(document.getElementById('pidTauI')?.value || 10);   // Integral time
+            const tauD = parseFloat(document.getElementById('pidTauD')?.value || 1);    // Derivative time
+            const tMax = parseFloat(document.getElementById('pidTmax')?.value || 50);   // Time scale
             const stepSize = parseFloat(document.getElementById('pidStep')?.value || 1);
 
             const ctx = document.getElementById('pidChart');
             if (!ctx) return;
 
-            // Generate time data
-            const tMax = tau * 8;
-            const dt = tMax / 200;
+            // Simulation parameters
+            const dt = tMax / 500;  // Time step
             const times = [];
-            const response = [];
-            const setpoint = [];
+            const processOutput = [];
+            const controllerOutput = [];
+            const setpointData = [];
+            const errorData = [];
 
+            // State variables
+            let y = 0;          // Process output
+            let yPrev = 0;      // Previous output
+            let integral = 0;   // Integral of error
+            let errorPrev = 0;  // Previous error
+
+            // Simulate closed-loop response
             for (let t = 0; t <= tMax; t += dt) {
                 times.push(t.toFixed(2));
-                setpoint.push(stepSize * K);
 
-                // Second-order response: y(t) = K * stepSize * [1 - e^(-zeta*wn*t) * (cos(wd*t) + (zeta/sqrt(1-zeta^2))*sin(wd*t))]
-                if (zeta < 1) {
-                    // Underdamped
-                    const wn = 1 / tau;
-                    const wd = wn * Math.sqrt(1 - zeta * zeta);
-                    const expTerm = Math.exp(-zeta * wn * t);
-                    const y = K * stepSize * (1 - expTerm * (Math.cos(wd * t) + (zeta / Math.sqrt(1 - zeta * zeta)) * Math.sin(wd * t)));
-                    response.push(y);
-                } else if (zeta === 1) {
-                    // Critically damped
-                    const wn = 1 / tau;
-                    const y = K * stepSize * (1 - Math.exp(-wn * t) * (1 + wn * t));
-                    response.push(y);
+                // Setpoint (step change at t=0)
+                const sp = stepSize;
+                setpointData.push(sp);
+
+                // Error
+                const error = sp - y;
+                errorData.push(error);
+
+                // Controller output based on type
+                let u = 0;
+                if (controllerType === 'P') {
+                    // P-only: u = Kc * e
+                    u = Kc * error;
+                } else if (controllerType === 'PI') {
+                    // PI: u = Kc * (e + 1/tauI * integral(e))
+                    integral += error * dt;
+                    u = Kc * (error + integral / tauI);
                 } else {
-                    // Overdamped
-                    const wn = 1 / tau;
-                    const r1 = -zeta * wn + wn * Math.sqrt(zeta * zeta - 1);
-                    const r2 = -zeta * wn - wn * Math.sqrt(zeta * zeta - 1);
-                    const y = K * stepSize * (1 - (r1 * Math.exp(r2 * t) - r2 * Math.exp(r1 * t)) / (r1 - r2));
-                    response.push(y);
+                    // PID: u = Kc * (e + 1/tauI * integral(e) + tauD * de/dt)
+                    integral += error * dt;
+                    const derivative = (error - errorPrev) / dt;
+                    u = Kc * (error + integral / tauI + tauD * derivative);
                 }
+                controllerOutput.push(u);
+
+                // First-order process: tau * dy/dt + y = Kp * u
+                // Euler method: y_new = y + dt * (Kp * u - y) / tau
+                const dydt = (Kp * u - y) / taup;
+                y = y + dydt * dt;
+                processOutput.push(y);
+
+                errorPrev = error;
+                yPrev = y;
+            }
+
+            // Calculate performance metrics
+            const finalValue = processOutput[processOutput.length - 1];
+            const peakValue = Math.max(...processOutput);
+            const overshoot = ((peakValue - stepSize) / stepSize) * 100;
+            const steadyStateError = Math.abs(stepSize - finalValue);
+
+            // Settling time (±2% of setpoint)
+            const tolerance = 0.02 * stepSize;
+            let settlingTime = tMax;
+            for (let i = processOutput.length - 1; i >= 0; i--) {
+                if (Math.abs(processOutput[i] - stepSize) > tolerance) {
+                    settlingTime = parseFloat(times[i]);
+                    break;
+                }
+            }
+
+            // Display metrics
+            const metricsDiv = document.getElementById('pidMetrics');
+            if (metricsDiv) {
+                metricsDiv.innerHTML = `
+                    <div class="metric-grid">
+                        <div class="metric"><span class="metric-label">Controller:</span> <strong>${controllerType}</strong></div>
+                        <div class="metric"><span class="metric-label">Overshoot:</span> <strong>${overshoot.toFixed(1)}%</strong></div>
+                        <div class="metric"><span class="metric-label">Settling Time (2%):</span> <strong>${settlingTime.toFixed(1)}s</strong></div>
+                        <div class="metric"><span class="metric-label">Steady-State Error:</span> <strong>${steadyStateError.toFixed(4)}</strong></div>
+                    </div>
+                `;
             }
 
             if (pidChartInstance) pidChartInstance.destroy();
@@ -5147,32 +5248,56 @@
                     labels: times,
                     datasets: [
                         {
-                            label: 'Response',
-                            data: response,
-                            borderColor: '#5b6eae',
-                            backgroundColor: 'rgba(91, 110, 174, 0.1)',
+                            label: 'Process Output (y)',
+                            data: processOutput,
+                            borderColor: '#58a6ff',
+                            backgroundColor: 'rgba(88, 166, 255, 0.1)',
                             fill: true,
-                            tension: 0.4,
-                            pointRadius: 0
+                            tension: 0.2,
+                            pointRadius: 0,
+                            borderWidth: 2
                         },
                         {
-                            label: 'Setpoint',
-                            data: setpoint,
-                            borderColor: '#22c55e',
+                            label: 'Setpoint (SP)',
+                            data: setpointData,
+                            borderColor: '#3fb950',
                             borderDash: [5, 5],
-                            pointRadius: 0
+                            pointRadius: 0,
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'Controller Output (u)',
+                            data: controllerOutput,
+                            borderColor: '#f85149',
+                            borderDash: [2, 2],
+                            pointRadius: 0,
+                            borderWidth: 1.5,
+                            hidden: true
                         }
                     ]
                 },
                 options: {
                     responsive: true,
                     plugins: {
-                        title: { display: true, text: `Second-Order Response (ζ=${zeta}, τ=${tau}s)`, color: '#e0e0e6' },
-                        legend: { labels: { color: '#8a8a9a' } }
+                        title: {
+                            display: true,
+                            text: `${controllerType} Controller Response (Kc=${Kc}, τp=${taup}s${controllerType !== 'P' ? ', τI=' + tauI + 's' : ''}${controllerType === 'PID' ? ', τD=' + tauD + 's' : ''})`,
+                            color: '#f0f6fc',
+                            font: { size: 13 }
+                        },
+                        legend: { labels: { color: '#8b949e' }, position: 'bottom' }
                     },
                     scales: {
-                        x: { title: { display: true, text: 'Time (s)', color: '#8a8a9a' }, ticks: { color: '#8a8a9a' }, grid: { color: 'rgba(255,255,255,0.05)' } },
-                        y: { title: { display: true, text: 'Output', color: '#8a8a9a' }, ticks: { color: '#8a8a9a' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                        x: {
+                            title: { display: true, text: 'Time (s)', color: '#8b949e' },
+                            ticks: { color: '#8b949e', maxTicksLimit: 10 },
+                            grid: { color: 'rgba(48, 54, 61, 0.5)' }
+                        },
+                        y: {
+                            title: { display: true, text: 'Value', color: '#8b949e' },
+                            ticks: { color: '#8b949e' },
+                            grid: { color: 'rgba(48, 54, 61, 0.5)' }
+                        }
                     }
                 }
             });
