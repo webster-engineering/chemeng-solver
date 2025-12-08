@@ -765,15 +765,19 @@
             transform: rotate(20deg);
         }
 
-        /* Tips Carousel */
+        /* Tips Carousel - Fixed bottom right */
         .tips-carousel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 320px;
             background: var(--bg-card);
+            backdrop-filter: blur(20px);
             border: 1px solid var(--border);
             border-radius: 12px;
             padding: 16px;
-            margin-top: 20px;
-            position: relative;
-            overflow: hidden;
+            z-index: 100;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
         }
 
         .tips-carousel .tip {
