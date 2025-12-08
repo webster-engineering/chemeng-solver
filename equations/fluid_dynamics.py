@@ -436,6 +436,61 @@ gasoline at same head (but different pressures!).
 
 
 # ===============================
+# HAZEN-WILLIAMS LEARNING CONTENT
+# ===============================
+HAZEN_WILLIAMS_LEARNING = LearningContent(
+    background_theory="""
+The **Hazen-Williams equation** is a widely-used empirical formula for 
+pressure loss in water distribution and fire protection systems.
+
+**The Equation:** h_L = 10.67 × L × Q^1.852 / (C^1.852 × D^4.87)
+
+Where:
+- h_L = Head loss (ft)
+- L = Pipe length (ft)
+- Q = Flow rate (gpm)
+- C = Hazen-Williams C-factor (roughness)
+- D = Pipe diameter (in)
+
+**Typical C Values:**
+| Pipe Type | C |
+|-----------|---|
+| New steel/iron | 140 |
+| Aged steel | 100-120 |
+| Cast iron | 130 |
+| PVC/copper | 150 |
+""",
+    key_concepts=[
+        "Empirical equation specifically for water",
+        "C-factor represents pipe roughness",
+        "Higher C = smoother pipe = less loss",
+        "Only valid for water at typical temperatures"
+    ],
+    common_mistakes=[
+        "Using for fluids other than water",
+        "Applying outside valid flow regime (Re > 4000)",
+        "Using wrong C for aged pipes"
+    ],
+    quiz_questions=[
+        QuizQuestion(
+            id="hw_q1",
+            question="What C-factor would you use for new PVC pipe?",
+            question_type=QuestionType.MULTIPLE_CHOICE,
+            options=["150", "100", "80", "50"],
+            correct_answer="150",
+            explanation="PVC is smooth plastic, so C ≈ 150 for Hazen-Williams.",
+            difficulty=Difficulty.BEGINNER,
+            points=10
+        )
+    ],
+    difficulty=Difficulty.BEGINNER,
+    estimated_time_minutes=10,
+    prerequisites=[],
+    related_equations=["darcy_weisbach", "pump_head"]
+)
+
+
+# ===============================
 # BERNOULLI LEARNING CONTENT
 # ===============================
 BERNOULLI_LEARNING = LearningContent(
@@ -846,6 +901,7 @@ class HazenWilliams(BaseEquation):
     category = "Fluid Dynamics"
     description = "Calculate head loss for water flow in pipes (empirical equation)"
     reference = "Fire protection and water distribution standards"
+    learning_content = HAZEN_WILLIAMS_LEARNING
     
     def get_parameters(self) -> List[EquationParameter]:
         return [
