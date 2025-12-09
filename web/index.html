@@ -7869,11 +7869,19 @@
         }
 
         async function calculateLearningMode() {
-            // Gather inputs from the regular input form
+            // Gather inputs from the learning mode input form
             const inputs = {};
             for (const param of equationParams) {
-                const valueEl = document.getElementById(`input_${param.name}`);
-                const unitEl = document.getElementById(`unit_${param.name}`);
+                // Try learning-specific inputs first, fall back to regular inputs
+                let valueEl = document.getElementById(`learning_input_${param.name}`);
+                let unitEl = document.getElementById(`learning_unit_${param.name}`);
+
+                // Fallback to regular inputs if learning inputs not found
+                if (!valueEl) {
+                    valueEl = document.getElementById(`input_${param.name}`);
+                    unitEl = document.getElementById(`unit_${param.name}`);
+                }
+
                 const value = parseFloat(valueEl?.value);
 
                 if (!isNaN(value)) {
@@ -7984,11 +7992,29 @@
                         inputSection.style.display = 'none';
                     }
 
-                    // Copy input form to learning step 3
+                    // Build input form for learning step 3 directly from equationParams
                     const learningInputGrid = document.getElementById('learningInputGrid');
-                    const originalInputGrid = document.getElementById('inputGrid');
-                    if (learningInputGrid && originalInputGrid) {
-                        learningInputGrid.innerHTML = originalInputGrid.innerHTML;
+                    if (learningInputGrid && equationParams && equationParams.length > 0) {
+                        learningInputGrid.innerHTML = equationParams.map(param => {
+                            const unitOptions = (param.unit_options && param.unit_options.length > 0)
+                                ? param.unit_options
+                                : (param.unit ? [param.unit] : ['']);
+                            const optionsHtml = unitOptions.map(u =>
+                                `<option value="${u}" ${u === param.unit ? 'selected' : ''}>${u || '—'}</option>`
+                            ).join('');
+
+                            return `
+                            <div class="input-group">
+                                <label class="input-label ${param.tooltip ? 'tooltip' : ''}" ${param.tooltip ? `data-tooltip="${param.tooltip}"` : ''}>
+                                    <span class="symbol">${param.symbol}</span>
+                                </label>
+                                <input type="number" class="input-field" id="learning_input_${param.name}" 
+                                       placeholder="${param.description}" step="any">
+                                <select class="unit-select" id="learning_unit_${param.name}">
+                                    ${optionsHtml}
+                                </select>
+                            </div>
+                        `}).join('');
                     }
                 } else {
                     // No learning content - show message
