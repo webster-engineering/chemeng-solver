@@ -2659,12 +2659,53 @@
         .equation-item .learning-badge {
             display: inline-block;
             background: linear-gradient(135deg, #10b981, #34d399);
-            color: white;
+            color: #1f2937;
+            /* Dark gray for better readability */
             font-size: 0.65rem;
+            font-weight: 600;
             padding: 2px 6px;
             border-radius: 10px;
             margin-left: 6px;
             vertical-align: middle;
+        }
+
+        /* Responsive Design for Small Screens */
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar,
+            .results-panel {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 15px;
+            }
+
+            .input-group {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .learning-toggle {
+                right: 10px;
+                padding: 6px 12px;
+                font-size: 0.75rem;
+            }
+
+            .learning-stepper {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .stepper-step {
+                flex: 1 1 auto;
+                min-width: 60px;
+            }
         }
 
         /* Difficulty Badges */
@@ -3648,6 +3689,15 @@
                     style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh;">
                     <h2>Welcome to the Webster Engineering Solver</h2>
                     <p class="tagline-fade">Select an equation from the sidebar to get started</p>
+                    <div
+                        style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 8px; padding: 12px 20px; margin-top: 20px; max-width: 500px;">
+                        <p
+                            style="color: #f59e0b; font-size: 0.85rem; margin: 0; display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 1.1rem;">⚠️</span>
+                            <strong>Beta Version</strong> — This site is under active development. Results should be
+                            verified independently. Report bugs or errors to improve the tool.
+                        </p>
+                    </div>
                     <div style="display: flex; gap: 15px; justify-content: center; margin-top: 30px;">
 
                         <a href="/pid.html" class="tool-card">
