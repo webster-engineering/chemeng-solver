@@ -448,6 +448,167 @@ MASS_TRANSFER_EQUATIONS = {
 }
 
 
+# ===============================
+# HTU-NTU LEARNING CONTENT
+# ===============================
+HTU_NTU_LEARNING = LearningContent(
+    background_theory="""
+The **HTU-NTU method** is the standard approach for designing packed columns. Unlike tray 
+columns with discrete stages, packed columns provide continuous contact between phases.
+
+**Fundamental Relationship:**
+Z = HTU × NTU
+
+Where:
+- **Z** = Required packing height (m or ft)
+- **HTU** = Height of a Transfer Unit (characteristic of packing/system)
+- **NTU** = Number of Transfer Units (determined by separation required)
+
+**Calculating NTU (for dilute systems):**
+NTU = ln[(y_in - y*)/(y_out - y*)]
+
+Or using log-mean driving force:
+NTU = (y_in - y_out) / ΔyLM
+
+**HTU depends on:**
+- Packing type and size
+- Gas and liquid flow rates
+- Physical properties (viscosity, diffusivity)
+- Operating conditions
+
+HTU is analogous to HETP (Height Equivalent to Theoretical Plate) but based on 
+transfer unit concept rather than equilibrium stage.
+""",
+    key_concepts=[
+        "Z = HTU × NTU separates packing characteristics from separation duty",
+        "HTU determined by mass transfer coefficients and flow rates",
+        "NTU determined by inlet/outlet concentrations and equilibrium",
+        "Lower HTU = more efficient packing = shorter column"
+    ],
+    real_world_applications=[
+        "Acid gas scrubbers (H2S, SO2, HCl removal)",
+        "Packed distillation columns",
+        "Cooling towers",
+        "VOC emission control wet scrubbers"
+    ],
+    industry_examples=[
+        "FGD (flue gas desulfurization) scrubbers in power plants",
+        "Ammonia strippers in fertilizer production",
+        "Structured packing in vacuum distillation"
+    ],
+    common_mistakes=[
+        "Confusing HTU with HETP (different concepts)",
+        "Not checking that driving force (y - y*) stays positive",
+        "Using correlation-based HTU outside its valid range",
+        "Forgetting to account for liquid-phase resistance"
+    ],
+    pro_tips=[
+        "Typical HTU values: 0.3-1.0 m for structured packing, 0.5-1.5 m for random",
+        "HTU_OG = HTU_G + (mG/L) × HTU_L for overall gas-phase",
+        "If y* ≈ 0 (irreversible absorption), NTU = ln(y_in/y_out)",
+        "Always add 20-50% safety factor to calculated height"
+    ],
+    variable_sources={
+        "HTU": "From vendor correlations, pilot data, or literature (Onda, Bravo-Fair)",
+        "y_in": "Feed gas composition from process conditions",
+        "y_out": "Target outlet spec (permit limit, downstream requirement)",
+        "y*": "Equilibrium with exiting liquid (often ~0 for pure solvent)"
+    },
+    quiz_questions=[
+        QuizQuestion(
+            id="htu_q1",
+            question="If HTU = 0.5 m and NTU = 4, what packing height is needed?",
+            question_type=QuestionType.NUMERIC,
+            options=[],
+            correct_answer="2",
+            explanation="Z = HTU × NTU = 0.5 × 4 = 2.0 m",
+            difficulty=Difficulty.BEGINNER,
+            hint="Just multiply!",
+            points=10
+        ),
+        QuizQuestion(
+            id="htu_q2",
+            question="Which packing type typically has lower HTU?",
+            question_type=QuestionType.MULTIPLE_CHOICE,
+            options=["Structured packing", "Random packing (Raschig rings)", 
+                     "They are always equal", "Depends only on column diameter"],
+            correct_answer="Structured packing",
+            explanation="Structured packing provides more surface area per volume and better liquid distribution, giving lower HTU (more efficient mass transfer).",
+            difficulty=Difficulty.INTERMEDIATE,
+            points=15
+        ),
+        QuizQuestion(
+            id="htu_q3",
+            question="For a 99% removal of a pollutant (y_in = 0.01, y_out = 0.0001, y* = 0), what is NTU?",
+            question_type=QuestionType.NUMERIC,
+            options=[],
+            correct_answer="4.6",
+            explanation="NTU = ln[(0.01 - 0)/(0.0001 - 0)] = ln(100) = 4.605 ≈ 4.6",
+            difficulty=Difficulty.INTERMEDIATE,
+            hint="NTU = ln(y_in/y_out) when y* = 0",
+            points=15
+        )
+    ],
+    worked_example=WorkedExample(
+        title="SO2 Scrubber Design",
+        scenario="Design a packed scrubber to remove 95% of SO2 from flue gas. Inlet: 2000 ppm SO2. The scrubbing liquid (NaOH) is in large excess so y* ≈ 0. HTU for the system is 0.6 m.",
+        given_values={
+            "y_in": "2000 ppm = 0.002",
+            "y_out": "100 ppm = 0.0001 (95% removal)",
+            "y*": "0 (excess alkali)",
+            "HTU": "0.6 m"
+        },
+        find=["NTU required", "Packing height Z"],
+        steps=[
+            CalculationStep(
+                step_number=1,
+                title="Calculate NTU",
+                description="For y* = 0, the NTU formula simplifies.",
+                formula="NTU = ln(y_in / y_out)",
+                substitution="NTU = ln(0.002 / 0.0001)",
+                computation="NTU = ln(20) = 3.0",
+                result="NTU = 3.0 transfer units"
+            ),
+            CalculationStep(
+                step_number=2,
+                title="Calculate packing height",
+                description="Apply the fundamental HTU-NTU relationship.",
+                formula="Z = HTU × NTU",
+                substitution="Z = 0.6 m × 3.0",
+                computation="Z = 1.8 m",
+                result="Z = 1.8 m required packing height"
+            ),
+            CalculationStep(
+                step_number=3,
+                title="Add safety factor",
+                description="Apply engineering margin for uncertainties.",
+                computation="Z_design = 1.8 × 1.3 = 2.34 m",
+                result="Z_design ≈ 2.4 m (with 30% margin)",
+                notes="Round to nearest standard packing bed depth"
+            )
+        ],
+        final_answer="Design packing height = 2.4 m (including safety factor)",
+        real_world_context="FGD scrubbers in power plants use similar calculations. Actual designs may have multiple spray zones and include mist eliminators."
+    ),
+    difficulty=Difficulty.INTERMEDIATE,
+    estimated_time_minutes=15,
+    prerequisites=["kremser"],
+    related_equations=["kremser", "film_coefficient", "packed_column_dp"],
+    references=[
+        "Treybal, R.E. 'Mass Transfer Operations', McGraw-Hill, 3rd Ed.",
+        "Onda, Takeuchi & Okumoto, J. Chem. Eng. Japan, 1968",
+        "Seader, Henley & Roper, 'Separation Process Principles', Wiley"
+    ],
+    derivation_summary="NTU is defined as the integral of dy/(y-y*) from outlet to inlet. For linear equilibrium and operating lines, this integral gives the logarithmic formula. HTU = G/(kya*a) relates mass transfer fundamentals to the empirical transfer unit concept.",
+    limitations_assumptions=[
+        "Assumes dilute concentrations (constant molar fluxes)",
+        "Linear equilibrium relationship",
+        "Plug flow of gas (no axial mixing)",
+        "HTU is constant through the column"
+    ]
+)
+
+
 class HTU_NTU(BaseEquation):
     """Height of Transfer Unit method for packed columns."""
     
@@ -456,6 +617,7 @@ class HTU_NTU(BaseEquation):
     category = "Mass Transfer"
     description = "Calculate packed column height using HTU and NTU"
     reference = "Treybal, Mass Transfer Operations"
+    learning_content = HTU_NTU_LEARNING
     
     def get_parameters(self) -> List[EquationParameter]:
         return [
@@ -490,6 +652,104 @@ class HTU_NTU(BaseEquation):
         }
 
 
+# ===============================
+# FILM COEFFICIENT LEARNING CONTENT
+# ===============================
+FILM_COEFFICIENT_LEARNING = LearningContent(
+    background_theory="""
+The **mass transfer coefficient (k)** quantifies the rate of mass transfer between phases.
+It's analogous to the heat transfer coefficient (h) in convection problems.
+
+**Fundamental Definition:**
+k = Sh × D_AB / L
+
+Where:
+- **k** = Mass transfer coefficient (m/s or mol/m²·s·Pa)
+- **Sh** = Sherwood number (dimensionless mass transfer analog of Nusselt)
+- **D_AB** = Molecular diffusivity of A in B (m²/s)
+- **L** = Characteristic length (diameter, film thickness, etc.)
+
+**Sherwood Number Correlations:**
+- Laminar flow over flat plate: Sh = 0.664 × Re^0.5 × Sc^0.33
+- Turbulent pipe flow: Sh = 0.023 × Re^0.8 × Sc^0.33
+- Packed beds (Onda): Sh = 0.0051 × (Re_L)^0.7 × Sc_L^0.5 × (a_t × d_p)^(-2)
+
+**Units Matter!**
+- k_c = molar basis (mol/m²·s·(mol/m³)) = m/s
+- k_G = pressure basis (mol/m²·s·Pa)
+- k_y = mole fraction basis (mol/m²·s)
+""",
+    key_concepts=[
+        "Sh = kL/D is the mass transfer analog of Nu = hL/k_thermal",
+        "Sherwood depends on Re (flow) and Sc (fluid properties)",
+        "Gas-phase coefficients typically larger than liquid-phase",
+        "Overall coefficient combines gas and liquid film resistances"
+    ],
+    real_world_applications=[
+        "Packed column design (kG, kL values)",
+        "Membrane separation flux estimation",
+        "Dissolution rate of solids",
+        "Evaporation from liquid surfaces"
+    ],
+    common_mistakes=[
+        "Using wrong characteristic length in Sh correlation",
+        "Mixing up mass and molar diffusivity",
+        "Applying correlation outside valid Re range",
+        "Forgetting to convert units between different k bases"
+    ],
+    pro_tips=[
+        "Sc = μ/(ρ·D) is typically 0.5-2 for gases, 100-1000 for liquids",
+        "For gases in air at 25°C: D_AB ≈ 0.1-0.5 cm²/s",
+        "For organics in water: D_AB ≈ 0.5-2 × 10⁻⁵ cm²/s",
+        "1/k_overall = 1/k_G + m/k_L (series resistance)"
+    ],
+    variable_sources={
+        "Sh": "From correlation based on geometry and flow regime",
+        "D_AB": "Wilke-Chang or FSG correlation, or experimental data",
+        "L": "Column diameter, packing size, or film thickness"
+    },
+    quiz_questions=[
+        QuizQuestion(
+            id="fc_q1",
+            question="If Sh = 100, D = 2×10⁻⁵ m²/s, and L = 0.02 m, what is k?",
+            question_type=QuestionType.NUMERIC,
+            options=[],
+            correct_answer="0.1",
+            explanation="k = Sh × D / L = 100 × 2×10⁻⁵ / 0.02 = 0.1 m/s",
+            difficulty=Difficulty.BEGINNER,
+            hint="Substitute into k = Sh × D / L",
+            points=10
+        ),
+        QuizQuestion(
+            id="fc_q2",
+            question="The Schmidt number (Sc = μ/ρD) is the mass transfer analog of which number?",
+            question_type=QuestionType.MULTIPLE_CHOICE,
+            options=["Prandtl number", "Reynolds number", "Nusselt number", "Grashof number"],
+            correct_answer="Prandtl number",
+            explanation="Sc (momentum/mass diffusivity) is analogous to Pr (momentum/thermal diffusivity). Both appear in boundary layer correlations.",
+            difficulty=Difficulty.INTERMEDIATE,
+            points=15
+        )
+    ],
+    difficulty=Difficulty.INTERMEDIATE,
+    estimated_time_minutes=12,
+    prerequisites=["reynolds"],
+    related_equations=["htu_ntu", "convection"],
+    references=[
+        "Sherwood, Pigford & Wilke, 'Mass Transfer', McGraw-Hill",
+        "Bird, Stewart & Lightfoot, 'Transport Phenomena', Wiley",
+        "Perry's Chemical Engineers' Handbook, Section 5"
+    ],
+    derivation_summary="The Sherwood number is defined by analogy to the Nusselt number. k = Sh × D/L comes from dimensional analysis of the convective-diffusive mass transport equation.",
+    limitations_assumptions=[
+        "Correlation-specific (check Re, Sc ranges)",
+        "Assumes steady-state mass transfer",
+        "Single transferring component",
+        "Properties evaluated at film conditions"
+    ]
+)
+
+
 class FilmCoefficient(BaseEquation):
     """Mass transfer film coefficient from correlations."""
     
@@ -498,6 +758,7 @@ class FilmCoefficient(BaseEquation):
     category = "Mass Transfer"
     description = "Calculate gas or liquid film coefficient (kG or kL)"
     reference = "Sherwood, Pigford & Wilke"
+    learning_content = FILM_COEFFICIENT_LEARNING
     
     def get_parameters(self) -> List[EquationParameter]:
         return [
@@ -732,6 +993,110 @@ class LiquidExtraction(BaseEquation):
         return {"N_stages": ureg.Quantity(max(n, 1), "")}
 
 
+# ===============================
+# MEMBRANE PERMEATION LEARNING CONTENT
+# ===============================
+MEMBRANE_PERMEATION_LEARNING = LearningContent(
+    background_theory="""
+**Membrane gas separation** uses selective permeation through polymer or inorganic membranes
+to separate gas mixtures. The driving force is the partial pressure difference across the membrane.
+
+**Permeation Equation:**
+J = P × A × ΔP / δ
+
+Where:
+- **J** = Molar flux (mol/s or cm³(STP)/s)
+- **P** = Permeability coefficient (Barrer)
+- **A** = Membrane area (m² or cm²)
+- **ΔP** = Partial pressure difference (bar or cmHg)
+- **δ** = Membrane thickness (μm)
+
+**The Barrer Unit:**
+1 Barrer = 10⁻¹⁰ cm³(STP)·cm/(cm²·s·cmHg)
+
+**Selectivity (α):**
+α = P_A / P_B = (D_A/D_B) × (S_A/S_B)
+
+Where D = diffusivity and S = solubility in the membrane.
+
+**Tradeoff:** High permeability membranes often have low selectivity (Robeson upper bound).
+""",
+    key_concepts=[
+        "Permeability = Diffusivity × Solubility (solution-diffusion model)",
+        "Selectivity determines separation quality",
+        "Thinner membranes = higher flux but mechanical limits",
+        "Pressure ratio affects stage cut and purity"
+    ],
+    real_world_applications=[
+        "Nitrogen generation from air",
+        "Hydrogen recovery in refineries",
+        "Natural gas CO2 removal",
+        "Biogas upgrading (CO2/CH4 separation)"
+    ],
+    common_mistakes=[
+        "Ignoring pressure ratio effects on separation",
+        "Using Barrer values at wrong temperature",
+        "Forgetting that flux is per unit area",
+        "Not accounting for concentration polarization"
+    ],
+    pro_tips=[
+        "Typical industrial permeances: 100-1000 GPU (1 GPU = 10⁻⁶ cm³/cm²·s·cmHg)",
+        "For asymmetric membranes, use permeance (P/δ) not permeability",
+        "Multi-stage systems needed for high-purity products",
+        "Check Robeson plot for realistic P vs α combinations"
+    ],
+    variable_sources={
+        "P": "Vendor data sheets, literature (Robeson, 2008)",
+        "δ": "Membrane specification sheet (typically 0.1-1 μm for selective layer)",
+        "ΔP": "Process design based on available driving force"
+    },
+    quiz_questions=[
+        QuizQuestion(
+            id="mp_q1",
+            question="If membrane selectivity α = Pₐ/Pᵦ = 20, and CO2 is 'A', what does this mean?",
+            question_type=QuestionType.MULTIPLE_CHOICE,
+            options=["CO2 permeates 20x faster than the other gas", 
+                     "The membrane is 20 μm thick",
+                     "20 bar pressure is needed",
+                     "Recovery is 20%"],
+            correct_answer="CO2 permeates 20x faster than the other gas",
+            explanation="Selectivity is the ratio of permeabilities. α = 20 means CO2 moves through the membrane 20 times faster than the slower component.",
+            difficulty=Difficulty.BEGINNER,
+            points=10
+        ),
+        QuizQuestion(
+            id="mp_q2",
+            question="What is the 'Robeson upper bound' in membrane science?",
+            question_type=QuestionType.MULTIPLE_CHOICE,
+            options=["The maximum achievable combination of permeability and selectivity", 
+                     "The maximum operating pressure for polymeric membranes",
+                     "The upper limit on membrane area",
+                     "The thickest practical membrane"],
+            correct_answer="The maximum achievable combination of permeability and selectivity",
+            explanation="Robeson showed there's a tradeoff: high permeability membranes have low selectivity and vice versa. The 'upper bound' line represents the best achievable combinations.",
+            difficulty=Difficulty.INTERMEDIATE,
+            points=15
+        )
+    ],
+    difficulty=Difficulty.INTERMEDIATE,
+    estimated_time_minutes=12,
+    prerequisites=[],
+    related_equations=["film_coefficient"],
+    references=[
+        "Baker, R.W. 'Membrane Technology and Applications', Wiley, 3rd Ed.",
+        "Robeson, L.M. 'The upper bound revisited', J. Membrane Sci., 2008",
+        "Seader, Henley & Roper, 'Separation Process Principles', Wiley"
+    ],
+    derivation_summary="The solution-diffusion model: gas dissolves in membrane surface (S), diffuses through (D), and desorbs. Permeability P = D × S. Flux is proportional to P and ΔP, inversely proportional to thickness.",
+    limitations_assumptions=[
+        "Solution-diffusion mechanism (not Knudsen flow)",
+        "Steady-state permeation",
+        "Ideal mixing on both sides",
+        "No concentration polarization"
+    ]
+)
+
+
 class MembranePermeation(BaseEquation):
     """Membrane gas permeation calculation."""
     
@@ -740,6 +1105,7 @@ class MembranePermeation(BaseEquation):
     category = "Mass Transfer"
     description = "Calculate membrane flux and selectivity"
     reference = "Baker, Membrane Technology"
+    learning_content = MEMBRANE_PERMEATION_LEARNING
     
     def get_parameters(self) -> List[EquationParameter]:
         return [
@@ -769,6 +1135,107 @@ class MembranePermeation(BaseEquation):
         return {"flux": ureg.Quantity(flux, "cm^3/s")}
 
 
+# ===============================
+# PACKED COLUMN ΔP LEARNING CONTENT
+# ===============================
+PACKED_COLUMN_DP_LEARNING = LearningContent(
+    background_theory="""
+The **Ergun equation** calculates pressure drop through packed beds. It applies to packed
+columns, fixed-bed reactors, and filtration systems.
+
+**Ergun Equation:**
+ΔP/L = 150 × μ(1-ε)²/dp²ε³ × v + 1.75 × ρ(1-ε)/dp·ε³ × v²
+
+Where:
+- **ΔP** = Pressure drop (Pa)
+- **L** = Bed height (m)
+- **μ** = Fluid viscosity (Pa·s)
+- **ε** = Void fraction (typically 0.35-0.45 for random packing)
+- **dp** = Particle/packing diameter (m)
+- **v** = Superficial velocity (m/s)
+- **ρ** = Fluid density (kg/m³)
+
+**The Two Terms:**
+1. **First term (150...)**: Viscous losses (dominates at low Re)
+2. **Second term (1.75...)**: Inertial losses (dominates at high Re)
+
+**Flooding:** At high gas rates, the column "floods" — liquid cannot drain and pressure drop
+spikes. Design typically targets 70-80% of flood velocity.
+""",
+    key_concepts=[
+        "ΔP increases with (1-ε)² term - void fraction is critical",
+        "Smaller packing = higher ΔP but better mass transfer",
+        "At flooding, ΔP increases dramatically",
+        "Low ε (tight packing) → much higher ΔP"
+    ],
+    real_world_applications=[
+        "Packed column design (absorption, distillation)",
+        "Fixed-bed reactor pressure drop",
+        "Filter bed sizing",
+        "Fluidization calculations"
+    ],
+    common_mistakes=[
+        "Using wrong void fraction (varies with column/packing diameter ratio)",
+        "Ignoring liquid holdup contribution to ΔP",
+        "Not checking flooding limits",
+        "Using superficial velocity instead of interstitial"
+    ],
+    pro_tips=[
+        "Typical void fractions: random packing 0.35-0.45, structured 0.90-0.97",
+        "For two-phase flow, use Generalized Pressure Drop Correlation (GPDC)",
+        "Design at 70-80% of flood velocity for safe operation",
+        "ΔP increases roughly with the square of gas velocity"
+    ],
+    variable_sources={
+        "ε": "Vendor data for packing, or measure experimentally",
+        "dp": "Packing specification (equivalent diameter for non-spherical)",
+        "μ, ρ": "Fluid property correlations at operating T, P"
+    },
+    quiz_questions=[
+        QuizQuestion(
+            id="dp_q1",
+            question="If you halve the packing diameter dp, what happens to pressure drop (approximately)?",
+            question_type=QuestionType.MULTIPLE_CHOICE,
+            options=["ΔP roughly quadruples (×4)", "ΔP doubles (×2)", 
+                     "ΔP halves (×0.5)", "ΔP stays the same"],
+            correct_answer="ΔP roughly quadruples (×4)",
+            explanation="ΔP scales with 1/dp² in the viscous term and 1/dp in the inertial term. For small particles (viscous-dominated), halving dp quadruples ΔP.",
+            difficulty=Difficulty.INTERMEDIATE,
+            points=15
+        ),
+        QuizQuestion(
+            id="dp_q2",
+            question="At what point does 'flooding' occur in a packed column?",
+            question_type=QuestionType.MULTIPLE_CHOICE,
+            options=["When gas velocity prevents liquid drainage", 
+                     "When liquid flow is too low",
+                     "When temperature exceeds boiling point",
+                     "When pressure reaches 1 atm"],
+            correct_answer="When gas velocity prevents liquid drainage",
+            explanation="Flooding occurs when upward gas flow is so high that liquid cannot drain down. The liquid accumulates, void fraction drops, and ΔP spikes.",
+            difficulty=Difficulty.BEGINNER,
+            points=10
+        )
+    ],
+    difficulty=Difficulty.INTERMEDIATE,
+    estimated_time_minutes=12,
+    prerequisites=["reynolds"],
+    related_equations=["htu_ntu", "darcy_weisbach"],
+    references=[
+        "Ergun, S. 'Fluid Flow Through Packed Columns', Chem. Eng. Prog., 1952",
+        "Perry's Chemical Engineers' Handbook, Section 6",
+        "Seader, Henley & Roper, 'Separation Process Principles', Wiley"
+    ],
+    derivation_summary="Ergun combined the Blake-Kozeny equation (viscous, low Re) with the Burke-Plummer equation (inertial, high Re) into a single correlation valid across all flow regimes.",
+    limitations_assumptions=[
+        "Single-phase flow (correlations exist for two-phase)",
+        "Uniform packing (no channeling)",
+        "Spherical or near-spherical particles",
+        "Incompressible fluid"
+    ]
+)
+
+
 class PackedColumnPressureDrop(BaseEquation):
     """Pressure drop in packed columns (Ergun equation)."""
     
@@ -777,6 +1244,7 @@ class PackedColumnPressureDrop(BaseEquation):
     category = "Mass Transfer"
     description = "Ergun equation for packed bed pressure drop"
     reference = "Ergun, 1952"
+    learning_content = PACKED_COLUMN_DP_LEARNING
     
     def get_parameters(self) -> List[EquationParameter]:
         return [
