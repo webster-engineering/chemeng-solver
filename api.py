@@ -136,6 +136,15 @@ async def root():
     return {"message": "Webster Engineering Solver API", "docs": "/docs"}
 
 
+@app.get("/favicon.png")
+async def favicon():
+    """Serve the favicon."""
+    favicon_path = Path(__file__).parent / "web" / "favicon.png"
+    if favicon_path.exists():
+        return FileResponse(favicon_path, media_type="image/png")
+    raise HTTPException(status_code=404, detail="Favicon not found")
+
+
 @app.get("/pid.html")
 async def pid_tool():
     """Serve the P&ID sketcher tool."""
