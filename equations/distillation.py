@@ -581,6 +581,7 @@ $$\\frac{N_R}{N_S} = \\left[ \\frac{B}{D} \\cdot \\frac{x_{F,HK}}{x_{F,LK}} \\cd
     },
     quiz_questions=[
         QuizQuestion(
+            id="kirk_q1",
             question="If B/D = 1, x_F,HK/x_F,LK = 1, and x_B,LK/x_D,HK = 1, what is N_R/N_S?",
             question_type=QuestionType.MULTIPLE_CHOICE,
             options=["0.5", "1.0", "2.0", "Undefined"],
@@ -591,6 +592,7 @@ $$\\frac{N_R}{N_S} = \\left[ \\frac{B}{D} \\cdot \\frac{x_{F,HK}}{x_{F,LK}} \\cd
             points=10
         ),
         QuizQuestion(
+            id="kirk_q2",
             question="A column has 30 total stages and Kirkbride gives N_R/N_S = 0.5. What is the optimal feed stage from the bottom?",
             question_type=QuestionType.NUMERIC,
             options=[],
@@ -690,6 +692,7 @@ while maintaining good efficiency.
     },
     quiz_questions=[
         QuizQuestion(
+            id="tray_q1",
             question="If vapor density doubles (rho_v * 2) while liquid density stays constant, what happens to flooding velocity?",
             question_type=QuestionType.MULTIPLE_CHOICE,
             options=["Increases by sqrt(2)", "Decreases by sqrt(2)", "Stays the same", "Doubles"],
@@ -700,6 +703,7 @@ while maintaining good efficiency.
             points=15
         ),
         QuizQuestion(
+            id="tray_q2",
             question="A column operates at 2.5 ft/s actual velocity with flooding velocity of 3.5 ft/s. What is the percent flood?",
             question_type=QuestionType.NUMERIC,
             options=[],
