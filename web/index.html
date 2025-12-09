@@ -7979,20 +7979,30 @@
             await originalSelectEquation(category, equationId);
 
             if (learningModeActive) {
-                const hasContent = await loadLearningContent(category, equationId);
-
                 // Remove any existing learning panels first to prevent stacking
                 document.querySelectorAll('.learning-panel').forEach(el => el.remove());
 
+                // Reset input section visibility before proceeding
+                const inputSection = document.querySelector('.input-section');
+                if (inputSection) {
+                    inputSection.style.display = '';
+                }
+
+                const hasContent = await loadLearningContent(category, equationId);
+
                 if (hasContent) {
+                    // Ensure currentLearningStep is reset (loadLearningContent should do this, but be explicit)
+                    currentLearningStep = 0;
+                    currentQuizIndex = 0;
+
                     // Hide regular input section, show learning panel
-                    const inputSection = document.querySelector('.input-section');
                     if (inputSection) {
                         inputSection.insertAdjacentHTML('beforebegin', renderLearningPanel());
                         inputSection.style.display = 'none';
                     }
 
                     // Build input form for learning step 3 directly from equationParams
+                    // equationParams is set by originalSelectEquation, so it should be current
                     const learningInputGrid = document.getElementById('learningInputGrid');
                     if (learningInputGrid && equationParams && equationParams.length > 0) {
                         learningInputGrid.innerHTML = equationParams.map(param => {
@@ -8015,10 +8025,11 @@
                                 </select>
                             </div>
                         `}).join('');
+                    } else {
+                        console.warn('Learning mode: equationParams is empty or learningInputGrid not found');
                     }
                 } else {
-                    // No learning content - show message
-                    const inputSection = document.querySelector('.input-section');
+                    // No learning content - show message but keep input section visible
                     if (inputSection) {
                         inputSection.insertAdjacentHTML('beforebegin', `
                             <div class="learning-panel active" style="text-align: center; padding: 40px;">
@@ -8027,6 +8038,8 @@
                                 <p style="color: var(--text-muted);">This equation doesn't have learning content yet. Use the regular calculator below.</p>
                             </div>
                         `);
+                        // Keep input section visible when no learning content
+                        inputSection.style.display = '';
                     }
                 }
             }
