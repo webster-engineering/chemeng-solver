@@ -7986,8 +7986,9 @@
 
                     // Copy input form to learning step 3
                     const learningInputGrid = document.getElementById('learningInputGrid');
-                    if (learningInputGrid) {
-                        learningInputGrid.innerHTML = document.getElementById('inputGrid').outerHTML;
+                    const originalInputGrid = document.getElementById('inputGrid');
+                    if (learningInputGrid && originalInputGrid) {
+                        learningInputGrid.innerHTML = originalInputGrid.innerHTML;
                     }
                 } else {
                     // No learning content - show message
