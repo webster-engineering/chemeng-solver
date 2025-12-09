@@ -7904,13 +7904,12 @@
                             Understanding the Variables
                         </div>
                         
-                        <div class="variable-sources">
+                        <div class="variable-sources" style="display: flex; flex-direction: column; gap: 12px;">
                             ${Object.entries(lc.variable_sources || {}).map(([varName, source]) => `
-                                <div class="variable-card">
-                                    <div class="variable-symbol">${varName}</div>
-                                    <div class="variable-info">
-                                        <h4>${varName}</h4>
-                                        <p>${source}</p>
+                                <div class="variable-card" style="display: flex; align-items: flex-start; gap: 16px; padding: 16px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; border-left: 3px solid var(--accent-primary, #00d4ff);">
+                                    <div class="variable-symbol" style="min-width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--accent-primary, #00d4ff), var(--accent-secondary, #7c3aed)); border-radius: 8px; font-weight: 700; font-size: 0.9em; color: white; flex-shrink: 0;">${varName}</div>
+                                    <div class="variable-info" style="flex: 1; min-width: 0;">
+                                        <p style="margin: 0; color: var(--text-secondary, #a0aec0); line-height: 1.5; font-size: 0.95em;">${source}</p>
                                     </div>
                                 </div>
                             `).join('')}
