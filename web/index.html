@@ -3743,6 +3743,50 @@
             border: 1px solid #ef4444;
             color: #ef4444;
         }
+
+        /* About Footer */
+        .about-footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            padding: 40px 20px;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .about-footer h3 {
+            color: var(--text-primary);
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .about-footer .version {
+            display: inline-block;
+            background: var(--accent-glow);
+            color: var(--accent-light);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+
+        .about-footer .description {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            max-width: 600px;
+            margin: 0 auto 20px;
+            line-height: 1.6;
+        }
+
+        .about-footer .dedication {
+            color: var(--text-muted);
+            font-style: italic;
+            font-size: 0.9rem;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
     </style>
 </head>
 
@@ -4854,6 +4898,19 @@
                 energy.</div>
         </div>
     </div>
+
+    <!-- About Footer -->
+    <footer class="about-footer">
+        <h3>About Webster Engineering Solver</h3>
+        <span class="version">Version 0.6</span>
+        <p class="description">
+            A comprehensive chemical engineering equation solver and learning platform.
+            Featuring 60+ equations across thermodynamics, fluid dynamics, heat transfer,
+            mass transfer, reaction kinetics, distillation, and process control.
+            Includes interactive learning mode with quizzes, worked examples, and study resources.
+        </p>
+        <p class="dedication">Dedicated to my professors at Montana State University</p>
+    </footer>
 
 
     <script>
