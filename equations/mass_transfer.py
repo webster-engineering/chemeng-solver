@@ -72,11 +72,11 @@ constant in each section of the column.
         "Add a partial reboiler and condenser as stages (+1 to +2)"
     ],
     variable_sources={
-        "xD": "Product spec from downstream process requirements",
-        "xB": "Bottoms spec from product purity or waste disposal limits",
-        "xF": "Feed analysis from laboratory or process analyzer",
-        "R": "Design choice - balance energy cost vs capital cost",
-        "α": "Calculate from VLE data: α = (y/x) / ((1-y)/(1-x)) or K₁/K₂"
+        "xD": "Product specification from downstream process requirements. Set by customer spec, sales grade, or next unit feed requirement. Typical values 0.90-0.99 for high-purity products.",
+        "xB": "Bottoms spec from product purity or waste disposal limits. Environmental permits, economic value recovery, or residue quality requirements set this value.",
+        "xF": "Feed analysis from laboratory GC/LC analysis or online process analyzer. Sample upstream of column and verify with multiple measurements.",
+        "R": "Design choice - start at 1.2-1.5 times minimum reflux. Higher R = fewer stages but more energy; lower R = more stages but less energy. Economic optimization required.",
+        "α": "Calculate from VLE data: α = K_light/K_heavy = (y/x)/(y'/x') at column conditions. Use average of top and bottom, or geometric mean. Check experiment or simulation."
     },
     quiz_questions=[
         QuizQuestion(
@@ -298,10 +298,10 @@ The Kremser equation is the analytical equivalent of stepping off stages graphic
         "Check Henry's law constant units carefully (pressure-based vs mole fraction)"
     ],
     variable_sources={
-        "A": "Calculate from L, G flow rates and equilibrium slope m",
-        "y_in": "Process feed gas composition from analyzer",
-        "y_out": "Target spec (permit limit, process requirement)",
-        "y*": "Equilibrium with inlet liquid - often y* = 0 for pure solvent"
+        "A": "Calculate A = L/(m*G) from measured liquid rate L, gas rate G, and equilibrium slope m from VLE data. Process control historian or DCS screens show flow rates.",
+        "y_in": "Process feed gas composition from online analyzer (GC, IR) or laboratory grab sample. Check that analyzer calibration is current.",
+        "y_out": "Target spec set by environmental permit, downstream process requirement, or product quality spec. Typically given as ppm or mole fraction.",
+        "y*": "Equilibrium composition with entering liquid. For pure/regenerated solvent, y* typically equals 0. Check Henry's law: y* = H*x_liquid."
     },
     quiz_questions=[
         QuizQuestion(
@@ -509,10 +509,10 @@ transfer unit concept rather than equilibrium stage.
         "Always add 20-50% safety factor to calculated height"
     ],
     variable_sources={
-        "HTU": "From vendor correlations, pilot data, or literature (Onda, Bravo-Fair)",
-        "y_in": "Feed gas composition from process conditions",
-        "y_out": "Target outlet spec (permit limit, downstream requirement)",
-        "y*": "Equilibrium with exiting liquid (often ~0 for pure solvent)"
+        "HTU": "From vendor correlations (Onda, Bravo-Fair), pilot plant tests, or literature for your packing type. Vendors often provide HETP which approximates HTU. Typical range 0.3-1.5 m.",
+        "y_in": "Feed gas composition measured by online analyzer or laboratory sample. For combustion gases, use flue gas analyzer. Verify with mass balance.",
+        "y_out": "Target outlet spec set by environmental permit, downstream process requirement, or product quality. Convert ppm to mole fraction: y = ppm / 1,000,000.",
+        "y*": "Equilibrium composition with liquid leaving column bottom. For chemical absorption (reaction), y* is often near zero. For physical absorption, calculate from Henry's law."
     },
     quiz_questions=[
         QuizQuestion(
@@ -704,9 +704,9 @@ Where:
         "1/k_overall = 1/k_G + m/k_L (series resistance)"
     ],
     variable_sources={
-        "Sh": "From correlation based on geometry and flow regime",
-        "D_AB": "Wilke-Chang or FSG correlation, or experimental data",
-        "L": "Column diameter, packing size, or film thickness"
+        "Sh": "Calculate from appropriate correlation for your geometry. For pipe flow: Sh = 0.023*Re^0.8*Sc^0.33. For packed beds: use Onda or similar. Check Re and Sc ranges.",
+        "D_AB": "Diffusivity from Wilke-Chang (liquids) or Chapman-Enskog/FSG (gases) correlations. Perry's Handbook Table 5-16/5-17 has values. Units are m^2/s.",
+        "L": "Characteristic length for your system: pipe diameter, packing size, particle diameter, or boundary layer thickness. Must match the correlation being used."
     },
     quiz_questions=[
         QuizQuestion(
@@ -845,10 +845,10 @@ Common extraction systems: water-organic, acid-base, metal chelation.
         "Consider raffinate recycling if valuable solute remains"
     ],
     variable_sources={
-        "x_F": "Feed analysis from lab or process analyzer",
-        "x_R": "Target spec from downstream requirements",
-        "K_D": "Measure experimentally or find in literature for your system",
-        "S/F": "Design choice - balance solvent cost vs stage count"
+        "x_F": "Feed analysis from laboratory GC/HPLC sample or online analyzer. For process design, use typical operating data or pilot plant measurements.",
+        "x_R": "Target raffinate concentration from environmental permit, product spec, or economic recovery analysis. Lower targets require more stages or solvent.",
+        "K_D": "Distribution coefficient from shake-flask experiments at your temperature. Check literature for similar systems. K_D varies with concentration - use average.",
+        "S/F": "Design variable - start at 1.0-2.0. Higher S/F gives fewer stages but more solvent cost. Optimize with economic analysis of solvent vs equipment cost."
     },
     quiz_questions=[
         QuizQuestion(
@@ -1046,9 +1046,9 @@ Where D = diffusivity and S = solubility in the membrane.
         "Check Robeson plot for realistic P vs α combinations"
     ],
     variable_sources={
-        "P": "Vendor data sheets, literature (Robeson, 2008)",
-        "δ": "Membrane specification sheet (typically 0.1-1 μm for selective layer)",
-        "ΔP": "Process design based on available driving force"
+        "P": "Permeability from membrane vendor data sheets or literature (Robeson 2008, Baker textbook). Units in Barrer. Check temperature - P increases with T.",
+        "delta": "Membrane selective layer thickness from vendor specification. For asymmetric membranes, this is the thin skin layer (0.1-1 um), not total thickness.",
+        "delta_p": "Partial pressure difference across membrane. Calculate from feed/permeate pressures and compositions. Higher ratio gives better separation but costs more."
     },
     quiz_questions=[
         QuizQuestion(
@@ -1187,9 +1187,10 @@ spikes. Design typically targets 70-80% of flood velocity.
         "ΔP increases roughly with the square of gas velocity"
     ],
     variable_sources={
-        "ε": "Vendor data for packing, or measure experimentally",
-        "dp": "Packing specification (equivalent diameter for non-spherical)",
-        "μ, ρ": "Fluid property correlations at operating T, P"
+        "epsilon": "Void fraction from packing vendor data. Measure by water displacement for installed bed. Typical random packing 0.35-0.45, structured 0.90-0.97.",
+        "dp": "Packing nominal diameter from vendor catalog. For non-spherical particles, use equivalent diameter (6*Vp/Ap). Units must match other lengths.",
+        "mu": "Gas dynamic viscosity from property correlations (Sutherland, Chapman-Enskog). Perry's Table 2-305 has values. Check temperature dependence.",
+        "rho": "Gas density from ideal gas law or equation of state at operating T, P. For mixtures, use molar average molecular weight."
     },
     quiz_questions=[
         QuizQuestion(
