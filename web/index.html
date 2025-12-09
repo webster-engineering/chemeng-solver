@@ -7773,10 +7773,21 @@
                 toggle.querySelector('.toggle-text').textContent = 'Learning ON';
                 xpDisplay.classList.add('show');
                 updateXpDisplay();
+                // Hide Calculate button when learning mode is active
+                const calculateBtn = document.querySelector('.calculate-btn');
+                if (calculateBtn) calculateBtn.style.display = 'none';
             } else {
                 toggle.classList.remove('active');
                 toggle.querySelector('.toggle-text').textContent = 'Learning Mode';
                 xpDisplay.classList.remove('show');
+                // Restore Calculate button when learning mode is disabled
+                const calculateBtn = document.querySelector('.calculate-btn');
+                if (calculateBtn) calculateBtn.style.display = '';
+                // Also remove any learning panels
+                document.querySelectorAll('.learning-panel').forEach(el => el.remove());
+                // Restore input section visibility
+                const inputSection = document.querySelector('.input-section');
+                if (inputSection) inputSection.style.display = '';
             }
 
             // Refresh current equation view if one is selected
@@ -8282,6 +8293,9 @@
                         inputSection.insertAdjacentHTML('beforebegin', renderLearningPanel());
                         inputSection.style.display = 'none';
                     }
+                    // Hide Calculate button in learning mode
+                    const calculateBtn = document.querySelector('.calculate-btn');
+                    if (calculateBtn) calculateBtn.style.display = 'none';
 
                     // Build input form for learning step 3 directly from equationParams
                     // equationParams is set by originalSelectEquation, so it should be current
