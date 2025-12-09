@@ -7963,6 +7963,9 @@
             if (learningModeActive) {
                 const hasContent = await loadLearningContent(category, equationId);
 
+                // Remove any existing learning panels first to prevent stacking
+                document.querySelectorAll('.learning-panel').forEach(el => el.remove());
+
                 if (hasContent) {
                     // Hide regular input section, show learning panel
                     const inputSection = document.querySelector('.input-section');
