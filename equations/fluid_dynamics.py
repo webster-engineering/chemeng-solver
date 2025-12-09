@@ -145,6 +145,19 @@ Named after Osborne Reynolds (1883) who visualized flow regimes using dye inject
     estimated_time_minutes=10,
     prerequisites=[],
     related_equations=["friction_factor", "darcy_weisbach"],
+    references=[
+        "Reynolds, O. 'An Experimental Investigation of the Circumstances Which Determine Whether the Motion of Water Shall Be Direct or Sinuous', Phil. Trans. Royal Society, 1883",
+        "Perry's Chemical Engineers' Handbook, 9th Ed., Section 6",
+        "Munson, Young & Okiishi, Fundamentals of Fluid Mechanics"
+    ],
+    derivation_summary="Derived from dimensional analysis comparing inertial forces (ρv²L²) to viscous forces (μvL). The ratio ρvL/μ produces a dimensionless number that characterizes flow regime independent of scale.",
+    limitations_assumptions=[
+        "Valid only for Newtonian fluids (constant viscosity)",
+        "Assumes steady-state, fully developed flow",
+        "Characteristic length must be properly defined for non-circular geometries (use hydraulic diameter)",
+        "Critical Re values (2100, 4000) are approximate and vary with entrance conditions",
+        "Does not apply to non-Newtonian fluids like polymers or slurries"
+    ],
     diagram_type="pipe_flow",
     diagram_labels={
         "pipe": "Pipe Section",
@@ -217,7 +230,19 @@ Where:
     difficulty=Difficulty.INTERMEDIATE,
     estimated_time_minutes=15,
     prerequisites=["reynolds_number", "friction_factor"],
-    related_equations=["reynolds_number", "friction_factor", "hazen_williams"]
+    related_equations=["reynolds_number", "friction_factor", "hazen_williams"],
+    references=[
+        "Darcy, H. 'Les Fontaines Publiques de la Ville de Dijon', 1856",
+        "Weisbach, J. 'Principles of the Mechanics of Machinery and Engineering', 1845",
+        "Crane Technical Paper 410, 'Flow of Fluids Through Valves, Fittings and Pipe'"
+    ],
+    derivation_summary="Developed empirically by Darcy and Weisbach in the 1840s-50s. The equation balances pressure forces with frictional resistance, with the friction factor f capturing all fluid and surface effects.",
+    limitations_assumptions=[
+        "Assumes steady, fully developed, incompressible flow",
+        "Friction factor must be determined separately (Moody chart or Colebrook)",
+        "Does not account for minor losses (fittings, valves)",
+        "Roughness values are approximate and change with age/fouling"
+    ]
 )
 
 
@@ -277,7 +302,19 @@ Typically only 55-80% of electrical power reaches the fluid!
     difficulty=Difficulty.BEGINNER,
     estimated_time_minutes=12,
     prerequisites=[],
-    related_equations=["pump_head", "npsh"]
+    related_equations=["pump_head", "npsh"],
+    references=[
+        "Hydraulic Institute Standards",
+        "Karassik, I.J. 'Pump Handbook', McGraw-Hill",
+        "Perry's Chemical Engineers' Handbook, 9th Ed., Section 10"
+    ],
+    derivation_summary="Derived from the definition of power as work per time. Hydraulic power equals flow rate × pressure rise. WHP uses the 3960 constant to convert gpm×ft to hp.",
+    limitations_assumptions=[
+        "Assumes incompressible flow",
+        "Efficiency varies with operating point - use manufacturer's curve",
+        "Does not account for suction conditions (see NPSH)",
+        "Motor efficiency typically 92-96% for properly sized motors"
+    ]
 )
 
 
@@ -330,7 +367,19 @@ This is why orifice sizing is critical for turndown ratio.
     difficulty=Difficulty.INTERMEDIATE,
     estimated_time_minutes=15,
     prerequisites=["bernoulli"],
-    related_equations=["bernoulli", "reynolds_number"]
+    related_equations=["bernoulli", "reynolds_number"],
+    references=[
+        "ISO 5167 - Measurement of fluid flow by means of pressure differential devices",
+        "Miller, R.W. 'Flow Measurement Engineering Handbook', McGraw-Hill",
+        "ASME MFC Standards"
+    ],
+    derivation_summary="Derived from Bernoulli's equation by applying continuity between upstream and vena contracta. The discharge coefficient Cd accounts for non-ideal effects like vena contracta and viscous losses.",
+    limitations_assumptions=[
+        "Beta ratio (d/D) typically limited to 0.2-0.75",
+        "Requires straight pipe runs upstream (15-50D) and downstream (5-8D)",
+        "Cd varies with Reynolds number at low Re",
+        "Not suitable for dirty/slurry fluids - erosion affects accuracy"
+    ]
 )
 
 
@@ -380,7 +429,18 @@ f = 0.25 / [log₁₀(ε/3.7D + 5.74/Re⁰·⁹)]²
     difficulty=Difficulty.INTERMEDIATE,
     estimated_time_minutes=12,
     prerequisites=["reynolds_number"],
-    related_equations=["reynolds_number", "darcy_weisbach"]
+    related_equations=["reynolds_number", "darcy_weisbach"],
+    references=[
+        "Moody, L.F. 'Friction Factors for Pipe Flow', Trans. ASME, 1944",
+        "Colebrook, C.F. 'Turbulent Flow in Pipes', J. Inst. Civil Eng., 1939",
+        "Swamee, P.K. & Jain, A.K., J. Hydraulic Division ASCE, 1976"
+    ],
+    derivation_summary="Laminar solution (f=64/Re) derived analytically from Hagen-Poiseuille. Turbulent correlations are empirical fits to Nikuradse's sand-grain roughness experiments.",
+    limitations_assumptions=[
+        "Colebrook equation is implicit - requires iteration or explicit approximation",
+        "Commercial pipe roughness differs from idealized sand-grain roughness",
+        "Roughness values change over time due to corrosion, scaling, biological growth"
+    ]
 )
 
 
@@ -431,7 +491,19 @@ gasoline at same head (but different pressures!).
     difficulty=Difficulty.INTERMEDIATE,
     estimated_time_minutes=15,
     prerequisites=["pump_power", "darcy_weisbach"],
-    related_equations=["pump_power", "npsh", "darcy_weisbach"]
+    related_equations=["pump_power", "npsh", "darcy_weisbach"],
+    references=[
+        "Hydraulic Institute Standards",
+        "Cameron Hydraulic Data, Flowserve",
+        "Crane Technical Paper 410"
+    ],
+    derivation_summary="Based on energy balance across pump and pipe system. Total head = static lift + friction losses + velocity head change + pressure head requirements.",
+    limitations_assumptions=[
+        "Assumes steady-state operation",
+        "Friction losses estimated using appropriate correlations",
+        "Does not account for surge/water hammer effects",
+        "System curve shifts with valve positions and process changes"
+    ]
 )
 
 
@@ -486,7 +558,19 @@ Where:
     difficulty=Difficulty.BEGINNER,
     estimated_time_minutes=10,
     prerequisites=[],
-    related_equations=["darcy_weisbach", "pump_head"]
+    related_equations=["darcy_weisbach", "pump_head"],
+    references=[
+        "Williams, G.S. & Hazen, A. 'Hydraulic Tables', John Wiley & Sons, 1914",
+        "NFPA 13 (Fire Protection), NFPA 14 (Standpipes)",
+        "AWWA Manual M11 - Steel Pipe"
+    ],
+    derivation_summary="Empirical correlation developed in early 1900s fitting pressure drop data for water in pipes. The C factor captures pipe roughness effects.",
+    limitations_assumptions=[
+        "Valid ONLY for water at typical temperatures (40-75°F)",
+        "Does not work for other fluids - use Darcy-Weisbach",
+        "C values are approximate and vary with pipe age/condition",
+        "Less accurate than Darcy-Weisbach but simpler"
+    ]
 )
 
 
@@ -546,7 +630,19 @@ For real flows with friction, add head loss: h_L on the downstream side.
     difficulty=Difficulty.BEGINNER,
     estimated_time_minutes=10,
     prerequisites=[],
-    related_equations=["reynolds_number", "darcy_weisbach"]
+    related_equations=["reynolds_number", "darcy_weisbach"],
+    references=[
+        "Bernoulli, D. 'Hydrodynamica', 1738",
+        "Munson, Young & Okiishi, Fundamentals of Fluid Mechanics",
+        "Perry's Chemical Engineers' Handbook, 9th Ed., Section 6"
+    ],
+    derivation_summary="Derived from Euler's equation for inviscid flow along a streamline. Integrating the momentum equation yields conservation of mechanical energy per unit volume.",
+    limitations_assumptions=[
+        "Assumes inviscid (frictionless) flow - must add head loss for real fluids",
+        "Valid only along a streamline",
+        "Assumes steady, incompressible flow",
+        "Does not apply to compressible gases at high Mach numbers"
+    ]
 )
 
 
@@ -603,7 +699,19 @@ NPSHa = (P_atm - P_vapor)/ρg + h_static - h_friction
     difficulty=Difficulty.INTERMEDIATE,
     estimated_time_minutes=15,
     prerequisites=["pump_power"],
-    related_equations=["pump_power", "pump_head"]
+    related_equations=["pump_power", "pump_head"],
+    references=[
+        "Hydraulic Institute Standards (ANSI/HI)",
+        "Karassik, I.J. 'Pump Handbook', McGraw-Hill",
+        "API 610 - Centrifugal Pumps for Petroleum Industry"
+    ],
+    derivation_summary="NPSH represents the total suction head (absolute pressure + static head - friction losses) minus vapor pressure, all converted to head. Ensures liquid stays above its boiling point.",
+    limitations_assumptions=[
+        "NPSHr is 3% head drop criterion - some cavitation may still occur",
+        "Temperature significantly affects vapor pressure and NPSHa",
+        "Suction specific speed should be checked for high-flow pumps",
+        "Altitude affects atmospheric pressure contribution"
+    ]
 )
 
 

@@ -7870,6 +7870,31 @@
                                 `).join('')}
                             </div>
                         ` : ''}
+                        
+                        ${lc.derivation_summary ? `
+                            <div class="derivation-box" style="margin-top: 20px; padding: 15px; background: rgba(91, 110, 174, 0.1); border-left: 3px solid var(--accent); border-radius: 8px;">
+                                <h4 style="margin: 0 0 10px; color: var(--accent);">🔬 Derivation Summary</h4>
+                                <p style="margin: 0; color: var(--text-secondary); line-height: 1.6;">${lc.derivation_summary}</p>
+                            </div>
+                        ` : ''}
+                        
+                        ${lc.limitations_assumptions && lc.limitations_assumptions.length > 0 ? `
+                            <div class="limitations-box" style="margin-top: 20px; padding: 15px; background: rgba(255, 193, 7, 0.1); border-left: 3px solid #ffc107; border-radius: 8px;">
+                                <h4 style="margin: 0 0 10px; color: #ffc107;">⚠️ Limitations & Assumptions</h4>
+                                <ul style="margin: 0; padding-left: 20px; color: var(--text-secondary);">
+                                    ${lc.limitations_assumptions.map(l => `<li style="margin-bottom: 5px;">${l}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                        
+                        ${lc.references && lc.references.length > 0 ? `
+                            <div class="references-box" style="margin-top: 20px; padding: 15px; background: rgba(0, 0, 0, 0.2); border-radius: 8px;">
+                                <h4 style="margin: 0 0 10px; color: var(--text-primary);">📚 References</h4>
+                                <ul style="margin: 0; padding-left: 20px; color: var(--text-secondary); font-size: 0.9em;">
+                                    ${lc.references.map(r => `<li style="margin-bottom: 5px; font-style: italic;">${r}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
                     </div>
                     
                     <!-- Step 2: Variables -->

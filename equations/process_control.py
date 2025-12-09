@@ -91,6 +91,17 @@ The **Ziegler-Nichols method** (1942) is the classic PID tuning technique. It us
     estimated_time_minutes=15,
     prerequisites=[],
     related_equations=["tyreus_luyben_pid", "lambda_tuning"],
+    references=[
+        "Ziegler, J.G. & Nichols, N.B. 'Optimum Settings for Automatic Controllers', Trans. ASME, 1942",
+        "Åström, K.J. & Hägglund, T. 'PID Controllers: Theory, Design, and Tuning', ISA, 1995"
+    ],
+    derivation_summary="Empirical method developed at Taylor Instruments. Based on finding the point of marginal stability (sustained oscillation) and backing off from there using experimentally derived ratios.",
+    limitations_assumptions=[
+        "Results in ~25% overshoot - may be too aggressive for some processes",
+        "Not suitable for integrating processes (level control)",
+        "Process must be able to oscillate under P-only control",
+        "Noise can make it difficult to identify true Ku and Pu"
+    ],
     diagram_type="control_loop"
 )
 
@@ -155,7 +166,18 @@ control over the closed-loop speed via the λ parameter.
     difficulty=Difficulty.INTERMEDIATE,
     estimated_time_minutes=15,
     prerequisites=[],
-    related_equations=["ziegler_nichols_pid", "simc_tuning"]
+    related_equations=["ziegler_nichols_pid", "simc_tuning"],
+    references=[
+        "Rivera, D.E., Morari, M. & Skogestad, S. 'Internal Model Control', Ind. Eng. Chem. Process Des. Dev., 1986",
+        "Skogestad, S. 'Simple analytic rules for model reduction and PID controller tuning', J. Process Control, 2003"
+    ],
+    derivation_summary="Based on Internal Model Control theory. The tuning parameter λ directly sets the desired closed-loop time constant, providing intuitive control over the speed-robustness tradeoff.",
+    limitations_assumptions=[
+        "Requires FOPDT model identification from step test",
+        "λ should generally not be smaller than dead time θ",
+        "Performance depends on model accuracy",
+        "Original IMC formulation assumes no model mismatch"
+    ]
 )
 
 
@@ -216,7 +238,19 @@ Where:
     difficulty=Difficulty.BEGINNER,
     estimated_time_minutes=12,
     prerequisites=[],
-    related_equations=["cv_gas", "cv_travel"]
+    related_equations=["cv_gas", "cv_travel"],
+    references=[
+        "ISA-75.01.01 - Flow Equations for Sizing Control Valves",
+        "Masoneilan Control Valve Handbook",
+        "Fisher Control Valve Handbook, Emerson"
+    ],
+    derivation_summary="Cv is defined empirically as the flow rate (gpm) of water at 60°F that will flow through a valve with a 1 psi pressure drop. The equation derives from Bernoulli with empirical corrections.",
+    limitations_assumptions=[
+        "Valid for non-flashing, non-cavitating liquid service",
+        "Assumes fully turbulent flow through valve",
+        "Does not account for choked flow conditions",
+        "Pipe reducer corrections may be needed for high velocities"
+    ]
 )
 
 
@@ -268,7 +302,18 @@ Works well for processes with θ/τ < 1 (moderate dead time).
     difficulty=Difficulty.INTERMEDIATE,
     estimated_time_minutes=15,
     prerequisites=[],
-    related_equations=["ziegler_nichols_pid", "lambda_tuning"]
+    related_equations=["ziegler_nichols_pid", "lambda_tuning"],
+    references=[
+        "Cohen, G.H. & Coon, G.A. 'Theoretical Consideration of Retarded Control', Trans. ASME, 1953",
+        "Ogunnaike, B.A. & Ray, W.H. 'Process Dynamics, Modeling, and Control', Oxford, 1994"
+    ],
+    derivation_summary="Uses process reaction curve to fit FOPDT model parameters K, τ, θ. Tuning formulas derived empirically to achieve quarter-decay ratio response with improved disturbance rejection.",
+    limitations_assumptions=[
+        "Best for processes with θ/τ < 1 (moderate dead time)",
+        "Requires clean step test for model identification",
+        "May give aggressive tuning for large dead time processes",
+        "Assumes FOPDT adequately represents process dynamics"
+    ]
 )
 
 
@@ -317,7 +362,18 @@ IMC provides guaranteed stability if model is accurate.
     difficulty=Difficulty.INTERMEDIATE,
     estimated_time_minutes=12,
     prerequisites=[],
-    related_equations=["lambda_tuning", "ziegler_nichols_pid"]
+    related_equations=["lambda_tuning", "ziegler_nichols_pid"],
+    references=[
+        "Morari, M. & Zafiriou, E. 'Robust Process Control', Prentice Hall, 1989",
+        "Skogestad, S. 'Simple analytic rules for model reduction and PID controller tuning', J. Process Control, 2003"
+    ],
+    derivation_summary="IMC derives controller settings by inverting the process model and adding a filter. For FOPDT, the resulting PI/PID settings are equivalent to Lambda tuning.",
+    limitations_assumptions=[
+        "Assumes process model is reasonably accurate",
+        "Performance degrades with model mismatch",
+        "Filter time constant λ must be chosen appropriately",
+        "Not suitable for unstable processes without modification"
+    ]
 )
 
 
@@ -368,7 +424,17 @@ T-L gives less overshoot and is preferred for chemical process control.
     difficulty=Difficulty.INTERMEDIATE,
     estimated_time_minutes=10,
     prerequisites=[],
-    related_equations=["ziegler_nichols_pid"]
+    related_equations=["ziegler_nichols_pid"],
+    references=[
+        "Tyreus, B.D. & Luyben, W.L. 'Tuning PI Controllers for Integrator/Dead Time Processes', Ind. Eng. Chem. Res., 1992",
+        "Luyben, W.L. 'Essentials of Process Control', McGraw-Hill, 1997"
+    ],
+    derivation_summary="Uses same ultimate gain/period as Z-N but with more conservative ratios. Developed specifically for chemical process control where less overshoot is preferred.",
+    limitations_assumptions=[
+        "Slower response than Z-N - not suitable where speed is critical",
+        "Still requires ability to find Ku and Pu",
+        "Better for disturbance rejection than setpoint tracking"
+    ]
 )
 
 
@@ -420,7 +486,19 @@ Flow cannot increase even with more ΔP.
     difficulty=Difficulty.INTERMEDIATE,
     estimated_time_minutes=15,
     prerequisites=["cv_liquid"],
-    related_equations=["cv_liquid"]
+    related_equations=["cv_liquid"],
+    references=[
+        "ISA-75.01.01 - Flow Equations for Sizing Control Valves",
+        "Fisher Controls Handbook, 'Sizing Control Valves for Gas and Vapor Flow'",
+        "IEC 60534 - Industrial Process Control Valves"
+    ],
+    derivation_summary="Derived from compressible flow equations with the Cv coefficient. The (1-x/3) term approximates the expansion factor Y for subcritical flow.",
+    limitations_assumptions=[
+        "Flow is choked when x = ΔP/P1 > 0.5",
+        "Use absolute pressure and temperature (psia, °R)",
+        "Specific gravity is relative to air (MW/29)",
+        "Simplified equation - full IEC 60534 more accurate for critical sizing"
+    ]
 )
 
 
@@ -472,7 +550,18 @@ Where:
     difficulty=Difficulty.INTERMEDIATE,
     estimated_time_minutes=10,
     prerequisites=["ziegler_nichols_pid"],
-    related_equations=["ziegler_nichols_pid", "tyreus_luyben_pid"]
+    related_equations=["ziegler_nichols_pid", "tyreus_luyben_pid"],
+    references=[
+        "Åström, K.J. & Murray, R.M. 'Feedback Systems: An Introduction for Scientists and Engineers', Princeton, 2008",
+        "Seborg, Edgar, Mellichamp & Doyle 'Process Dynamics and Control', Wiley, 2016"
+    ],
+    derivation_summary="Gain margin is the factor by which loop gain can increase before reaching the stability boundary (where Nyquist plot crosses -1). Derived from Nyquist stability criterion.",
+    limitations_assumptions=[
+        "Assumes linear system (gain margin may vary with operating point)",
+        "Should check both gain AND phase margin for robustness",
+        "Process gain changes with operating conditions may reduce effective GM",
+        "GM > 2 (6 dB) is a guideline, not absolute rule"
+    ]
 )
 
 class ZieglerNicholsPID(BaseEquation):

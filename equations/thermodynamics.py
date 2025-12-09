@@ -199,6 +199,17 @@ real gases behave most ideally.
     estimated_time_minutes=15,
     prerequisites=[],
     related_equations=["van_der_waals", "compressor_work"],
+    references=[
+        "Smith, Van Ness & Abbott, 'Introduction to Chemical Engineering Thermodynamics', McGraw-Hill",
+        "Perry's Chemical Engineers' Handbook, 9th Ed., Section 2"
+    ],
+    derivation_summary="Derived from kinetic theory of gases assuming point masses with elastic collisions and no intermolecular forces. Combines Boyle's Law (P∝1/V), Charles's Law (V∝T), and Avogadro's Law (V∝n).",
+    limitations_assumptions=[
+        "Valid only at low pressures and high temperatures",
+        "Molecules assumed to have zero volume",
+        "No intermolecular forces considered",
+        "Use Van der Waals, Peng-Robinson, or SRK for high pressures"
+    ],
     diagram_type="gas_tank",
     diagram_labels={
         "tank": "Gas Storage Vessel",
@@ -390,6 +401,18 @@ The Antoine equation is more accurate than Clausius-Clapeyron for moderate tempe
     estimated_time_minutes=12,
     prerequisites=[],
     related_equations=["raoults_law", "clausius_clapeyron", "flash"],
+    references=[
+        "Antoine, C. 'Tensions des vapeurs', C.R. Acad. Sci. Paris, 1888",
+        "NIST Chemistry WebBook (nist.gov/chemistry/webbook)",
+        "Yaws, C.L. 'Handbook of Vapor Pressure', Gulf Publishing"
+    ],
+    derivation_summary="Empirical three-parameter correlation fitted to experimental vapor pressure data. The 'C' parameter improves accuracy over Clausius-Clapeyron by accounting for temperature variation in ΔHvap.",
+    limitations_assumptions=[
+        "Valid only within temperature range specified for constants",
+        "Constants from different sources may have different units",
+        "Less accurate near critical point - use Wagner equation",
+        "Pure component only - mixtures need Raoult's or activity coefficients"
+    ],
     diagram_type="phase_diagram",
     diagram_labels={
         "curve": "Vapor Pressure Curve",
@@ -506,7 +529,18 @@ Raoult's Law works for **ideal mixtures** - similar molecules like alkane mixtur
     difficulty=Difficulty.BEGINNER,
     estimated_time_minutes=10,
     prerequisites=["antoine"],
-    related_equations=["antoine", "flash", "activity_coefficient"]
+    related_equations=["antoine", "flash", "activity_coefficient"],
+    references=[
+        "Raoult, F.M. 'Loi générale des tensions de vapeur des dissolvants', C.R. Acad. Sci. Paris, 1887",
+        "Smith, Van Ness & Abbott, 'Introduction to Chemical Engineering Thermodynamics'"
+    ],
+    derivation_summary="Based on the thermodynamic requirement that chemical potential must be equal in equilibrium phases. For ideal mixtures, partial molar properties equal pure component properties scaled by mole fraction.",
+    limitations_assumptions=[
+        "Valid only for ideal solutions (similar molecules)",
+        "Applies to each component independently",
+        "Non-ideal systems require activity coefficients (γ)",
+        "Assumes vapor phase behaves ideally"
+    ]
 )
 
 
@@ -596,7 +630,18 @@ This is the theoretical basis for the Antoine equation (which adds the C paramet
     difficulty=Difficulty.INTERMEDIATE,
     estimated_time_minutes=15,
     prerequisites=["ideal_gas"],
-    related_equations=["antoine", "heat_capacity_mixture"]
+    related_equations=["antoine", "heat_capacity_mixture"],
+    references=[
+        "Clausius, R. 'Über die bewegende Kraft der Wärme', Annalen der Physik, 1850",
+        "Clapeyron, B.P.E. 'Mémoire sur la puissance motrice de la chaleur', J. École Polytech., 1834"
+    ],
+    derivation_summary="Derived from the fundamental thermodynamic relation dP/dT = ΔS/ΔV for phase equilibrium. With ideal gas assumption for vapor, this integrates to the logarithmic form.",
+    limitations_assumptions=[
+        "Assumes constant heat of vaporization (valid for small ΔT)",
+        "Vapor assumed to behave as ideal gas",
+        "Liquid volume neglected compared to vapor volume",
+        "Antoine equation is generally more accurate over wider T ranges"
+    ]
 )
 
 
@@ -656,7 +701,18 @@ Flash drums are used everywhere: crude oil processing, refrigeration, chemical p
     difficulty=Difficulty.INTERMEDIATE,
     estimated_time_minutes=20,
     prerequisites=["raoults_law", "antoine"],
-    related_equations=["raoults_law", "antoine"]
+    related_equations=["raoults_law", "antoine"],
+    references=[
+        "Rachford, H.H. & Rice, J.D. 'Procedure for Use of Electronic Digital Computers...', J. Pet. Tech., 1952",
+        "Henley, E.J. & Seader, J.D. 'Separation Process Principles', Wiley"
+    ],
+    derivation_summary="Combines material balance (z = Vx/F + (1-V/F)y) with VLE (y = Kx) to derive the Rachford-Rice equation. Solving for V/F gives the vapor fraction, from which compositions are calculated.",
+    limitations_assumptions=[
+        "Assumes thermodynamic equilibrium between phases",
+        "K-values must be evaluated at flash T and P",
+        "Flash may not be possible if T/P outside two-phase envelope",
+        "Iterative solution needed if K-values depend on composition"
+    ]
 )
 
 
@@ -717,7 +773,18 @@ Single-stage compression ratio typically limited to 3-4:1 to control discharge t
     difficulty=Difficulty.INTERMEDIATE,
     estimated_time_minutes=15,
     prerequisites=["ideal_gas"],
-    related_equations=["ideal_gas"]
+    related_equations=["ideal_gas"],
+    references=[
+        "Smith, Van Ness & Abbott, 'Introduction to Chemical Engineering Thermodynamics'",
+        "GPSA Engineering Data Book, Gas Processors Suppliers Association"
+    ],
+    derivation_summary="Derived from the First Law applied to an adiabatic, reversible (isentropic) process. For ideal gas with constant k, integration yields the polytropic work expression.",
+    limitations_assumptions=[
+        "Assumes isentropic (adiabatic, reversible) compression",
+        "Real compressors have efficiency < 100%",
+        "k varies with temperature - use average value",
+        "Multi-stage needed for compression ratios > 3-4"
+    ]
 )
 
 
@@ -776,7 +843,18 @@ Van der Waals laid the foundation for modern cubic equations of state (Peng-Robi
     difficulty=Difficulty.INTERMEDIATE,
     estimated_time_minutes=15,
     prerequisites=["ideal_gas"],
-    related_equations=["ideal_gas", "compressor_work"]
+    related_equations=["ideal_gas", "compressor_work"],
+    references=[
+        "Van der Waals, J.D. 'On the Continuity of the Gaseous and Liquid States', PhD Thesis, Leiden, 1873",
+        "Sandler, S.I. 'Chemical, Biochemical, and Engineering Thermodynamics', Wiley"
+    ],
+    derivation_summary="Van der Waals modified the ideal gas equation by adding a pressure correction (a/V²) for intermolecular attraction and a volume correction (b) for molecular size.",
+    limitations_assumptions=[
+        "Qualitatively correct but quantitatively inaccurate for design",
+        "Peng-Robinson or SRK equations are preferred for process design",
+        "Parameters a and b are calculated from critical properties",
+        "Cannot accurately predict liquid densities"
+    ]
 )
 
 
@@ -826,7 +904,18 @@ Where A₁₂ and A₂₁ are empirical parameters from experimental data.
     difficulty=Difficulty.INTERMEDIATE,
     estimated_time_minutes=12,
     prerequisites=["raoults_law"],
-    related_equations=["raoults_law", "flash"]
+    related_equations=["raoults_law", "flash"],
+    references=[
+        "Margules, M. 'On the Composition of Saturated Vapors of Mixtures', Sitzungsber. Akad. Wiss. Wien, 1895",
+        "Prausnitz, Lichtenthaler & Azevedo, 'Molecular Thermodynamics of Fluid-Phase Equilibria', Pearson"
+    ],
+    derivation_summary="Activity coefficients arise from excess Gibbs energy models. The Margules equation is a polynomial expansion of G^E/RT in terms of mole fractions.",
+    limitations_assumptions=[
+        "Margules is limited to binary systems",
+        "Constants must be fitted to experimental VLE data",
+        "For multicomponent systems, use NRTL, UNIQUAC, or UNIFAC",
+        "Temperature dependence often neglected but can be significant"
+    ]
 )
 
 
@@ -878,7 +967,18 @@ through a valve (isenthalpic process). This is the basis for refrigeration.
     difficulty=Difficulty.INTERMEDIATE,
     estimated_time_minutes=12,
     prerequisites=["ideal_gas"],
-    related_equations=["ideal_gas", "van_der_waals"]
+    related_equations=["ideal_gas", "van_der_waals"],
+    references=[
+        "Joule, J.P. & Thomson, W. (Lord Kelvin), 'On the Thermal Effects of Fluids in Motion', Phil. Trans., 1854",
+        "Smith, Van Ness & Abbott, 'Introduction to Chemical Engineering Thermodynamics'"
+    ],
+    derivation_summary="The J-T coefficient μ = (∂T/∂P)ₕ is derived from the equation of state. For a van der Waals gas, μ = (2a/RT - b)/Cp.",
+    limitations_assumptions=[
+        "Process is isenthalpic (H = constant)",
+        "Ideal gases have μ = 0 (no temperature change)",
+        "H₂ and He heat up at room temperature (above inversion T)",
+        "Effect depends on initial T and P"
+    ]
 )
 
 
@@ -929,7 +1029,18 @@ Where:
     difficulty=Difficulty.BEGINNER,
     estimated_time_minutes=10,
     prerequisites=[],
-    related_equations=["heat_duty"]
+    related_equations=["heat_duty"],
+    references=[
+        "Perry's Chemical Engineers' Handbook, 9th Ed., Section 2",
+        "Yaws, C.L. 'Chemical Properties Handbook', McGraw-Hill"
+    ],
+    derivation_summary="For ideal mixtures, the heat capacity is a linear combination of pure component values weighted by composition. This follows from the additive property of enthalpy for ideal mixtures.",
+    limitations_assumptions=[
+        "Assumes ideal mixing (no excess heat capacity)",
+        "Individual Cp values may vary significantly with temperature",
+        "For accuracy, use polynomial correlations for Cp(T)",
+        "Non-ideal mixtures may have significant excess Cp"
+    ]
 )
 
 

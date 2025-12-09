@@ -118,6 +118,18 @@ Where F is the correction factor for multi-pass arrangements (F=1 for true count
     estimated_time_minutes=12,
     prerequisites=[],
     related_equations=["hx_area", "heat_duty", "ntu_eff"],
+    references=[
+        "Perry's Chemical Engineers' Handbook, 9th Ed., Section 11",
+        "Kern, D.Q. 'Process Heat Transfer', McGraw-Hill",
+        "TEMA (Tubular Exchanger Manufacturers Association) Standards"
+    ],
+    derivation_summary="LMTD comes from integrating the heat transfer rate along the exchanger length, assuming constant U. The log mean properly averages the varying temperature difference.",
+    limitations_assumptions=[
+        "Assumes constant overall heat transfer coefficient U",
+        "Valid for single-pass or true counterflow/cocurrent",
+        "Multi-pass requires correction factor F",
+        "Temperature cross situations may require special analysis"
+    ],
     diagram_type="heat_exchanger",
     diagram_labels={
         "shell": "Shell Side (Hot)",
@@ -184,7 +196,19 @@ This is the fundamental energy balance that links both sides of the exchanger.
     difficulty=Difficulty.BEGINNER,
     estimated_time_minutes=10,
     prerequisites=[],
-    related_equations=["lmtd", "hx_area"]
+    related_equations=["lmtd", "hx_area"],
+    references=[
+        "Perry's Chemical Engineers' Handbook, 9th Ed., Section 11",
+        "McCabe, Smith & Harriott, Unit Operations of Chemical Engineering",
+        "Incropera & DeWitt, Fundamentals of Heat and Mass Transfer"
+    ],
+    derivation_summary="Derived from the First Law of Thermodynamics applied to a flowing fluid. The rate of enthalpy change equals the heat transfer rate: Q = ṁΔH = ṁCpΔT for sensible heat.",
+    limitations_assumptions=[
+        "Assumes constant Cp over temperature range",
+        "Does not include phase change - add latent heat separately",
+        "Assumes no heat loss to surroundings",
+        "For non-ideal mixing, use enthalpy values directly"
+    ]
 )
 
 
@@ -243,7 +267,19 @@ Where Cr = C_min / C_max (heat capacity ratio)
     difficulty=Difficulty.INTERMEDIATE,
     estimated_time_minutes=15,
     prerequisites=["lmtd", "heat_duty"],
-    related_equations=["lmtd", "hx_area", "overall_u"]
+    related_equations=["lmtd", "hx_area", "overall_u"],
+    references=[
+        "Kays, W.M. & London, A.L. 'Compact Heat Exchangers', McGraw-Hill",
+        "Incropera & DeWitt, Fundamentals of Heat and Mass Transfer",
+        "Shah, R.K. & Sekulic, D.P. 'Fundamentals of Heat Exchanger Design'"
+    ],
+    derivation_summary="NTU is defined as UA/C_min. Effectiveness equations are derived by integrating the heat transfer equations along the exchanger. Different configurations yield different ε-NTU relationships.",
+    limitations_assumptions=[
+        "Assumes constant U along the exchanger",
+        "Different formulas apply to each exchanger configuration",
+        "Phase change (Cr→0) uses simplified exponential formula",
+        "For rating problems (known UA), this method is preferred over LMTD"
+    ]
 )
 
 
@@ -503,7 +539,19 @@ Where:
     difficulty=Difficulty.INTERMEDIATE,
     estimated_time_minutes=12,
     prerequisites=["reynolds_number"],
-    related_equations=["overall_u", "ntu_eff"]
+    related_equations=["overall_u", "ntu_eff"],
+    references=[
+        "Dittus, F.W. & Boelter, L.M.K., University of California Publications in Engineering, 1930",
+        "Incropera & DeWitt, Fundamentals of Heat and Mass Transfer",
+        "Perry's Chemical Engineers' Handbook, 9th Ed., Section 5"
+    ],
+    derivation_summary="Empirical correlation from 1930 based on experimental data for turbulent flow in smooth tubes. The 0.8 exponent on Re reflects the enhancing effect of turbulent mixing on heat transfer.",
+    limitations_assumptions=[
+        "Valid only for turbulent flow (Re > 10,000)",
+        "Limited Prandtl number range: 0.6 < Pr < 160",
+        "Requires fully developed flow (L/D > 10)",
+        "Smooth tubes only - modified correlations exist for rough surfaces"
+    ]
 )
 
 

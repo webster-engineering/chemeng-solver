@@ -116,6 +116,11 @@ class LearningContent:
     common_mistakes: List[str] = field(default_factory=list)
     pro_tips: List[str] = field(default_factory=list)
     
+    # New enhanced fields for Introduction section
+    references: List[str] = field(default_factory=list)  # Academic/industry sources
+    derivation_summary: str = ""  # Brief explanation of equation origin
+    limitations_assumptions: List[str] = field(default_factory=list)  # When it applies/doesn't
+    
     # Variable information
     variable_sources: Dict[str, str] = field(default_factory=dict)  # param -> where to find
     
@@ -144,6 +149,9 @@ class LearningContent:
             "industry_examples": self.industry_examples,
             "common_mistakes": self.common_mistakes,
             "pro_tips": self.pro_tips,
+            "references": self.references,
+            "derivation_summary": self.derivation_summary,
+            "limitations_assumptions": self.limitations_assumptions,
             "variable_sources": self.variable_sources,
             "quiz_questions": [
                 {
