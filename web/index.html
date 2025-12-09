@@ -320,10 +320,10 @@
         }
 
         .equation-item.active {
-            background: var(--gradient-1);
-            color: white;
-            border-left-color: transparent;
-            box-shadow: 0 4px 15px var(--accent-glow);
+            background: transparent;
+            border-left: 3px solid var(--accent-light);
+            border: 2px solid var(--accent-light);
+            box-shadow: 0 0 8px var(--accent-glow);
         }
 
         /* Main Content */
@@ -7849,7 +7849,7 @@
                     <!-- Step 1: Introduction -->
                     <div class="learning-step-content ${currentLearningStep === 0 ? 'active' : ''}" data-step="0">
                         <div class="step-header">
-                            <span class="step-icon">📖</span>
+                            <span class="step-icon">1</span>
                             Background Theory
                         </div>
                         <div class="theory-content">
@@ -7866,21 +7866,21 @@
                             <h4 style="margin-top: 20px; color: var(--text-primary);">Real-World Applications</h4>
                             <div class="applications-grid">
                                 ${lc.real_world_applications.map(app => `
-                                    <div class="application-card">📍 ${app}</div>
+                                    <div class="application-card">${app}</div>
                                 `).join('')}
                             </div>
                         ` : ''}
                         
                         ${lc.derivation_summary ? `
                             <div class="derivation-box" style="margin-top: 20px; padding: 15px; background: rgba(91, 110, 174, 0.1); border-left: 3px solid var(--accent); border-radius: 8px;">
-                                <h4 style="margin: 0 0 10px; color: var(--accent);">🔬 Derivation Summary</h4>
+                                <h4 style="margin: 0 0 10px; color: var(--accent);">Derivation Summary</h4>
                                 <p style="margin: 0; color: var(--text-secondary); line-height: 1.6;">${lc.derivation_summary}</p>
                             </div>
                         ` : ''}
                         
                         ${lc.limitations_assumptions && lc.limitations_assumptions.length > 0 ? `
                             <div class="limitations-box" style="margin-top: 20px; padding: 15px; background: rgba(255, 193, 7, 0.1); border-left: 3px solid #ffc107; border-radius: 8px;">
-                                <h4 style="margin: 0 0 10px; color: #ffc107;">⚠️ Limitations & Assumptions</h4>
+                                <h4 style="margin: 0 0 10px; color: #ffc107;">Limitations & Assumptions</h4>
                                 <ul style="margin: 0; padding-left: 20px; color: var(--text-secondary);">
                                     ${lc.limitations_assumptions.map(l => `<li style="margin-bottom: 5px;">${l}</li>`).join('')}
                                 </ul>
@@ -7889,7 +7889,7 @@
                         
                         ${lc.references && lc.references.length > 0 ? `
                             <div class="references-box" style="margin-top: 20px; padding: 15px; background: rgba(0, 0, 0, 0.2); border-radius: 8px;">
-                                <h4 style="margin: 0 0 10px; color: var(--text-primary);">📚 References</h4>
+                                <h4 style="margin: 0 0 10px; color: var(--text-primary);">References</h4>
                                 <ul style="margin: 0; padding-left: 20px; color: var(--text-secondary); font-size: 0.9em;">
                                     ${lc.references.map(r => `<li style="margin-bottom: 5px; font-style: italic;">${r}</li>`).join('')}
                                 </ul>
@@ -7900,7 +7900,7 @@
                     <!-- Step 2: Variables -->
                     <div class="learning-step-content ${currentLearningStep === 1 ? 'active' : ''}" data-step="1">
                         <div class="step-header">
-                            <span class="step-icon">📐</span>
+                            <span class="step-icon">2</span>
                             Understanding the Variables
                         </div>
                         
@@ -7917,7 +7917,7 @@
                         
                         ${lc.common_mistakes && lc.common_mistakes.length > 0 ? `
                             <div class="mistakes-box">
-                                <h4>⚠️ Common Mistakes to Avoid</h4>
+                                <h4>Common Mistakes to Avoid</h4>
                                 <ul>
                                     ${lc.common_mistakes.map(m => `<li>${m}</li>`).join('')}
                                 </ul>
@@ -7926,7 +7926,7 @@
                         
                         ${lc.pro_tips && lc.pro_tips.length > 0 ? `
                             <div class="tips-box">
-                                <h4>💡 Pro Tips</h4>
+                                <h4>Pro Tips</h4>
                                 <ul>
                                     ${lc.pro_tips.map(t => `<li>${t}</li>`).join('')}
                                 </ul>
@@ -7937,7 +7937,7 @@
                     <!-- Step 3: Input (uses existing input form) -->
                     <div class="learning-step-content ${currentLearningStep === 2 ? 'active' : ''}" data-step="2">
                         <div class="step-header">
-                            <span class="step-icon">✏️</span>
+                            <span class="step-icon">3</span>
                             Enter Your Values
                         </div>
                         <p style="color: var(--text-secondary); margin-bottom: 20px;">
@@ -7949,7 +7949,7 @@
                     <!-- Step 4: Quiz -->
                     <div class="learning-step-content ${currentLearningStep === 3 ? 'active' : ''}" data-step="3">
                         <div class="step-header">
-                            <span class="step-icon">❓</span>
+                            <span class="step-icon">4</span>
                             Knowledge Check
                         </div>
                         <div id="quizContainer"></div>
@@ -7958,7 +7958,7 @@
                     <!-- Step 5: Solution -->
                     <div class="learning-step-content ${currentLearningStep === 4 ? 'active' : ''}" data-step="4">
                         <div class="step-header">
-                            <span class="step-icon">🎉</span>
+                            <span class="step-icon">5</span>
                             Your Results
                         </div>
                         <div id="learningResultsContainer"></div>
