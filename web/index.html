@@ -5168,7 +5168,7 @@
                 const progressPct = withLearningInCat > 0 ? (completedInCat / withLearningInCat) * 100 : 0;
 
                 return `
-                <div class="category ${index === 0 ? 'expanded' : ''}" data-category="${catId}">
+                <div class="category " data-category="${catId}">
                     <div class="category-header" onclick="toggleCategory(this)">
                         ${cat.name}
                         <span class="category-count">${cat.equation_count}</span>
