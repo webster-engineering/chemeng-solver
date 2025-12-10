@@ -3879,6 +3879,100 @@
             color: #ef4444;
         }
 
+        /* Practice Category Filter */
+        .practice-filter-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .practice-filter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .practice-filter-title {
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .practice-filter-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .practice-filter-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.15s ease;
+        }
+
+        .practice-filter-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent-light);
+        }
+
+        .practice-filter-categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .practice-category-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 10px 16px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            user-select: none;
+        }
+
+        .practice-category-checkbox:hover {
+            border-color: var(--accent);
+        }
+
+        .practice-category-checkbox.active {
+            background: rgba(91, 110, 174, 0.15);
+            border-color: var(--accent);
+        }
+
+        .practice-category-checkbox input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+
+        .practice-category-checkbox .category-label {
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .practice-category-checkbox .category-icon {
+            font-size: 1rem;
+        }
+
+        .practice-no-categories {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
         /* About Footer */
         .about-footer {
             background: var(--bg-secondary);
@@ -4788,12 +4882,45 @@
                 <div class="practice-panel">
                     <h2
                         style="color: var(--accent-light); margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
-                        <span>🎯</span> Unit Conversion Practice
+                        Unit Conversion Practice
                     </h2>
                     <p style="color: var(--text-secondary); margin-bottom: 30px;">
                         Test your unit conversion skills! Practice common engineering unit conversions with instant
                         feedback.
                     </p>
+
+                    <!-- Category Filter Panel -->
+                    <div class="practice-filter-panel">
+                        <div class="practice-filter-header">
+                            <span class="practice-filter-title">Practice Categories</span>
+                            <div class="practice-filter-actions">
+                                <button class="practice-filter-btn" onclick="selectAllPracticeCategories()">Select
+                                    All</button>
+                                <button class="practice-filter-btn" onclick="clearAllPracticeCategories()">Clear
+                                    All</button>
+                            </div>
+                        </div>
+                        <div class="practice-filter-categories" id="practiceCategoryFilters">
+                            <label class="practice-category-checkbox active">
+                                <input type="checkbox" value="pressure" checked onchange="updatePracticeCategory(this)">
+                                <span class="category-label">Pressure</span>
+                            </label>
+                            <label class="practice-category-checkbox active">
+                                <input type="checkbox" value="temperature" checked
+                                    onchange="updatePracticeCategory(this)">
+                                <span class="category-label">Temperature</span>
+                            </label>
+                            <label class="practice-category-checkbox active">
+                                <input type="checkbox" value="flow" checked onchange="updatePracticeCategory(this)">
+                                <span class="category-label">Flow</span>
+                            </label>
+                            <label class="practice-category-checkbox active">
+                                <input type="checkbox" value="length" checked onchange="updatePracticeCategory(this)">
+                                <span class="category-label">Length</span>
+                            </label>
+                        </div>
+                    </div>
+
                     <div id="practiceContent">
                         <div class="empty-state">
                             <p>Loading practice problems...</p>
@@ -5033,7 +5160,7 @@
     <!-- About Footer -->
     <footer class="about-footer">
         <h3>About Webster Engineering Solver</h3>
-        <span class="version">Version 0.7</span>
+        <span class="version">Version 0.8</span>
         <p class="description">
             A comprehensive chemical engineering equation solver I wish I had in college.
         </p>
@@ -8815,10 +8942,96 @@
 
         let practiceStats = { correct: 0, total: 0, streak: 0 };
         let currentPracticeProblem = null;
+        let selectedPracticeCategories = ['pressure', 'temperature', 'flow', 'length'];
+
+        // Load saved category preferences from localStorage
+        function loadPracticeCategoryPreferences() {
+            const saved = localStorage.getItem('practiceCategoryPreferences');
+            if (saved) {
+                try {
+                    selectedPracticeCategories = JSON.parse(saved);
+                    // Update checkboxes to match saved state
+                    document.querySelectorAll('#practiceCategoryFilters input[type="checkbox"]').forEach(cb => {
+                        const isSelected = selectedPracticeCategories.includes(cb.value);
+                        cb.checked = isSelected;
+                        cb.closest('.practice-category-checkbox').classList.toggle('active', isSelected);
+                    });
+                } catch (e) {
+                    console.error('Error loading practice category preferences:', e);
+                }
+            }
+        }
+
+        // Save category preferences to localStorage
+        function savePracticeCategoryPreferences() {
+            localStorage.setItem('practiceCategoryPreferences', JSON.stringify(selectedPracticeCategories));
+        }
+
+        // Update category when checkbox changes
+        function updatePracticeCategory(checkbox) {
+            const category = checkbox.value;
+            const label = checkbox.closest('.practice-category-checkbox');
+
+            if (checkbox.checked) {
+                if (!selectedPracticeCategories.includes(category)) {
+                    selectedPracticeCategories.push(category);
+                }
+                label.classList.add('active');
+            } else {
+                selectedPracticeCategories = selectedPracticeCategories.filter(c => c !== category);
+                label.classList.remove('active');
+            }
+
+            savePracticeCategoryPreferences();
+
+            // Generate new problem if current problem is from a now-disabled category
+            if (currentPracticeProblem && !selectedPracticeCategories.includes(currentPracticeProblem.category)) {
+                generatePracticeProblem();
+            }
+        }
+
+        // Select all categories
+        function selectAllPracticeCategories() {
+            selectedPracticeCategories = Object.keys(PRACTICE_UNITS);
+            document.querySelectorAll('#practiceCategoryFilters input[type="checkbox"]').forEach(cb => {
+                cb.checked = true;
+                cb.closest('.practice-category-checkbox').classList.add('active');
+            });
+            savePracticeCategoryPreferences();
+            generatePracticeProblem();
+        }
+
+        // Clear all categories
+        function clearAllPracticeCategories() {
+            selectedPracticeCategories = [];
+            document.querySelectorAll('#practiceCategoryFilters input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+                cb.closest('.practice-category-checkbox').classList.remove('active');
+            });
+            savePracticeCategoryPreferences();
+            renderNoCategoriesMessage();
+        }
+
+        // Show message when no categories selected
+        function renderNoCategoriesMessage() {
+            const container = document.getElementById('practiceContent');
+            if (!container) return;
+            container.innerHTML = `
+                <div class="practice-no-categories">
+                    <p>Please select at least one category to practice.</p>
+                </div>
+            `;
+        }
 
         function generatePracticeProblem() {
-            const categories = Object.keys(PRACTICE_UNITS);
-            const category = categories[Math.floor(Math.random() * categories.length)];
+            // Check if any categories are selected
+            if (selectedPracticeCategories.length === 0) {
+                renderNoCategoriesMessage();
+                return;
+            }
+
+            // Filter to only selected categories
+            const category = selectedPracticeCategories[Math.floor(Math.random() * selectedPracticeCategories.length)];
             const units = PRACTICE_UNITS[category];
 
             const fromIdx = Math.floor(Math.random() * units.length);
@@ -8905,7 +9118,7 @@
                             <div class="practice-stat-label">Attempted</div>
                         </div>
                         <div class="practice-stat">
-                            <div class="practice-stat-value">${practiceStats.streak}🔥</div>
+                            <div class="practice-stat-value">${practiceStats.streak}</div>
                             <div class="practice-stat-label">Streak</div>
                         </div>
                         <div class="practice-stat">
@@ -8959,8 +9172,13 @@
         // Initialize practice mode when tab is clicked
         function initPracticeMode() {
             const container = document.getElementById('practiceContent');
-            if (container && !currentPracticeProblem) {
-                generatePracticeProblem();
+            if (container) {
+                // Load saved preferences first
+                loadPracticeCategoryPreferences();
+
+                if (!currentPracticeProblem) {
+                    generatePracticeProblem();
+                }
             }
         }
 
