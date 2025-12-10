@@ -4900,7 +4900,7 @@
     <!-- About Footer -->
     <footer class="about-footer">
         <h3>About Webster Engineering Solver</h3>
-        <span class="version">Version 0.6</span>
+        <span class="version">Version 0.7</span>
         <p class="description">
             A comprehensive chemical engineering equation solver I wish I had in college.
         </p>
@@ -4991,21 +4991,7 @@
             return `https://en.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(equationName + ' chemical engineering')}`;
         }
 
-        // ===== Chemical Engineering Tips =====
-        const chemEngTips = [
-            { icon: "🧪", text: "The Haber process for ammonia synthesis operates at 400-500°C and 150-300 atm, producing 150 million tons annually worldwide." },
-            { icon: "⚗️", text: "A typical oil refinery can process up to 600,000 barrels of crude oil per day into gasoline, diesel, and jet fuel." },
-            { icon: "🔬", text: "The Reynolds number (Re > 4000) determines turbulent flow - discovered by Osborne Reynolds in 1883." },
-            { icon: "💧", text: "Water has an unusually high heat capacity (4.18 kJ/kg·K), making it excellent for industrial cooling." },
-            { icon: "🏭", text: "The first commercial petrochemical plant opened in 1920 in the US, producing isopropyl alcohol." },
-            { icon: "⚡", text: "Electrolysis of water requires 237 kJ/mol, but fuel cells can recover up to 83% of this energy." },
-            { icon: "🌡️", text: "Absolute zero (-273.15°C) is theoretically unreachable - the closest achieved is 100 picoKelvin." },
-            { icon: "🔄", text: "Distillation accounts for ~40% of all energy used in chemical processing. Heat integration can cut this in half." },
-            { icon: "📊", text: "The Navier-Stokes equations governing fluid flow remain one of the Millennium Prize Problems in mathematics." },
-            { icon: "🎯", text: "Six Sigma quality (3.4 defects per million) was pioneered by Motorola and adopted industry-wide." },
-            { icon: "💨", text: "Supersonic wind tunnels can simulate speeds up to Mach 10 (12,350 km/h) for aerospace testing." },
-            { icon: "🧬", text: "Bioreactors can produce 200+ grams of monoclonal antibodies per liter - up from milligrams in the 1980s." },
-        ];
+        // Tips carousel uses HTML elements directly (see .tips-carousel in HTML)
         let currentTipIndex = 0;
 
         // ===== Theme Toggle =====
@@ -5043,7 +5029,8 @@
             if (data.date !== today) {
                 data = { date: today, count: 0 };
             }
-            document.getElementById('calcCount').textContent = data.count;
+            const calcCountEl = document.getElementById('calcCount');
+            if (calcCountEl) calcCountEl.textContent = data.count;
         }
 
         // ===== Mobile Menu Toggle =====
@@ -5727,8 +5714,7 @@
             });
         }
 
-        // Update displayResults to show chart button
-        const originalDisplayResults = displayResults;
+        // Enhanced displayResults function with chart support
         displayResults = function (result) {
             const container = document.getElementById('resultsContent');
 
@@ -5843,10 +5829,14 @@
             showLinkSuggestions(result.outputs);
         };
 
-        // ===== Particle System (Brownian Motion) =====
+        // ===== Particle System (Brownian Motion) - Optimized =====
         const particleCanvas = document.getElementById('particleCanvas');
         const ctx = particleCanvas ? particleCanvas.getContext('2d') : null;
         let particles = [];
+        let particleAnimationId = null;
+        let isPageVisible = true;
+        let frameCount = 0;
+        let resizeTimeout = null;
 
         function initParticles() {
             if (!particleCanvas || !ctx) return;
@@ -5855,7 +5845,8 @@
             particleCanvas.height = window.innerHeight;
 
             particles = [];
-            const numParticles = 25;
+            // Reduced from 25 to 15 for better performance
+            const numParticles = 15;
 
             for (let i = 0; i < numParticles; i++) {
                 particles.push({
@@ -5870,7 +5861,14 @@
         }
 
         function drawParticles() {
-            if (!ctx || !particleCanvas) return;
+            if (!ctx || !particleCanvas || !isPageVisible) return;
+
+            // Frame skip: render every 2nd frame (~30fps instead of 60fps)
+            frameCount++;
+            if (frameCount % 2 !== 0) {
+                particleAnimationId = requestAnimationFrame(drawParticles);
+                return;
+            }
 
             ctx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
 
@@ -5920,7 +5918,30 @@
                 ctx.fill();
             }
 
-            requestAnimationFrame(drawParticles);
+            particleAnimationId = requestAnimationFrame(drawParticles);
+        }
+
+        // Page Visibility API - pause animations when tab is hidden
+        document.addEventListener('visibilitychange', function () {
+            isPageVisible = !document.hidden;
+            if (isPageVisible && particleCanvas && ctx) {
+                // Resume animation when tab becomes visible
+                if (!particleAnimationId) {
+                    particleAnimationId = requestAnimationFrame(drawParticles);
+                }
+            } else if (particleAnimationId) {
+                // Cancel animation when tab is hidden
+                cancelAnimationFrame(particleAnimationId);
+                particleAnimationId = null;
+            }
+        });
+
+        // Debounced resize handler for particles
+        function handleParticleResize() {
+            if (resizeTimeout) clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                initParticles();
+            }, 250);
         }
 
         // ===== Ripple Effect on Calculate Button =====
@@ -6094,13 +6115,8 @@
             container.appendChild(suggestionsDiv);
         }
 
-        // ===== Window Resize Handler =====
-        window.addEventListener('resize', () => {
-            if (particleCanvas) {
-                particleCanvas.width = window.innerWidth;
-                particleCanvas.height = window.innerHeight;
-            }
-        });
+        // ===== Window Resize Handler (Debounced) =====
+        window.addEventListener('resize', handleParticleResize);
 
         // Initialize
         loadCategories();
@@ -6465,10 +6481,17 @@
         }
 
         // ===== Chart Instances =====
-        let pidChartInstance = null;
-        let pumpChartInstance = null;
-        let txyChartInstance = null;
-        let moodyChartInstance = null;
+        // Using var to avoid temporal dead zone issues with let declarations
+        var pidChartInstance = null;
+        var pumpChartInstance = null;
+        var txyChartInstance = null;
+        var moodyChartInstance = null;
+        var phaseChartInstance = null;
+        var arrheniusChartInstance = null;
+        var ntuChartInstance = null;
+        var bodeMagChartInstance = null;
+        var bodePhaseChartInstance = null;
+        var heatChartInstance = null;
 
         // ===== PID Step Response =====
         // Simulates closed-loop step response for P, PI, or PID controller with FOPTD process
@@ -7050,13 +7073,7 @@
             });
         }
 
-        // ===== Additional Chart Instances =====
-        let phaseChartInstance = null;
-        let arrheniusChartInstance = null;
-        let ntuChartInstance = null;
-        let bodeMagChartInstance = null;
-        let bodePhaseChartInstance = null;
-        let heatChartInstance = null;
+        // (Chart instances are declared at the top of the script section)
 
         // ===== Phase Diagram =====
         const phaseData = {
