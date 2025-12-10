@@ -584,7 +584,7 @@ class ZieglerNicholsPID(BaseEquation):
                               "time", "min", ParameterType.INPUT, symbol="Pᵤ", 
                               typical_range=(0.1, 1000),
                               tooltip="Measure peak-to-peak time at sustained oscillation"),
-            EquationParameter("controller_type", "Controller type (1=P, 2=PI, 3=PID)", 
+            EquationParameter("type", "Controller type (1=P, 2=PI, 3=PID)", 
                               "dimensionless", "", ParameterType.INPUT, required=False,
                               tooltip="Enter 1 for P, 2 for PI, 3 for PID (default)"),
             EquationParameter("Kp", "Proportional gain - controller P term", 
