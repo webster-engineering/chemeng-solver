@@ -6713,31 +6713,44 @@
         }
 
         // ===== Graph Selection =====
-        function selectGraph(graphType) {
-            // Update buttons
+        function selectGraph(graphType, clickedElement) {
+            // Update buttons - use closest() to handle nested elements in buttons
             document.querySelectorAll('.graph-type-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            event.target.classList.add('active');
+
+            // Find the button element (handle both direct clicks and nested element clicks)
+            const buttonElement = clickedElement ?
+                (clickedElement.classList.contains('graph-type-btn') ? clickedElement : clickedElement.closest('.graph-type-btn')) :
+                (event && event.target ? event.target.closest('.graph-type-btn') : null);
+
+            if (buttonElement) {
+                buttonElement.classList.add('active');
+            }
 
             // Show selected graph container
             document.querySelectorAll('.graph-container').forEach(container => {
                 container.classList.remove('active');
             });
-            document.getElementById(graphType + 'Graph').classList.add('active');
-
-            // Plot the selected graph
-            switch (graphType) {
-                case 'pid': plotPIDResponse(); break;
-                case 'pump': plotPumpCurves(); break;
-                case 'txy': plotTxy(); break;
-                case 'moody': plotMoody(); break;
-                case 'phase': plotPhase(); break;
-                case 'arrhenius': plotArrhenius(); break;
-                case 'ntu': plotNTU(); break;
-                case 'bode': plotBode(); break;
-                case 'heat': plotHeatCurves(); break;
+            const graphContainer = document.getElementById(graphType + 'Graph');
+            if (graphContainer) {
+                graphContainer.classList.add('active');
             }
+
+            // Use setTimeout to ensure the container is visible before plotting
+            setTimeout(() => {
+                switch (graphType) {
+                    case 'pid': plotPIDResponse(); break;
+                    case 'pump': plotPumpCurves(); break;
+                    case 'txy': plotTxy(); break;
+                    case 'moody': plotMoody(); break;
+                    case 'phase': plotPhase(); break;
+                    case 'arrhenius': plotArrhenius(); break;
+                    case 'ntu': plotNTU(); break;
+                    case 'bode': plotBode(); break;
+                    case 'heat': plotHeatCurves(); break;
+                }
+            }, 50);
         }
 
         // ===== Chart Instances =====
